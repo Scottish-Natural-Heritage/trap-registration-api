@@ -1,0 +1,34 @@
+FROM node:lts-alpine
+
+# drop back to the non-privileged user for run-time
+WORKDIR /home/node
+USER node
+
+# copy in the package files so that we can install and build the project
+# dependencies
+COPY --chown=node:node package*.json ./
+
+# install all the node modules required
+RUN npm ci
+
+# copy the code from the project
+COPY --chown=node:node ./src ./src
+COPY --chown=node:node ./util ./util
+COPY --chown=node:node .sequelizerc ./
+
+# these variables are for overriding but keep them consistent between image and
+# run
+ENV PORT 3000
+ENV PATH_PREFIX /trap-registration-api
+
+# these variables are for overriding and they only matter during run
+ENV NOTIFY_API_KEY override_this_value
+ENV LICENSING_DB_HOST override_this_value
+ENV LICENSING_DB_PASS override_this_value
+ENV TRAPS_DB_PASS override_this_value
+
+# let docker know about our listening port
+EXPOSE $PORT
+
+# run the default start script, which kicks off a few pre-start things too
+CMD ["npm", "start"]
