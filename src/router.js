@@ -46,14 +46,15 @@ router.put('/registrations/:id', async (req, res) => {
     }
 
     // Update the registration in the database with our client's values.
-    const success = await Registration.update(existingId, req.body);
-    if (success) {
-      // If they're successful, tell them!
-      res.status(204).send();
-    } else {
-      // If not, send a 500 error.
+    const updatedReg = await Registration.update(existingId, req.body);
+
+    // If they're not successful, send a 500 error.
+    if (updatedReg === undefined) {
       res.status(500).send({message: `Could not update registration ${existingId}.`});
     }
+
+    // If they are, send back the finalised registration.
+    res.status(200).send(updatedReg);
   } catch (error) {
     // If anything goes wrong (such as a validation error), tell the client.
     res.status(500).send({error});

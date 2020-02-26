@@ -49,34 +49,30 @@ const tryCreate = async () => {
  * @returns {String} a formatted date string
  */
 const buildExpiryDateString = (issueDate) => {
-  const expiryDateTime = new Date(issueDate);
-  expiryDateTime.setFullYear(expiryDateTime.getFullYear() + 5);
+  // Every registration has a 5 year expiry, tied to the issue date of that
+  // year's General Licenses. General Licenses are always issued on January 1st,
+  // so registrations last for four whole years, plus the rest of the issued
+  // year.
+  const expiryYear = issueDate.getFullYear() + 4;
 
-  const d = String(expiryDateTime.getDate()).padStart(2, '0');
-  const m = String(expiryDateTime.getMonth() + 1).padStart(2, '0');
-  const y = String(expiryDateTime.getFullYear()).padStart(4, '0');
+  const d = 31;
+  const m = 12;
+  const y = String(expiryYear).padStart(4, '0');
 
   return `${d}/${m}/${y}`;
 };
 
 /**
- * Send emails to the applicant and the internal system to let everyone know it
- * was successful.
+ * Send emails to the applicant to let them know it was successful.
  *
- * @param {Number} id an existing registration's ID
- * @param {any} reg a JSON version of the model to replace the database's copy
+ * @param {any} reg an enhanced JSON version of the model
  */
-const sendSuccessEmails = async (id, reg) => {
+const sendSuccessEmail = async (reg) => {
   const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
-  const regNo = `NS-TRP-${String(id).padStart(5, '0')}`;
 
-  const registrationDateTime = new Date();
-  const expiryDate = buildExpiryDateString(registrationDateTime);
-
-  // Send an email to the applicant, confirming their registration.
-  await notifyClient.sendEmail('7b7a0810-a15d-4c72-8fcf-c1e7494641b3', 'traps@nature.scot', {
+  await notifyClient.sendEmail('7b7a0810-a15d-4c72-8fcf-c1e7494641b3', reg.emailAddress, {
     personalisation: {
-      regNo,
+      regNo: reg.regNo,
       convictions: reg.convictions ? 'yes' : 'no',
       noConvictions: reg.convictions ? 'no' : 'yes',
       general1: reg.usingGL01 ? 'yes' : 'no',
@@ -89,33 +85,9 @@ const sendSuccessEmails = async (id, reg) => {
       noComply: reg.complyWithTerms ? 'no' : 'yes',
       meatBait: reg.meatBaits ? 'yes' : 'no',
       noMeatBait: reg.meatBaits ? 'no' : 'yes',
-      expiryDate
+      expiryDate: reg.expiryDate
     },
-    reference: regNo,
-    emailReplyToId: '4a9b34d1-ab1f-4806-83df-3e29afef4165'
-  });
-
-  // Send an email to us, logging all their details.
-  await notifyClient.sendEmail('59b7f2f3-b152-405a-9441-c8633fc45399', 'traps@nature.scot', {
-    personalisation: {
-      regNo,
-      convictions: reg.convictions ? 'yes' : 'no',
-      general1: reg.usingGL01 ? 'yes' : 'no',
-      general2: reg.usingGL02 ? 'yes' : 'no',
-      general3: reg.usingGL03 ? 'yes' : 'no',
-      comply: reg.complyWithTerms ? 'yes' : 'no',
-      meatBait: reg.meatBaits ? 'yes' : 'no',
-      fullName: reg.fullName,
-      addressLine1: reg.addressLine1,
-      addressLine2: reg.addressLine2,
-      addressTown: reg.addressTown,
-      addressCounty: reg.addressCounty,
-      addressPostcode: reg.addressPostcode,
-      phoneNumber: reg.phoneNumber,
-      emailAddress: reg.emailAddress,
-      registrationDateTime: registrationDateTime.toISOString()
-    },
-    reference: regNo,
+    reference: reg.regNo,
     emailReplyToId: '4a9b34d1-ab1f-4806-83df-3e29afef4165'
   });
 };
@@ -168,13 +140,32 @@ const RegistrationController = {
    * @returns {boolean} true if the record is updated, otherwise false
    */
   update: async (id, reg) => {
+    // Save the new values to the database.
     const result = await Registration.update(reg, {where: {id}});
+
+    // Check to make sure the saving process went OK.
     const success = result.length > 0 && result[0] === 1;
     if (success) {
-      await sendSuccessEmails(id, reg);
+      // Take a copy of the object's fields as we're about to add two extra ones
+      // to it.
+      const updatedReg = {...reg};
+
+      // Generate and save  the human-readable version of the reg no.
+      updatedReg.regNo = `NS-TRP-${String(id).padStart(5, '0')}`;
+
+      // Generate and save the registration's expiry date.
+      updatedReg.expiryDate = buildExpiryDateString(new Date());
+
+      // Send the applicant their confirmation email.
+      await sendSuccessEmail(updatedReg);
+
+      // Return the updated object to the caller, for them to send back to the
+      // client.
+      return updatedReg;
     }
 
-    return success;
+    // If something went wrong, return undefined to signify this.
+    return undefined;
   }
 };
 
