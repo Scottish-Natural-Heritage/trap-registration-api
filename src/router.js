@@ -22,6 +22,36 @@ router.post('/registrations', async (req, res) => {
   }
 });
 
+/**
+ * Clean the incoming POST request body to make it more compatible with the
+ * database and its validation rules.
+ *
+ * @param {any} body the incoming request's body
+ * @returns {any} a json object that's just got our cleaned up fields on it
+ */
+const cleanInput = (body) => {
+  return {
+    // The booleans are just copied across.
+    convictions: body.convictions,
+    usingGL01: body.usingGL01,
+    usingGL02: body.usingGL02,
+    usingGL03: body.usingGL03,
+    complyWithTerms: body.complyWithTerms,
+    meatBaits: body.meatBaits,
+    // The strings are trimmed for leading and trailing whitespace and then
+    // copied across if they're in the POST body or are set to undefined if
+    // they're missing.
+    fullName: body.fullName === undefined ? undefined : body.fullName.trim(),
+    addressLine1: body.addressLine1 === undefined ? undefined : body.addressLine1.trim(),
+    addressLine2: body.addressLine2 === undefined ? undefined : body.addressLine2.trim(),
+    addressTown: body.addressTown === undefined ? undefined : body.addressTown.trim(),
+    addressCounty: body.addressCounty === undefined ? undefined : body.addressCounty.trim(),
+    addressPostcode: body.addressPostcode === undefined ? undefined : body.addressPostcode.trim(),
+    phoneNumber: body.phoneNumber === undefined ? undefined : body.phoneNumber.trim(),
+    emailAddress: body.emailAddress === undefined ? undefined : body.emailAddress.trim()
+  };
+};
+
 // Allow an API consumer to save a registration against an allocated but un-assigned registration number.
 router.put('/registrations/:id', async (req, res) => {
   try {
@@ -45,8 +75,11 @@ router.put('/registrations/:id', async (req, res) => {
       return;
     }
 
+    // Clean up the user's input before we store it in the database.
+    const cleanObject = cleanInput(req.body);
+
     // Update the registration in the database with our client's values.
-    const updatedReg = await Registration.update(existingId, req.body);
+    const updatedReg = await Registration.update(existingId, cleanObject);
 
     // If they're not successful, send a 500 error.
     if (updatedReg === undefined) {
