@@ -1,6 +1,6 @@
 {
   "name": "trap-registration-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "author": "Mike Coats <mike.coats@nature.scot>",
   "repository": "github:Scottish-Natural-Heritage/trap-registration-api",
@@ -19,18 +19,18 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.1",
-    "morgan": "^1.9.1",
+    "morgan": "^1.10.0",
     "notifications-node-client": "^4.7.2",
-    "pg": "^7.18.1",
+    "pg": "^7.18.2",
     "pg-hstore": "^2.3.3",
-    "sequelize": "^5.21.4",
+    "sequelize": "^5.21.5",
     "sequelize-cli": "^5.5.1",
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.3",
-    "prettier": "^1.19.1",
-    "xo": "^0.25.3"
+    "babel-eslint": "^10.1.0",
+    "prettier": "^2.0.2",
+    "xo": "^0.28.0"
   },
   "xo": {
     "space": 2,

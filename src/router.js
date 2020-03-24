@@ -6,19 +6,18 @@ const router = express.Router();
 import Registration from './controllers/registration.js';
 
 // Allow an API consumer to allocate a new registration number.
-router.post('/registrations', async (req, res) => {
+router.post('/registrations', async (request, response) => {
   const baseUrl = new URL(
-    `${req.protocol}://${req.hostname}:${config.port}${req.originalUrl}${req.originalUrl.endsWith('/') ? '' : '/'}`
+    `${request.protocol}://${request.hostname}:${config.port}${request.originalUrl}${
+      request.originalUrl.endsWith('/') ? '' : '/'
+    }`
   );
 
   try {
     const newId = await Registration.create();
-    res
-      .status(201)
-      .location(new URL(newId, baseUrl))
-      .send();
+    response.status(201).location(new URL(newId, baseUrl)).send();
   } catch (error) {
-    res.status(500).send({error});
+    response.status(500).send({error});
   }
 });
 
@@ -53,44 +52,44 @@ const cleanInput = (body) => {
 };
 
 // Allow an API consumer to save a registration against an allocated but un-assigned registration number.
-router.put('/registrations/:id', async (req, res) => {
+router.put('/registrations/:id', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
-    const existingId = Number(req.params.id);
+    const existingId = Number(request.params.id);
     if (isNaN(existingId)) {
-      res.status(404).send({message: `Registration ${req.params.id} not valid.`});
+      response.status(404).send({message: `Registration ${request.params.id} not valid.`});
       return;
     }
 
     // Check if there's a registration allocated at the specified ID.
     const existingReg = await Registration.findOne(existingId);
     if (existingReg === undefined || existingReg === null) {
-      res.status(404).send({message: `Registration ${existingId} not allocated.`});
+      response.status(404).send({message: `Registration ${existingId} not allocated.`});
       return;
     }
 
     // Check the specified registration hasn't been assigned to anyone yet.
     if (existingReg.fullName !== undefined && existingReg.fullName !== null) {
-      res.status(409).send({message: `Registration ${existingId} already assigned.`});
+      response.status(409).send({message: `Registration ${existingId} already assigned.`});
       return;
     }
 
     // Clean up the user's input before we store it in the database.
-    const cleanObject = cleanInput(req.body);
+    const cleanObject = cleanInput(request.body);
 
     // Update the registration in the database with our client's values.
     const updatedReg = await Registration.update(existingId, cleanObject);
 
     // If they're not successful, send a 500 error.
     if (updatedReg === undefined) {
-      res.status(500).send({message: `Could not update registration ${existingId}.`});
+      response.status(500).send({message: `Could not update registration ${existingId}.`});
     }
 
     // If they are, send back the finalised registration.
-    res.status(200).send(updatedReg);
+    response.status(200).send(updatedReg);
   } catch (error) {
     // If anything goes wrong (such as a validation error), tell the client.
-    res.status(500).send({error});
+    response.status(500).send({error});
   }
 });
 

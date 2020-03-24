@@ -14,8 +14,8 @@ app.use(morgan('combined', {stream: logger.stream}));
 
 app.use(`${config.pathPrefix}/v1`, router);
 
-app.use((req, res) => {
-  res.status(404).send({message: 'Not found.'});
+app.use((request, response) => {
+  response.status(404).send({message: 'Not found.'});
 });
 
 export {app as default};
