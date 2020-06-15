@@ -34,7 +34,7 @@ const cleanInput = (body) => {
     convictions: body.convictions,
     usingGL01: body.usingGL01,
     usingGL02: body.usingGL02,
-    usingGL03: body.usingGL03,
+    usingGL03: null,
     complyWithTerms: body.complyWithTerms,
     meatBaits: body.meatBaits,
     // The strings are trimmed for leading and trailing whitespace and then

@@ -79,8 +79,6 @@ const sendSuccessEmail = async (reg) => {
       noGeneral1: reg.usingGL01 ? 'no' : 'yes',
       general2: reg.usingGL02 ? 'yes' : 'no',
       noGeneral2: reg.usingGL02 ? 'no' : 'yes',
-      general3: reg.usingGL03 ? 'yes' : 'no',
-      noGeneral3: reg.usingGL03 ? 'no' : 'yes',
       comply: reg.complyWithTerms ? 'yes' : 'no',
       noComply: reg.complyWithTerms ? 'no' : 'yes',
       meatBait: reg.meatBaits ? 'yes' : 'no',
