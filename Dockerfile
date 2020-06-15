@@ -18,17 +18,17 @@ COPY --chown=node:node .sequelizerc ./
 
 # these variables are for overriding but keep them consistent between image and
 # run
-ENV PORT 3000
-ENV PATH_PREFIX /trap-registration-api
+ENV TR_API_PORT 3001
+ENV TR_API_PATH_PREFIX trap-registration-api
 
 # these variables are for overriding and they only matter during run
-ENV NOTIFY_API_KEY override_this_value
 ENV LICENSING_DB_HOST override_this_value
 ENV LICENSING_DB_PASS override_this_value
-ENV TRAPS_DB_PASS override_this_value
+ENV TR_DB_PASS override_this_value
+ENV TR_NOTIFY_API_KEY override_this_value
 
 # let docker know about our listening port
-EXPOSE $PORT
+EXPOSE $TR_API_PORT
 
 # run the default start script, which kicks off a few pre-start things too
 CMD ["npm", "start"]
