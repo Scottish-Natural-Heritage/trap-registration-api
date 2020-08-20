@@ -3,7 +3,7 @@ import Sequelize from 'sequelize';
 
 import Registration from './registration.js';
 
-const sequelize = new Sequelize(dbConfig.production);
+const sequelize = new Sequelize(dbConfig.database);
 
 const db = {};
 db.Sequelize = Sequelize;
