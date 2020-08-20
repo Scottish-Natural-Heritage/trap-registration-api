@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "xo",
     "premigrations": "npx sequelize-cli db:migrate --env preMigrations --migrations-path util/db/pre-migrations",
-    "migrations": "npx sequelize-cli db:migrate --env production",
+    "migrations": "npx sequelize-cli db:migrate  --env database",
     "prestart": "npm run lint && npm run migrations",
     "start": "node --experimental-modules src/server.js"
   },
@@ -30,6 +30,7 @@
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "prettier": "^2.0.2",
+    "sqlite3": "^5.0.0",
     "xo": "^0.28.0"
   },
   "xo": {
@@ -45,6 +46,7 @@
     "printWidth": 120,
     "singleQuote": true,
     "arrowParens": "always",
-    "bracketSpacing": false
+    "bracketSpacing": false,
+    "trailingComma": "none"
   }
 }
