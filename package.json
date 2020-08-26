@@ -10,7 +10,8 @@
     "premigrations": "npx sequelize-cli db:migrate --env preMigrations --migrations-path util/db/pre-migrations",
     "migrations": "npx sequelize-cli db:migrate  --env database",
     "prestart": "npm run lint && npm run migrations",
-    "start": "node --experimental-modules src/server.js"
+    "start": "node --experimental-modules src/server.js",
+    "nm:run": "newman run tests/trap-registration-api.postman_collection.json"
   },
   "engines": {
     "node": "12.14.1",
@@ -30,6 +31,7 @@
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "prettier": "^2.0.2",
+    "newman": "^4.6.0",
     "sqlite3": "^5.0.0",
     "xo": "^0.28.0"
   },
