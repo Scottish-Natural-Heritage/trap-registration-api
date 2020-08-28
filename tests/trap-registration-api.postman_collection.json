@@ -85,6 +85,173 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Create new Registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d60caa9b-3c31-4ed1-a320-f3a4dc6f8e53",
+						"exec": [
+							"pm.test('Status code is 201 Created', function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.have.status('Created');\r",
+							"});\r",
+							"\r",
+							"pm.test('Location is present', function () {\r",
+							"    pm.response.to.have.header('Location');\r",
+							"    \r",
+							"    \r",
+							"    pm.expect(pm.response.headers.get('Location')).to.include(\r",
+							"        `http://localhost:3001/trap-registration-api/v1/registrations/`\r",
+							"    );\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"TR_NEW_REG_ID\", pm.response.headers.get('Location').split('/').pop());\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/registrations",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"registrations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a Registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f1a4b536-f826-4463-9a45-df19e4021dd9",
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('Returned object matches posted object', function () {\r",
+							"    \r",
+							"    var reqJsonData = JSON.parse(pm.request.body.raw);\r",
+							"    var resJsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(reqJsonData.fullName).to.eql(resJsonData.fullName);\r",
+							"    pm.expect(reqJsonData.addressLine1).to.eql(resJsonData.addressLine1);\r",
+							"    pm.expect(reqJsonData.addressLine2).to.eql(resJsonData.addressLine2);\r",
+							"    pm.expect(reqJsonData.addressTown).to.eql(resJsonData.addressTown);\r",
+							"    pm.expect(reqJsonData.addressCounty).to.eql(resJsonData.addressCounty);\r",
+							"    pm.expect(reqJsonData.addressPostcode).to.eql(resJsonData.addressPostcode);\r",
+							"    pm.expect(reqJsonData.phoneNumber).to.eql(resJsonData.phoneNumber);\r",
+							"    pm.expect(reqJsonData.emailAddress).to.eql(resJsonData.emailAddress);\r",
+							"    \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update non-existent Registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5ce01a7c-4d37-42d5-886e-2b0114fe132a",
+						"exec": [
+							"pm.test('Status code is 404 Not Found', function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"    pm.response.to.have.status('Not Found');\r",
+							"});\r",
+							"\r",
+							"pm.test('Message is \"Registration -1 not allocated.\"', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql('Registration -1 not allocated.');\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/-1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"registrations",
+						"-1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"id": "ce27173f-33fb-4a27-ba10-3a47d7849b8f",
+			"key": "TR_NEW_REG_ID",
+			"value": "96549"
 		}
 	],
 	"protocolProfileBehavior": {}
