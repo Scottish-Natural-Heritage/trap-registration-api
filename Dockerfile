@@ -18,6 +18,7 @@ RUN npm ci
 COPY --chown=node:node ./src ./src
 COPY --chown=node:node ./util ./util
 COPY --chown=node:node .sequelizerc ./
+COPY --chown=node:node ./.secrets ./.secrets
 
 # these variables are for overriding but keep them consistent between image and
 # run

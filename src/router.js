@@ -1,6 +1,8 @@
 import express from 'express';
 import config from './config/app.js';
 
+import jose from 'node-jose';
+
 const router = express.Router();
 
 import Registration from './controllers/registration.js';
@@ -96,6 +98,13 @@ router.put('/registrations/:id', async (request, response) => {
     // If anything goes wrong (such as a validation error), tell the client.
     response.status(500).send({error});
   }
+});
+
+// Allow an API consumer to retrieve the public half of our ECDSA key to
+// validate our signed JWTs.
+router.get('/public-key', async (request, response) => {
+  const key = await jose.JWK.asKey(config.jwtPublicKey, 'pem');
+  response.status(200).send(key.toJSON());
 });
 
 export {router as default};
