@@ -12,5 +12,6 @@ module.exports = Object.freeze({
   trapsPassword: process.env.TR_DB_PASS || 'override_this_value',
   pathPrefix: process.env.TR_API_PATH_PREFIX ? `/${process.env.TR_API_PATH_PREFIX}` : '/trap-registration-api',
   notifyApiKey: process.env.TR_NOTIFY_API_KEY,
+  jwtPrivateKey: fs.readFileSync('./.secrets/jwt-key'),
   jwtPublicKey: fs.readFileSync('./.secrets/jwt-key.pub')
 });

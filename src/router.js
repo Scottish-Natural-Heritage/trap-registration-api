@@ -1,6 +1,7 @@
 import express from 'express';
 import config from './config/app.js';
 
+import jwt from 'jsonwebtoken';
 import jose from 'node-jose';
 
 const router = express.Router();
