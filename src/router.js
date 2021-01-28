@@ -203,4 +203,11 @@ router.get('/registrations/:id/login', async (request, response) => {
   });
 });
 
+// Allow the API consumer to submit a return against a registration.
+router.post('/registrations/:id/return', async (request, response) => {
+  response.status(500).send({
+    message: 'Not implemented.'
+  });
+});
+
 export {router as default};
