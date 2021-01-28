@@ -4,6 +4,8 @@ import config from './config/app.js';
 import jwt from 'jsonwebtoken';
 import jose from 'node-jose';
 
+import NotifyClient from 'notifications-node-client';
+
 const router = express.Router();
 
 import Registration from './controllers/registration.js';
@@ -106,6 +108,99 @@ router.put('/registrations/:id', async (request, response) => {
 router.get('/public-key', async (request, response) => {
   const key = await jose.JWK.asKey(config.jwtPublicKey, 'pem');
   response.status(200).send(key.toJSON());
+});
+
+/**
+ * Build a JWT to allow a visitor to log in to the supply a return flow.
+ *
+ * @param {string} jwtPrivateKey
+ * @param {string} id
+ * @returns {string} a signed JWT
+ */
+const buildToken = (jwtPrivateKey, id) => {
+  return jwt.sign({}, jwtPrivateKey, {subject: `${id}`, algorithm: 'ES256', expiresIn: '30m', noTimestamp: true});
+};
+
+/**
+ * Send an email to the visitor that contains a link which allows them to log in
+ * to the rest of the meat bait return system.
+ *
+ * @param {string} notifyApiKey API key for sending emails
+ * @param {string} emailAddress where to send the log in email
+ * @param {string} loginLink link to log in via
+ * @param {string} regNo trap registration number for notify's records
+ */
+const sendLoginEmail = async (notifyApiKey, emailAddress, loginLink, regNo) => {
+  const notifyClient = new NotifyClient.NotifyClient(notifyApiKey);
+
+  await notifyClient.sendEmail('a5901745-e01c-4e42-a726-ece91b63e593', emailAddress, {
+    personalisation: {
+      loginLink
+    },
+    reference: `${regNo}`,
+    emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
+  });
+};
+
+// Allow the API consumer to provide enough personal information to allow us to
+// build and send a login link for the specified visitor.
+router.get('/registrations/:id/login', async (request, response) => {
+  // Try to parse the incoming ID to make sure it's really a number.
+  const existingId = Number(request.params.id);
+  const idInvalid = isNaN(existingId);
+
+  // Check if there's a registration allocated at the specified ID.
+  const existingReg = await Registration.findOne(existingId);
+  const idNotFound = existingReg === undefined || existingReg === null;
+
+  // Check that the visitor's given us a postcode.
+  const {postcode} = request.query;
+  const postcodeInvalid = postcode === undefined || postcode === null;
+
+  // Check that the visitor's supplied postcode matches their stored one.
+  const postcodeIncorrect = existingReg !== undefined && existingReg.addressPostcode !== postcode;
+
+  // Check that the visitor's given us a base url.
+  const {redirectBaseUrl} = request.query;
+  const urlInvalid = redirectBaseUrl === undefined || redirectBaseUrl === null;
+
+  // As long as we're happy that the visitor's provided use with valid
+  // information, build them a token for logging in with.
+  let token;
+  if (!idInvalid && !idNotFound && !postcodeInvalid && !postcodeIncorrect) {
+    token = buildToken(config.jwtPrivateKey, existingId);
+  }
+
+  // If the visitor has give us enough information, build them a link that will
+  // allow them to click-to-log-in.
+  let loginLink;
+  if (!urlInvalid && token !== undefined) {
+    loginLink = `${redirectBaseUrl}${token}`;
+  }
+
+  // As long as we've managed to build a login link, send the visitor an email
+  // with that link included.
+  if (loginLink !== undefined) {
+    await sendLoginEmail(config.notifyApiKey, existingReg.emailAddress, loginLink, existingId);
+  }
+
+  // If we're in production, no matter what, tell the API consumer that everything went well.
+  if (process.env.NODE_ENV === 'production') {
+    response.status(200);
+    return;
+  }
+
+  // If we're in development mode, send back a debug message, with the link for
+  // the developer, to avoid sending unnecessary emails.
+  response.status(200).send({
+    idInvalid,
+    idNotFound,
+    postcodeInvalid,
+    postcodeIncorrect,
+    urlInvalid,
+    token,
+    loginLink
+  });
 });
 
 export {router as default};

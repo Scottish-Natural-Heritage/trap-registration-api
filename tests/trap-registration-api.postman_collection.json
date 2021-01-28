@@ -284,6 +284,82 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Log in to supply a Meat Bait return",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('Debug response is valid', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.idInvalid).to.eql(false);\r",
+							"    pm.expect(jsonData.idNotFound).to.eql(false);\r",
+							"    pm.expect(jsonData.postcodeInvalid).to.eql(false);\r",
+							"    pm.expect(jsonData.postcodeIncorrect).to.eql(false);\r",
+							"    pm.expect(jsonData.urlInvalid).to.eql(false);\r",
+							"    pm.expect(jsonData.token).to.not.eql(undefined);\r",
+							"    pm.expect(jsonData.loginLink.startsWith('https://example.org/login?token=')).to.eql(true);\r",
+							"    pm.expect(jsonData.loginLink.endsWith(jsonData.token)).to.eql(true);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				},
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/{{TR_NEW_REG_ID}}/login?postcode=IV3 8NW&redirectBaseUrl=https://example.org/login?token=",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"login"
+					],
+					"query": [
+						{
+							"key": "postcode",
+							"value": "IV3 8NW"
+						},
+						{
+							"key": "redirectBaseUrl",
+							"value": "https://example.org/login?token="
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
