@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e1829a25-0060-4f32-bda1-3237a7dac80e",
+		"_postman_id": "8da800e7-5862-40e5-94de-906e133d0681",
 		"name": "trap-registration-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -11,7 +11,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "526cd232-1406-4ef3-b01a-d44ae1bf9f47",
 						"exec": [
 							"pm.test('Status code is 200 OK', function () {\r",
 							"    pm.response.to.have.status(200);\r",
@@ -52,7 +51,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9443c37d-6378-4a01-8652-d46bf6c76148",
 						"exec": [
 							"pm.test('Status code is 404 Not Found', function () {\r",
 							"    pm.response.to.have.status(404);\r",
@@ -87,12 +85,55 @@
 			"response": []
 		},
 		{
+			"name": "Public Key",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('Message is a ECDSA JWK', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.kty).to.eql('EC');\r",
+							"    pm.expect(jsonData.kid).to.not.eql(undefined);\r",
+							"    pm.expect(jsonData.crv).to.eql('P-256');\r",
+							"    pm.expect(jsonData.x).to.not.eql(undefined);\r",
+							"    pm.expect(jsonData.y).to.not.eql(undefined);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/public-key",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"public-key"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Create new Registration",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "d60caa9b-3c31-4ed1-a320-f3a4dc6f8e53",
 						"exec": [
 							"pm.test('Status code is 201 Created', function () {\r",
 							"    pm.response.to.have.status(201);\r",
@@ -140,7 +181,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f1a4b536-f826-4463-9a45-df19e4021dd9",
 						"exec": [
 							"pm.test('Status code is 200 OK', function () {\r",
 							"    pm.response.to.have.status(200);\r",
@@ -209,7 +249,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5ce01a7c-4d37-42d5-886e-2b0114fe132a",
 						"exec": [
 							"pm.test('Status code is 404 Not Found', function () {\r",
 							"    pm.response.to.have.status(404);\r",
@@ -245,14 +284,88 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Log in to supply a Meat Bait return",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('Debug response is valid', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.idInvalid).to.eql(false);\r",
+							"    pm.expect(jsonData.idNotFound).to.eql(false);\r",
+							"    pm.expect(jsonData.postcodeInvalid).to.eql(false);\r",
+							"    pm.expect(jsonData.postcodeIncorrect).to.eql(false);\r",
+							"    pm.expect(jsonData.urlInvalid).to.eql(false);\r",
+							"    pm.expect(jsonData.token).to.not.eql(undefined);\r",
+							"    pm.expect(jsonData.loginLink.startsWith('https://example.org/login?token=')).to.eql(true);\r",
+							"    pm.expect(jsonData.loginLink.endsWith(jsonData.token)).to.eql(true);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				},
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/{{TR_NEW_REG_ID}}/login?postcode=IV3 8NW&redirectBaseUrl=https://example.org/login?token=",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"login"
+					],
+					"query": [
+						{
+							"key": "postcode",
+							"value": "IV3 8NW"
+						},
+						{
+							"key": "redirectBaseUrl",
+							"value": "https://example.org/login?token="
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
 		{
-			"id": "ce27173f-33fb-4a27-ba10-3a47d7849b8f",
 			"key": "TR_NEW_REG_ID",
 			"value": "96549"
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
