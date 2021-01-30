@@ -9,6 +9,7 @@ import NotifyClient from 'notifications-node-client';
 const router = express.Router();
 
 import Registration from './controllers/registration.js';
+import Return from './controllers/return.js';
 
 // `/health` is a simple health-check end-point to test whether the service is up.
 router.get('/health', async (request, response) => {
@@ -203,11 +204,120 @@ router.get('/registrations/:id/login', async (request, response) => {
   });
 });
 
+/**
+ * Clean the incoming POST request body to make it more compatible with the
+ * database and its validation rules.
+ *
+ * @param {any} body The incoming request's body.
+ * @returns {any} A json object that's just got our cleaned up fields on it.
+ */
+const cleanReturnInput = (id, body) => {
+  return {
+    // The booleans are just copied across.
+    nonTargetSpeciesToReport: body.nonTargetSpeciesToReport,
+    // The strings are trimmed for leading and trailing whitespace and then
+    // copied across if they're in the POST body or are set to undefined if
+    // they're missing.
+    trapRegistrationNumber: id,
+
+    // We copy across the nonTargetSpeciesCaught, cleaning them as we go.
+    nonTargetSpecies:
+      body.nonTargetSpeciesCaught === undefined
+        ? undefined
+        : body.nonTargetSpeciesCaught.map((nonTargetSpecies) => {
+            return {
+              // The number is just copied across.
+              numberCaught: nonTargetSpecies.numberCaught,
+
+              // The strings are trimmed then copied.
+              gridReference:
+                nonTargetSpecies.gridReference === undefined ? undefined : nonTargetSpecies.gridReference.trim(),
+              speciesCaught:
+                nonTargetSpecies.speciesCaught === undefined ? undefined : nonTargetSpecies.speciesCaught.trim(),
+              trapType: nonTargetSpecies.trapType === undefined ? undefined : nonTargetSpecies.trapType.trim(),
+              comment: nonTargetSpecies.comment === undefined ? undefined : nonTargetSpecies.comment.trim()
+            };
+          })
+  };
+};
+
 // Allow the API consumer to submit a return against a registration.
 router.post('/registrations/:id/return', async (request, response) => {
-  response.status(500).send({
-    message: 'Not implemented.'
-  });
+  // Try to parse the incoming ID to make sure it's really a number.
+  const existingId = Number(request.params.id);
+  if (isNaN(existingId)) {
+    response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    return;
+  }
+
+  // Check if there's a registration allocated at the specified ID.
+  const existingReg = await Registration.findOne(existingId);
+  if (existingReg === undefined || existingReg === null) {
+    response.status(404).send({message: `Registration ${existingId} not allocated.`});
+    return;
+  }
+
+  const baseUrl = new URL(
+    `${request.protocol}://${request.hostname}:${config.port}${request.originalUrl}${
+      request.originalUrl.endsWith('/') ? '' : '/'
+    }`
+  );
+
+  try {
+    const newId = await Return.create();
+    response.status(201).location(new URL(newId, baseUrl)).send();
+  } catch (error) {
+    response.status(500).send({error});
+  }
+});
+
+// Allow an API consumer to save a return against an allocated but un-assigned return number.
+router.put('/registrations/:id/return/:returnId', async (request, response) => {
+  try {
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingId = Number(request.params.id);
+    if (isNaN(existingId)) {
+      response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+      return;
+    }
+
+    // Check if there's a registration allocated at the specified ID.
+    const existingReg = await Registration.findOne(existingId);
+    if (existingReg === undefined || existingReg === null) {
+      response.status(404).send({message: `Registration ${existingId} not allocated.`});
+      return;
+    }
+
+    const existingReturnId = Number(request.params.returnId);
+    if (isNaN(existingReturnId)) {
+      response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
+      return;
+    }
+
+    // Check if there's a return allocated at the specified ID.
+    const existingReturn = await Return.findOne(existingReturnId);
+    if (existingReturn === undefined || existingReturn === null) {
+      response.status(404).send({message: `Return ${existingReturnId} not allocated.`});
+      return;
+    }
+
+    // Clean up the user's input before we store it in the database.
+    const cleanObject = cleanReturnInput(existingId, request.body);
+
+    // Update the registration in the database with our client's values.
+    const updatedReturn = await Return.update(existingReturnId, cleanObject);
+
+    // If they're not successful, send a 500 error.
+    if (updatedReturn === undefined) {
+      response.status(500).send({message: `Could not update return ${existingReturnId}.`});
+    }
+
+    // If they are, send back the finalised return.
+    response.status(200).send(updatedReturn);
+  } catch (error) {
+    // If anything goes wrong (such as a validation error), tell the client.
+    response.status(500).send({error});
+  }
 });
 
 export {router as default};
