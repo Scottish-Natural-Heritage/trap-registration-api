@@ -1,43 +1,7 @@
 // eslint-disable-next-line unicorn/import-index, import/no-useless-path-segments
 import db from '../models/index.js';
-import Sequelize from 'sequelize';
 
 const {Return, NonTargetSpecies} = db;
-
-/**
- * Attempt to create an empty, randomly allocated Return.
- *
- * Generates a random number and attempts to create an empty record in the
- * database with that ID. If it fails because another record already exists,
- * then it returns undefined. If any errors occur, it bubbles them back to the
- * calling code.
- *
- * @returns {Sequelize.Model | undefined} A new empty model is successful,
- * otherwise undefined.
- */
-const tryCreate = async () => {
-  try {
-    // Generate a random 5 digit number and attempt to create a new record with
-    // that ID.
-    const newReturn = await Return.create({id: Math.floor(Math.random() * 99999)});
-
-    // X.create only ever returns if it's successful, so we can just return our
-    // new model.
-    return newReturn;
-  } catch (error) {
-    // There are two possible error conditions here...
-
-    // The first is if we try to create a duplicate ID, which we manually check
-    // for and return undefined as an indicator.
-    if (error instanceof Sequelize.UniqueConstraintError) {
-      return undefined;
-    }
-
-    // The second error condition is 'anything else' i.e. a proper DB error. In
-    // that case, just throw it up to the calling code.
-    throw error;
-  }
-};
 
 /**
  * An object to perform 'persistence' operations on our Return objects.
@@ -51,15 +15,7 @@ const ReturnController = {
    * @returns {Number} ID of the new Return
    */
   create: async () => {
-    let newReturn;
-    let remainingAttempts = 10;
-    // Loop until we have a new empty Return or we run out of attempts,
-    // whichever happens first.
-    while (newReturn === undefined && remainingAttempts > 0) {
-      newReturn = await tryCreate(); // eslint-disable-line no-await-in-loop
-      remainingAttempts--;
-    }
-
+    const newReturn = await Return.create();
     // If we run out of attempts let the calling code know by raising an error.
     if (newReturn === undefined) {
       throw new Error('Unable to generate new Return.');
