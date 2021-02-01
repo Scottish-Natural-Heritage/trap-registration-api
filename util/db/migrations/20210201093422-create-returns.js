@@ -5,12 +5,13 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
+        autoIncrement: true,
         type: Sequelize.INTEGER
       },
       nonTargetSpeciesToReport: {
         type: Sequelize.BOOLEAN
       },
-      trapRegistrationNumber: {
+      RegistrationId: {
         type: Sequelize.STRING,
         references: {
           model: 'Registrations',

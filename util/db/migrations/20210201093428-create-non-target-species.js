@@ -9,7 +9,7 @@ module.exports = {
         autoIncrement: true,
         type: Sequelize.INTEGER
       },
-      returnId: {
+      ReturnId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
