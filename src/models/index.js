@@ -14,6 +14,8 @@ db.Registration = Registration(sequelize, Sequelize);
 db.Return = Return(sequelize, Sequelize);
 db.NonTargetSpecies = NonTargetSpecies(sequelize, Sequelize);
 
+db.Registration.hasMany(db.Return);
+db.Return.belongsTo(db.Registration);
 db.Return.hasMany(db.NonTargetSpecies);
 db.NonTargetSpecies.belongsTo(db.Return);
 
