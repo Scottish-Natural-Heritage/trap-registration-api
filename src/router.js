@@ -215,10 +215,8 @@ const cleanReturnInput = (id, body) => {
   return {
     // The booleans are just copied across.
     nonTargetSpeciesToReport: body.nonTargetSpeciesToReport,
-    // The strings are trimmed for leading and trailing whitespace and then
-    // copied across if they're in the POST body or are set to undefined if
-    // they're missing.
-    trapRegistrationNumber: id,
+    // The id passed in is set as the registration id.
+    RegistrationId: id,
 
     // We copy across the nonTargetSpeciesCaught, cleaning them as we go.
     nonTargetSpecies:

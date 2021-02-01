@@ -15,7 +15,7 @@ const ReturnModel = (sequelize) => {
 
   Return.init(
     {
-      trapRegistrationNumber: {
+      RegistrationId: {
         type: Sequelize.INTEGER,
         validate: {
           notEmpty: true

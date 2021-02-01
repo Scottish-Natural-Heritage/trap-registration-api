@@ -108,7 +108,7 @@ const ReturnController = {
       nonTargetSpecies.map(async (jsonNonTargetSpecies) => {
         // Create the new sett object.
         const speciesCaught = await NonTargetSpecies.create({
-          returnId: id,
+          ReturnId: id,
           gridReference: jsonNonTargetSpecies.gridReference,
           speciesCaught: jsonNonTargetSpecies.speciesCaught,
           numberCaught: jsonNonTargetSpecies.numberCaught,

@@ -9,7 +9,7 @@ const NonTargetSpeciesModel = (sequelize) => {
 
   NonTargetSpecies.init(
     {
-      returnId: {
+      ReturnId: {
         type: Sequelize.INTEGER,
         validate: {
           notEmpty: true
