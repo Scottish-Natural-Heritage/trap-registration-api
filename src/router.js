@@ -155,10 +155,11 @@ router.get('/registrations/:id/login', async (request, response) => {
 
   // Check that the visitor's given us a postcode.
   const {postcode} = request.query;
-  const postcodeInvalid = postcode === undefined || postcode === null;
+  const postcodeInvalid = postcode === undefined;
 
   // Check that the visitor's supplied postcode matches their stored one.
-  const postcodeIncorrect = existingReg !== undefined && existingReg.addressPostcode !== postcode;
+  const postcodeIncorrect =
+    existingReg !== undefined && existingReg !== null && existingReg.addressPostcode !== postcode;
 
   // Check that the visitor's given us a base url.
   const {redirectBaseUrl} = request.query;
