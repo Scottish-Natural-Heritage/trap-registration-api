@@ -29,15 +29,15 @@
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.21.5",
     "sequelize-cli": "^5.5.1",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "xo": "^0.28.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "prettier": "^2.0.2",
     "newman": "^4.6.0",
     "sqlite3": "^5.0.0",
-    "start-server-and-test": "^1.10.11",
-    "xo": "^0.28.0"
+    "start-server-and-test": "^1.10.11"
   },
   "xo": {
     "space": 2,
