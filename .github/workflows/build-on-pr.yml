@@ -6,6 +6,7 @@ on:
 
 env:
   TR_NOTIFY_API_KEY: ${{ secrets.TR_NOTIFY_TEST_KEY }}
+  JWT_KEY_GPG_PASSPHRASE: ${{ secrets.TR_JWT_KEY_GPG_PASSPHRASE }}
 
 jobs:
 
@@ -21,6 +22,11 @@ jobs:
 
     - name: Check the linter
       run: npm run lint
+
+    - name: Decrypt the secrets
+      run: |
+        chmod +x ./decrypt_secrets.sh
+        ./decrypt_secrets.sh
 
     - name: Check the pre-start operations
       run: npm run prestart
