@@ -1,0 +1,29 @@
+name: Lint and Test on PRs
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  TR_NOTIFY_API_KEY: ${{ secrets.TR_NOTIFY_TEST_KEY }}
+
+jobs:
+
+  lint_and_test:
+    name: Lint and Test the Project
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Install all the pre-requisites
+      run: npm ci
+
+    - name: Check the linter
+      run: npm run lint
+
+    - name: Check the pre-start operations
+      run: npm run prestart
+
+    - name: Check the integration tests
+      run: npm run test
