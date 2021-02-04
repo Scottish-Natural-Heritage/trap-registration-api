@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:12-alpine
 
 # drop back to the non-privileged user for run-time
 WORKDIR /home/node
