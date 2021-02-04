@@ -13,10 +13,13 @@ jobs:
 
   lint_and_test:
     name: Lint and Test the Project
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
 
     - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '12'
 
     - name: Install all the pre-requisites
       run: npm ci
@@ -37,7 +40,7 @@ jobs:
 
   build_and_push:
     name: Build and Push the Image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
 
     - uses: actions/checkout@v2
