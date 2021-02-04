@@ -12,7 +12,7 @@ module.exports = {
         type: Sequelize.BOOLEAN
       },
       RegistrationId: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         references: {
           model: 'Registrations',
           key: 'id'
