@@ -188,7 +188,7 @@ router.get('/registrations/:id/login', async (request, response) => {
 
   // If we're in production, no matter what, tell the API consumer that everything went well.
   if (process.env.NODE_ENV === 'production') {
-    response.status(200);
+    response.status(200).send();
     return;
   }
 
