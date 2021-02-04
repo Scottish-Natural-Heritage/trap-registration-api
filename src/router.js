@@ -270,6 +270,25 @@ router.post('/registrations/:id/return', async (request, response) => {
   }
 });
 
+/**
+ * Send email to the trap owner to let them know their return was successful.
+ *
+ * @param {string} apiKey API key for sending emails
+ * @param {string} email where to send the return confirmation email
+ * @param {string} regNo trap registration number for notify's records
+ */
+const sendSuccessReturnEmail = async (apiKey, email, regNo) => {
+  const notifyClient = new NotifyClient.NotifyClient(apiKey);
+
+  await notifyClient.sendEmail('dd023ad0-7168-44b6-86e2-f9795d3f78c5', email, {
+    personalisation: {
+      regNo: `${regNo}`
+    },
+    reference: `${regNo}`,
+    emailReplyToId: '4a9b34d1-ab1f-4806-83df-3e29afef4165'
+  });
+};
+
 // Allow an API consumer to save a return against an allocated but un-assigned return number.
 router.put('/registrations/:id/return/:returnId', async (request, response) => {
   try {
@@ -310,6 +329,9 @@ router.put('/registrations/:id/return/:returnId', async (request, response) => {
     if (updatedReturn === undefined) {
       response.status(500).send({message: `Could not update return ${existingReturnId}.`});
     }
+
+    // Send the trap holder their confirmation email.
+    await sendSuccessReturnEmail(config.notifyApiKey, existingReg.emailAddress, existingId);
 
     // If they are, send back the finalised return.
     response.status(200).send(updatedReturn);
