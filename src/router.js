@@ -143,6 +143,30 @@ const sendLoginEmail = async (notifyApiKey, emailAddress, loginLink, regNo) => {
   });
 };
 
+/**
+ * Test if two postcodes match.
+ *
+ * A match is when the alphanumeric characters in the supplied strings equal
+ * each other once all other characters have been removed and everything's been
+ * transformed to lower-case. It's extreme, but ' !"£IV3$%^8NW&*( ' should match
+ * 'iv3 8nw'.
+ *
+ * @param {string} postcode1 a postcode to check
+ * @param {string} postcode2 the other postcode to check
+ * @returns {boolean} true if they kinda match, false otherwise
+ */
+const postcodesMatch = (postcode1, postcode2) => {
+  // Regex that matches any and all non alpha-num characters.
+  const notAlphaNumber = /[^a-z\d]/gi;
+
+  // Clean our two strings to the 'same' representation.
+  const cleanPostcode1 = postcode1.replace(notAlphaNumber, '').toLocaleLowerCase();
+  const cleanPostcode2 = postcode2.replace(notAlphaNumber, '').toLocaleLowerCase();
+
+  // Check if they match, now that they're clean.
+  return cleanPostcode1 === cleanPostcode2;
+};
+
 // Allow the API consumer to provide enough personal information to allow us to
 // build and send a login link for the specified visitor.
 router.get('/registrations/:id/login', async (request, response) => {
@@ -160,7 +184,7 @@ router.get('/registrations/:id/login', async (request, response) => {
 
   // Check that the visitor's supplied postcode matches their stored one.
   const postcodeIncorrect =
-    existingReg !== undefined && existingReg !== null && existingReg.addressPostcode !== postcode;
+    existingReg !== undefined && existingReg !== null && !postcodesMatch(existingReg.addressPostcode, postcode);
 
   // Check that the visitor's given us a base url.
   const {redirectBaseUrl} = request.query;
