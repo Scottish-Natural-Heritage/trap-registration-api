@@ -8,9 +8,11 @@
   "scripts": {
     "lint": "xo",
     "premigrations": "npx sequelize-cli db:migrate --env preMigrations --migrations-path util/db/pre-migrations",
-    "migrations": "npx sequelize-cli db:migrate --env production",
+    "migrations": "npx sequelize-cli db:migrate  --env database",
     "prestart": "npm run lint && npm run migrations",
-    "start": "node --experimental-modules src/server.js"
+    "start": "node --experimental-modules src/server.js",
+    "nm:run": "newman run tests/trap-registration-api.postman_collection.json",
+    "test": "start-server-and-test start http://localhost:3001/trap-registration-api/v1/health nm:run"
   },
   "engines": {
     "node": "12.14.1",
@@ -18,19 +20,24 @@
   },
   "license": "MIT",
   "dependencies": {
+    "babel-eslint": "^10.1.0",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
+    "node-jose": "^2.0.0",
     "notifications-node-client": "^4.7.2",
     "pg": "^7.18.2",
     "pg-hstore": "^2.3.3",
+    "prettier": "^2.0.2",
     "sequelize": "^5.21.5",
     "sequelize-cli": "^5.5.1",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "xo": "^0.28.0"
   },
   "devDependencies": {
-    "babel-eslint": "^10.1.0",
-    "prettier": "^2.0.2",
-    "xo": "^0.28.0"
+    "newman": "^4.6.0",
+    "sqlite3": "^5.0.0",
+    "start-server-and-test": "^1.10.11"
   },
   "xo": {
     "space": 2,
@@ -45,6 +52,7 @@
     "printWidth": 120,
     "singleQuote": true,
     "arrowParens": "always",
-    "bracketSpacing": false
+    "bracketSpacing": false,
+    "trailingComma": "none"
   }
 }
