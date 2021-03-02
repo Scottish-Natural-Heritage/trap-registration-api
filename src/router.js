@@ -16,6 +16,20 @@ router.get('/health', async (request, response) => {
   response.status(200).send({message: 'OK'});
 });
 
+router.get('/registrations', async (request, response) => {
+  try {
+    const registrations = await Registration.findAll();
+    if (registrations) {
+      // If they are, send back the finalised registrations.
+      response.status(200).send(registrations);
+    } else {
+      response.status(404).send({message: `No registrations found.`});
+      return;
+    }
+  } catch (error) {
+    response.status(500).send({error});
+  }
+});
 // Allow an API consumer to allocate a new registration number.
 router.post('/registrations', async (request, response) => {
   const baseUrl = new URL(
