@@ -26,6 +26,20 @@ const ReturnController = {
   },
 
   /**
+   * Retrieve all returns from the database.
+   *
+   * @returns all existing returns for a reg
+   */
+  findAll: async (id) => {
+    return Return.findAll({
+      where: {
+        RegistrationId: id
+      },
+      include: [NonTargetSpecies]
+    });
+  },
+
+  /**
    * Retrieve the specified Return from the database.
    *
    * @param {Number} id an existing Return's ID
