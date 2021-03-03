@@ -608,16 +608,92 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "GET single registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('JSON response has properties', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('convictions');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL01');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL02');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL03');\r",
+							"    pm.expect(jsonData).to.have.property('complyWithTerms');\r",
+							"    pm.expect(jsonData).to.have.property('meatBaits');\r",
+							"    pm.expect(jsonData).to.have.property('fullName');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine1');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine2');\r",
+							"    pm.expect(jsonData).to.have.property('addressTown');\r",
+							"    pm.expect(jsonData).to.have.property('addressCounty');\r",
+							"    pm.expect(jsonData).to.have.property('addressPostcode');\r",
+							"    pm.expect(jsonData).to.have.property('phoneNumber');\r",
+							"    pm.expect(jsonData).to.have.property('emailAddress');\r",
+							"    pm.expect(jsonData).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData).to.have.property('Returns');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('id');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('RegistrationId');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('nonTargetSpeciesToReport');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('NonTargetSpecies');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('id');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('ReturnId');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('gridReference');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('speciesCaught');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('numberCaught');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('trapType');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('comment');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('deletedAt');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
 		{
 			"key": "TR_NEW_REG_ID",
-			"value": "20627"
+			"value": "28914"
 		},
 		{
 			"key": "TR_NEW_RET_ID",
-			"value": "93509"
+			"value": "93529"
 		}
 	]
 }
