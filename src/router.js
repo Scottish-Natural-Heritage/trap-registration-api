@@ -86,12 +86,6 @@ router.get('/registrations/:id', async (request, response) => {
 
     const registration = await Registration.findOne(existingId);
     if (registration) {
-      const returns = await Return.findAll(existingId);
-      // I tried doing something along the lines of this but it results in a 500.
-      // Both registration and returns return individually fine on line 96 but when i try to join the 2
-      // it errors
-      const fullObject1 = Object.assign(registration, returns);
-      const fullObject2 = {...registration, ...returns};
       // If they are, send back the finalised registration.
       response.status(200).send(registration);
     } else {
