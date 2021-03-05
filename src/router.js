@@ -76,6 +76,27 @@ const cleanInput = (body) => {
   };
 };
 
+router.get('/registrations/:id', async (request, response) => {
+  try {
+    const existingId = Number(request.params.id);
+    if (isNaN(existingId)) {
+      response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+      return;
+    }
+
+    const registration = await Registration.findOne(existingId);
+    if (registration) {
+      // If they are, send back the finalised registration.
+      response.status(200).send(registration);
+    } else {
+      response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+      return;
+    }
+  } catch (error) {
+    response.status(500).send({error});
+  }
+});
+
 // Allow an API consumer to save a registration against an allocated but un-assigned registration number.
 router.put('/registrations/:id', async (request, response) => {
   try {
