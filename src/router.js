@@ -140,6 +140,20 @@ router.put('/registrations/:id', async (request, response) => {
   }
 });
 
+router.get('/returns', async (request, response) => {
+  try {
+    const returns = await Return.findAll();
+    if (returns) {
+      // If they are, send back the finalised registrations.
+      response.status(200).send(returns);
+    } else {
+      response.status(404).send({message: `No returns found.`});
+      return;
+    }
+  } catch (error) {
+    response.status(500).send({error});
+  }
+});
 // Allow an API consumer to retrieve the public half of our ECDSA key to
 // validate our signed JWTs.
 router.get('/public-key', async (request, response) => {

@@ -36,6 +36,15 @@ const ReturnController = {
   },
 
   /**
+   * Retrieve all returns from the database.
+   *
+   * @returns all existing returns
+   */
+  findAll: async () => {
+    return Return.findAll();
+  },
+
+  /**
    * Replace a return in the database with our new JSON model.
    *
    * @param {number} id An existing returns ID.
