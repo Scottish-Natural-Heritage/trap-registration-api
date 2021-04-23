@@ -185,6 +185,43 @@ router.get('/registrations/:id/return', async (request, response) => {
   }
 });
 
+router.get('/registrations/:id/return/:returnId', async (request, response) => {
+  try {
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingId = Number(request.params.id);
+    if (isNaN(existingId)) {
+      response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+      return;
+    }
+
+    // Check if there's a registration allocated at the specified ID.
+    const existingReg = await Registration.findOne(existingId);
+    if (existingReg === undefined || existingReg === null) {
+      response.status(404).send({message: `Registration ${existingId} not allocated.`});
+      return;
+    }
+
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingReturnId = Number(request.params.returnId);
+    if (isNaN(existingReturnId)) {
+      response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
+      return;
+    }
+
+    // Check if there's return allocated at the specified ID.
+    const existingReturn = await Return.findOne(existingReturnId);
+    if (existingReturn === undefined || existingReturn === null) {
+      response.status(404).send({message: `Return ${existingReturnId} not allocated.`});
+      return;
+    }
+
+    // If they are, send back the finalised return.
+    response.status(200).send(existingReturn);
+  } catch (error) {
+    response.status(500).send({error});
+  }
+});
+
 // Allow an API consumer to retrieve the public half of our ECDSA key to
 // validate our signed JWTs.
 router.get('/public-key', async (request, response) => {
