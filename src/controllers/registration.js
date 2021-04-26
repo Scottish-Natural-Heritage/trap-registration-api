@@ -136,9 +136,7 @@ const RegistrationController = {
    * @returns all existing registrations
    */
   findAll: async () => {
-    return Registration.findAll({
-      include: [Return]
-    });
+    return Registration.findAll();
   },
 
   /**
