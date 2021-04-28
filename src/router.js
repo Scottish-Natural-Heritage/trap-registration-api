@@ -196,12 +196,13 @@ router.get('/registrations/:id/return/:returnId', async (request, response) => {
 
     // Check if there's a return allocated at the specified ID.
     const existingReturn = await Return.findOne(existingReturnId);
+
     if (existingReturn === undefined || existingReturn === null) {
       return response.status(404).send({message: `Return ${existingReturnId} not allocated.`});
     }
 
     // Check if the return is allocated to the specified registration.
-    if (existingReturn.RegistrationId !== request.params.id) {
+    if (existingReturn.RegistrationId !== existingId) {
       return response
         .status(404)
         .send({message: `Return ${existingReturnId} not found against Registration ${existingId}.`});
