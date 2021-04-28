@@ -62,6 +62,7 @@ const cleanInput = (body) => {
     usingGL03: null,
     complyWithTerms: body.complyWithTerms,
     meatBaits: body.meatBaits,
+    createdByLicensingOfficer: body.createdByLicensingOfficer,
     // The strings are trimmed for leading and trailing whitespace and then
     // copied across if they're in the POST body or are set to undefined if
     // they're missing.
