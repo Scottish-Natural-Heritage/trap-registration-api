@@ -19,15 +19,14 @@ router.get('/health', async (request, response) => {
 router.get('/registrations', async (request, response) => {
   try {
     const registrations = await Registration.findAll();
-    if (registrations) {
-      // If they are, send back the finalised registrations.
-      response.status(200).send(registrations);
-    } else {
-      response.status(404).send({message: `No registrations found.`});
-      return;
+
+    if (registrations === undefined || registrations === null) {
+      return response.status(404).send({message: `No registrations found.`});
     }
+
+    return response.status(200).send(registrations);
   } catch (error) {
-    response.status(500).send({error});
+    return response.status(500).send({error});
   }
 });
 // Allow an API consumer to allocate a new registration number.
@@ -40,9 +39,9 @@ router.post('/registrations', async (request, response) => {
 
   try {
     const newId = await Registration.create();
-    response.status(201).location(new URL(newId, baseUrl)).send();
+    return response.status(201).location(new URL(newId, baseUrl)).send();
   } catch (error) {
-    response.status(500).send({error});
+    return response.status(500).send({error});
   }
 });
 
@@ -81,20 +80,18 @@ router.get('/registrations/:id', async (request, response) => {
   try {
     const existingId = Number(request.params.id);
     if (isNaN(existingId)) {
-      response.status(404).send({message: `Registration ${request.params.id} not valid.`});
-      return;
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
     const registration = await Registration.findOne(existingId);
-    if (registration) {
-      // If they are, send back the finalised registration.
-      response.status(200).send(registration);
-    } else {
-      response.status(404).send({message: `Registration ${request.params.id} not valid.`});
-      return;
+
+    if (registration === undefined || registration === null) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
+
+    return response.status(200).send(registration);
   } catch (error) {
-    response.status(500).send({error});
+    return response.status(500).send({error});
   }
 });
 
@@ -104,21 +101,18 @@ router.put('/registrations/:id', async (request, response) => {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
     if (isNaN(existingId)) {
-      response.status(404).send({message: `Registration ${request.params.id} not valid.`});
-      return;
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
     // Check if there's a registration allocated at the specified ID.
     const existingReg = await Registration.findOne(existingId);
     if (existingReg === undefined || existingReg === null) {
-      response.status(404).send({message: `Registration ${existingId} not allocated.`});
-      return;
+      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
     }
 
     // Check the specified registration hasn't been assigned to anyone yet.
     if (existingReg.fullName !== undefined && existingReg.fullName !== null) {
-      response.status(409).send({message: `Registration ${existingId} already assigned.`});
-      return;
+      return response.status(409).send({message: `Registration ${existingId} already assigned.`});
     }
 
     // Clean up the user's input before we store it in the database.
@@ -129,14 +123,95 @@ router.put('/registrations/:id', async (request, response) => {
 
     // If they're not successful, send a 500 error.
     if (updatedReg === undefined) {
-      response.status(500).send({message: `Could not update registration ${existingId}.`});
+      return response.status(500).send({message: `Could not update registration ${existingId}.`});
     }
 
     // If they are, send back the finalised registration.
-    response.status(200).send(updatedReg);
+    return response.status(200).send(updatedReg);
   } catch (error) {
     // If anything goes wrong (such as a validation error), tell the client.
-    response.status(500).send({error});
+    return response.status(500).send({error});
+  }
+});
+
+router.get('/returns', async (request, response) => {
+  try {
+    const returns = await Return.findAll();
+
+    if (returns === undefined || returns === null) {
+      return response.status(404).send({message: `No returns found.`});
+    }
+
+    return response.status(200).send(returns);
+  } catch (error) {
+    return response.status(500).send({error});
+  }
+});
+
+router.get('/registrations/:id/return', async (request, response) => {
+  try {
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingId = Number(request.params.id);
+    if (isNaN(existingId)) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    }
+
+    // Check if there's a registration allocated at the specified ID.
+    const existingReg = await Registration.findOne(existingId);
+    if (existingReg === undefined || existingReg === null) {
+      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+    }
+
+    const returns = await Return.findRegReturns(existingId);
+
+    if (returns === undefined || returns === null) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    }
+
+    return response.status(200).send(returns);
+  } catch (error) {
+    return response.status(500).send({error});
+  }
+});
+
+router.get('/registrations/:id/return/:returnId', async (request, response) => {
+  try {
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingId = Number(request.params.id);
+    if (isNaN(existingId)) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    }
+
+    // Check if there's a registration allocated at the specified ID.
+    const existingReg = await Registration.findOne(existingId);
+    if (existingReg === undefined || existingReg === null) {
+      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+    }
+
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingReturnId = Number(request.params.returnId);
+    if (isNaN(existingReturnId)) {
+      return response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
+    }
+
+    // Check if there's a return allocated at the specified ID.
+    const existingReturn = await Return.findOne(existingReturnId);
+
+    if (existingReturn === undefined || existingReturn === null) {
+      return response.status(404).send({message: `Return ${existingReturnId} not allocated.`});
+    }
+
+    // Check if the return is allocated to the specified registration.
+    if (existingReturn.RegistrationId !== existingId) {
+      return response
+        .status(404)
+        .send({message: `Return ${existingReturnId} not found against Registration ${existingId}.`});
+    }
+
+    // If they are, send back the finalised return.
+    return response.status(200).send(existingReturn);
+  } catch (error) {
+    return response.status(500).send({error});
   }
 });
 
@@ -144,7 +219,7 @@ router.put('/registrations/:id', async (request, response) => {
 // validate our signed JWTs.
 router.get('/public-key', async (request, response) => {
   const key = await jose.JWK.asKey(config.jwtPublicKey, 'pem');
-  response.status(200).send(key.toJSON());
+  return response.status(200).send(key.toJSON());
 });
 
 /**
@@ -248,13 +323,12 @@ router.get('/registrations/:id/login', async (request, response) => {
 
   // If we're in production, no matter what, tell the API consumer that everything went well.
   if (process.env.NODE_ENV === 'production') {
-    response.status(200).send();
-    return;
+    return response.status(200).send();
   }
 
   // If we're in development mode, send back a debug message, with the link for
   // the developer, to avoid sending unnecessary emails.
-  response.status(200).send({
+  return response.status(200).send({
     idInvalid,
     idNotFound,
     postcodeInvalid,
@@ -305,15 +379,13 @@ router.post('/registrations/:id/return', async (request, response) => {
   // Try to parse the incoming ID to make sure it's really a number.
   const existingId = Number(request.params.id);
   if (isNaN(existingId)) {
-    response.status(404).send({message: `Registration ${request.params.id} not valid.`});
-    return;
+    return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
   }
 
   // Check if there's a registration allocated at the specified ID.
   const existingReg = await Registration.findOne(existingId);
   if (existingReg === undefined || existingReg === null) {
-    response.status(404).send({message: `Registration ${existingId} not allocated.`});
-    return;
+    return response.status(404).send({message: `Registration ${existingId} not allocated.`});
   }
 
   const baseUrl = new URL(
@@ -324,9 +396,9 @@ router.post('/registrations/:id/return', async (request, response) => {
 
   try {
     const newId = await Return.create();
-    response.status(201).location(new URL(newId, baseUrl)).send();
+    return response.status(201).location(new URL(newId, baseUrl)).send();
   } catch (error) {
-    response.status(500).send({error});
+    return response.status(500).send({error});
   }
 });
 
@@ -355,28 +427,24 @@ router.put('/registrations/:id/return/:returnId', async (request, response) => {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
     if (isNaN(existingId)) {
-      response.status(404).send({message: `Registration ${request.params.id} not valid.`});
-      return;
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
     // Check if there's a registration allocated at the specified ID.
     const existingReg = await Registration.findOne(existingId);
     if (existingReg === undefined || existingReg === null) {
-      response.status(404).send({message: `Registration ${existingId} not allocated.`});
-      return;
+      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
     }
 
     const existingReturnId = Number(request.params.returnId);
     if (isNaN(existingReturnId)) {
-      response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
-      return;
+      return response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
     }
 
     // Check if there's a return allocated at the specified ID.
     const existingReturn = await Return.findOne(existingReturnId);
     if (existingReturn === undefined || existingReturn === null) {
-      response.status(404).send({message: `Return ${existingReturnId} not allocated.`});
-      return;
+      return response.status(404).send({message: `Return ${existingReturnId} not allocated.`});
     }
 
     // Clean up the user's input before we store it in the database.
@@ -387,17 +455,17 @@ router.put('/registrations/:id/return/:returnId', async (request, response) => {
 
     // If they're not successful, send a 500 error.
     if (updatedReturn === undefined) {
-      response.status(500).send({message: `Could not update return ${existingReturnId}.`});
+      return response.status(500).send({message: `Could not update return ${existingReturnId}.`});
     }
 
     // Send the trap holder their confirmation email.
     await sendSuccessReturnEmail(config.notifyApiKey, existingReg.emailAddress, existingId);
 
     // If they are, send back the finalised return.
-    response.status(200).send(updatedReturn);
+    return response.status(200).send(updatedReturn);
   } catch (error) {
     // If anything goes wrong (such as a validation error), tell the client.
-    response.status(500).send({error});
+    return response.status(500).send({error});
   }
 });
 
