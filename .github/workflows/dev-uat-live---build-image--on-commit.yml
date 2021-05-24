@@ -6,8 +6,6 @@ on:
 
 env:
   ECR_REPOSITORY: naturescot/trap-registration-api
-  TR_NOTIFY_API_KEY: ${{ secrets.TR_NOTIFY_LIVE_KEY }}
-  JWT_KEY_GPG_PASSPHRASE: ${{ secrets.TR_JWT_KEY_GPG_PASSPHRASE }}
 
 jobs:
 
@@ -24,6 +22,8 @@ jobs:
         node-version: '12'
 
     - name: Decrypt the secrets
+      env:
+        JWT_KEY_GPG_PASSPHRASE: ${{ secrets.TR_JWT_KEY_GPG_PASSPHRASE }}
       run: |
         chmod +x ./decrypt_secrets.sh
         ./decrypt_secrets.sh
@@ -37,6 +37,8 @@ jobs:
         npm run lint
 
     - name: Check the integration tests
+      env:
+        TR_NOTIFY_API_KEY: ${{ secrets.TR_NOTIFY_TEST_KEY }}
       run: |
         npm run test
 
