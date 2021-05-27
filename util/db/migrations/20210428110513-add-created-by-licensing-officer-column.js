@@ -1,10 +1,24 @@
 'use strict';
+const databaseConfig = require('../../../src/config/database.js');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('Registrations', 'createdByLicensingOfficer', {type: Sequelize.BOOLEAN});
+    await queryInterface.addColumn(
+      {
+        schema: databaseConfig.database.schema,
+        tableName: 'Registrations'
+      },
+      'createdByLicensingOfficer',
+      Sequelize.BOOLEAN
+    );
   },
   down: async (queryInterface) => {
-    await queryInterface.removeColumn('Registrations', 'createdByLicensingOfficer');
+    await queryInterface.removeColumn(
+      {
+        schema: databaseConfig.database.schema,
+        tableName: 'Registrations'
+      },
+      'createdByLicensingOfficer'
+    );
   }
 };
