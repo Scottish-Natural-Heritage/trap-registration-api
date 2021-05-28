@@ -65,7 +65,7 @@ const RegistrationModel = (sequelize, DataTypes) => {
         }
       },
       createdByLicensingOfficer: {
-        type: DataTypes.BOOLEAN
+        type: DataTypes.STRING
       }
     },
     {
