@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "eb854df0-45b1-48ad-86fd-fed332551865",
+		"_postman_id": "9bdf477d-d9ce-4f89-b37e-de74502e2887",
 		"name": "trap-registration-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -444,7 +444,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\",\r\n  \"createdByLicensingOfficer\": true\r\n}"
+					"raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\",\r\n  \"createdByLicensingOfficer\": \"9990000\"\r\n}"
 				},
 				"url": {
 					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/{{TR_NEW_REG_ID}}",
@@ -498,7 +498,7 @@
 							"    pm.expect(jsonData).to.have.property('Returns');\r",
 							"    pm.expect(jsonData.Returns.length).to.equal(0);\r",
 							"    pm.expect(jsonData).to.have.property('createdByLicensingOfficer');\r",
-							"    pm.expect(jsonData.createdByLicensingOfficer).to.be.true;\r",
+							"    pm.expect(jsonData.createdByLicensingOfficer).to.equal('9990000');\r",
 							"});"
 						],
 						"type": "text/javascript"
