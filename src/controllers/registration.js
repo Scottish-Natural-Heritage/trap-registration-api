@@ -4,7 +4,7 @@ import Sequelize from 'sequelize';
 import NotifyClient from 'notifications-node-client';
 import config from '../config/app.js';
 
-const {Registration} = db;
+const {Registration, Return, NonTargetSpecies} = db;
 
 /**
  * Attempt to create an empty, randomly allocated registration.
@@ -127,7 +127,16 @@ const RegistrationController = {
    * @returns an existing registration
    */
   findOne: async (id) => {
-    return Registration.findByPk(id);
+    return Registration.findByPk(id, {include: [{model: Return, include: NonTargetSpecies}]});
+  },
+
+  /**
+   * Retrieve all registrations from the database.
+   *
+   * @returns all existing registrations
+   */
+  findAll: async () => {
+    return Registration.findAll();
   },
 
   /**

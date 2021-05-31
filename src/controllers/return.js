@@ -35,6 +35,24 @@ const ReturnController = {
     return Return.findByPk(id, {include: NonTargetSpecies});
   },
 
+  findRegReturns: async (id) => {
+    return Return.findAll({
+      where: {
+        RegistrationId: id
+      },
+      include: NonTargetSpecies
+    });
+  },
+
+  /**
+   * Retrieve all returns from the database.
+   *
+   * @returns all existing returns
+   */
+  findAll: async () => {
+    return Return.findAll();
+  },
+
   /**
    * Replace a return in the database with our new JSON model.
    *

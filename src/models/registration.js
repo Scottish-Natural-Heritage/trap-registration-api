@@ -63,6 +63,9 @@ const RegistrationModel = (sequelize, DataTypes) => {
           notEmpty: true,
           isEmail: true
         }
+      },
+      createdByLicensingOfficer: {
+        type: DataTypes.STRING
       }
     },
     {
