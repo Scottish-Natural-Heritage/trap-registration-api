@@ -173,6 +173,27 @@ const RegistrationController = {
 
     // If something went wrong, return undefined to signify this.
     return undefined;
+  },
+
+  /**
+   * Soft delete a registration in the database.
+   *
+   * @param {Number} id an existing registration's ID to be deleted
+   * @returns {boolean} true if the record is deleted, otherwise false
+   */
+  delete: async (id) => {
+    // Save the new values to the database.
+    const result = await Registration.destroy({where: {id}});
+    // Check to make sure the saving process went OK.
+    const success = result === 1;
+    if (success) {
+      // Return the updated object to the caller, for them to send back to the
+      // client.
+      return result;
+    }
+
+    // If something went wrong, return undefined to signify this.
+    return undefined;
   }
 };
 
