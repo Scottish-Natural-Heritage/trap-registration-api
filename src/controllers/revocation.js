@@ -49,7 +49,7 @@ const RevocationController = {
    * @param {any} revocation a JSON version of the model to replace the database's copy
    * @returns {boolean} true if the record is updated, otherwise false
    */
-  update: async (id, revocation) => {;
+  update: async (id, revocation) => {
     // Save the new values to the database.
     const result = await Revocation.update(revocation, {where: {id}});
     // Check to make sure the saving process went OK.

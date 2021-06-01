@@ -10,6 +10,7 @@ const router = express.Router();
 
 import Registration from './controllers/registration.js';
 import Return from './controllers/return.js';
+import Revocation from './controllers/revocation.js';
 
 // `/health` is a simple health-check end-point to test whether the service is up.
 router.get('/health', async (request, response) => {
@@ -128,6 +129,69 @@ router.put('/registrations/:id', async (request, response) => {
 
     // If they are, send back the finalised registration.
     return response.status(200).send(updatedReg);
+  } catch (error) {
+    // If anything goes wrong (such as a validation error), tell the client.
+    return response.status(500).send({error});
+  }
+});
+
+/**
+ * Clean the incoming request body to make it more compatible with the
+ * database and its validation rules.
+ *
+ * @param {any} existingId the Registration that is being revoked
+ * @param {any} body the incoming request's body
+ * @returns {any} a json object that's just got our cleaned up fields on it
+ */
+const cleanRevokeInput = (existingId, body) => {
+  return {
+    RegistrationId: existingId,
+    // The strings are trimmed for leading and trailing whitespace and then
+    // copied across if they're in the POST body or are set to undefined if
+    // they're missing.
+    reason: body.reason === undefined ? undefined : body.reason.trim(),
+    revokedBy: body.revokedBy === undefined ? undefined : body.revokedBy.trim()
+  };
+};
+
+// Allow an API consumer to delete a registration.
+router.delete('/registrations/:id', async (request, response) => {
+  try {
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingId = Number(request.params.id);
+    if (isNaN(existingId)) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    }
+
+    // Check if there's a registration allocated at the specified ID.
+    const existingReg = await Registration.findOne(existingId);
+    if (existingReg === undefined || existingReg === null) {
+      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+    }
+
+    // Create an empty revocation entry.
+    const newId = await Revocation.create();
+    // Clean up the user's input before we store it in the database.
+    const cleanObject = cleanRevokeInput(existingId, request.body);
+
+    // Update the revocation in the database with our client's values.
+    const updatedRevocation = await Revocation.update(newId, cleanObject);
+
+    // If they're not successful, send a 500 error.
+    if (updatedRevocation === undefined) {
+      return response.status(500).send({message: `Could not update revocation ${newId}.`});
+    }
+
+    // Soft delete the registration that is being revoked.
+    const deleteRegistration = await Registration.delete(existingId);
+
+    // If they're not successful, send a 500 error.
+    if (deleteRegistration === undefined) {
+      return response.status(500).send({message: `Could not delete Registration ${existingId}.`});
+    }
+
+    // If they are, send back true.
+    return response.status(200).send(updatedRevocation);
   } catch (error) {
     // If anything goes wrong (such as a validation error), tell the client.
     return response.status(500).send({error});
