@@ -7,10 +7,8 @@ import jose from 'node-jose';
 import NotifyClient from 'notifications-node-client';
 
 const router = express.Router();
-
 import Registration from './controllers/registration.js';
 import Return from './controllers/return.js';
-import Revocation from './controllers/revocation.js';
 
 // `/health` is a simple health-check end-point to test whether the service is up.
 router.get('/health', async (request, response) => {
@@ -163,35 +161,17 @@ router.delete('/registrations/:id', async (request, response) => {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
-    // Check if there's a registration allocated at the specified ID.
-    const existingReg = await Registration.findOne(existingId);
-    if (existingReg === undefined || existingReg === null) {
-      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
-    }
-
-    // Create an empty revocation entry.
-    const newId = await Revocation.create();
     // Clean up the user's input before we store it in the database.
     const cleanObject = cleanRevokeInput(existingId, request.body);
 
-    // Update the revocation in the database with our client's values.
-    const updatedRevocation = await Revocation.update(newId, cleanObject);
+    const deleteRegistration = await Registration.delete(existingId, cleanObject);
 
-    // If they're not successful, send a 500 error.
-    if (updatedRevocation === undefined) {
-      return response.status(500).send({message: `Could not update revocation ${newId}.`});
-    }
-
-    // Soft delete the registration that is being revoked.
-    const deleteRegistration = await Registration.delete(existingId);
-
-    // If they're not successful, send a 500 error.
-    if (deleteRegistration === undefined) {
+    if (deleteRegistration === false) {
       return response.status(500).send({message: `Could not delete Registration ${existingId}.`});
     }
 
     // If they are, send back true.
-    return response.status(200).send(updatedRevocation);
+    return response.status(200).send();
   } catch (error) {
     // If anything goes wrong (such as a validation error), tell the client.
     return response.status(500).send({error});

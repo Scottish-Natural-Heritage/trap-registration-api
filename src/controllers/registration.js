@@ -4,7 +4,7 @@ import Sequelize from 'sequelize';
 import NotifyClient from 'notifications-node-client';
 import config from '../config/app.js';
 
-const {Registration, Return, NonTargetSpecies} = db;
+const {Registration, Return, NonTargetSpecies, Revocation} = db;
 
 /**
  * Attempt to create an empty, randomly allocated registration.
@@ -178,22 +178,21 @@ const RegistrationController = {
   /**
    * Soft delete a registration in the database.
    *
-   * @param {Number} id an existing registration's ID to be deleted
+   * @param {Number} id a possible ID of a registration.
+   * @param {Object} cleanObject an new revocation object to be added to the database.
    * @returns {boolean} true if the record is deleted, otherwise false
    */
-  delete: async (id) => {
-    // Save the new values to the database.
-    const result = await Registration.destroy({where: {id}});
-    // Check to make sure the saving process went OK.
-    const success = result === 1;
-    if (success) {
-      // Return the updated object to the caller, for them to send back to the
-      // client.
-      return result;
+  delete: async (id, cleanObject) => {
+    try {
+      await db.sequelize.transaction(async (t) => {
+        await Registration.findByPk(id, {transaction: t, rejectOnEmpty: true});
+        await Revocation.create(cleanObject, {transaction: t});
+        await Registration.destroy({where: {id}, transaction: t});
+        return true;
+      });
+    } catch {
+      return false;
     }
-
-    // If something went wrong, return undefined to signify this.
-    return undefined;
   }
 };
 
