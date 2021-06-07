@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9bdf477d-d9ce-4f89-b37e-de74502e2887",
+		"_postman_id": "fe1c57f1-12f6-4adc-be47-7fa3717469bf",
 		"name": "trap-registration-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -444,7 +444,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\",\r\n  \"createdByLicensingOfficer\": \"9990000\"\r\n}"
+					"raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\",\r\n  \"createdByLicensingOfficer\": true\r\n}"
 				},
 				"url": {
 					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/{{TR_NEW_REG_ID}}",
@@ -498,7 +498,6 @@
 							"    pm.expect(jsonData).to.have.property('Returns');\r",
 							"    pm.expect(jsonData.Returns.length).to.equal(0);\r",
 							"    pm.expect(jsonData).to.have.property('createdByLicensingOfficer');\r",
-							"    pm.expect(jsonData.createdByLicensingOfficer).to.equal('9990000');\r",
 							"});"
 						],
 						"type": "text/javascript"
@@ -1052,6 +1051,88 @@
 						"{{TR_NEW_REG_ID}}",
 						"return",
 						"{{TR_NEW_RET_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Revoke Registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"reason\": \"Nature Scot Reason\",\r\n    \"revokedBy\": \"989745\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get revoked registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 404 Not Found', function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"    pm.response.to.have.status('Not Found');\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
 					]
 				}
 			},
