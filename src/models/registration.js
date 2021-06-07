@@ -1,4 +1,7 @@
 'use strict';
+
+import utils from 'naturescot-utils';
+
 const RegistrationModel = (sequelize, DataTypes) => {
   const Registration = sequelize.define(
     'Registration',
@@ -61,7 +64,14 @@ const RegistrationModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         validate: {
           notEmpty: true,
-          isEmail: true
+          isValidEmail(value) {
+            try {
+              utils.recipients.validateEmailAddress(value);
+              return true;
+            } catch {
+              return false;
+            }
+          }
         }
       },
       createdByLicensingOfficer: {

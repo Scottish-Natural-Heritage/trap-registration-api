@@ -4,6 +4,7 @@ import config from './config/app.js';
 import jwt from 'jsonwebtoken';
 import jose from 'node-jose';
 
+import utils from 'naturescot-utils';
 import NotifyClient from 'notifications-node-client';
 
 const router = express.Router();
@@ -72,7 +73,10 @@ const cleanInput = (body) => {
     addressCounty: body.addressCounty === undefined ? undefined : body.addressCounty.trim(),
     addressPostcode: body.addressPostcode === undefined ? undefined : body.addressPostcode.trim(),
     phoneNumber: body.phoneNumber === undefined ? undefined : body.phoneNumber.trim(),
-    emailAddress: body.emailAddress === undefined ? undefined : body.emailAddress.trim()
+    emailAddress:
+      body.emailAddress === undefined
+        ? undefined
+        : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase())
   };
 };
 
