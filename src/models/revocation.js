@@ -21,8 +21,11 @@ const RevocationModel = (sequelize) => {
           notEmpty: true
         }
       },
-      revokedBy: {
+      createdBy: {
         type: Sequelize.STRING
+      },
+      isRevoked: {
+        type: Sequelize.BOOLEAN
       },
       reason: {
         type: Sequelize.STRING
