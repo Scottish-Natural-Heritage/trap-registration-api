@@ -152,7 +152,8 @@ const cleanRevokeInput = (existingId, body) => {
     // copied across if they're in the POST body or are set to undefined if
     // they're missing.
     reason: body.reason === undefined ? undefined : body.reason.trim(),
-    revokedBy: body.revokedBy === undefined ? undefined : body.revokedBy.trim()
+    createdBy: body.createdBy === undefined ? undefined : body.createdBy.trim(),
+    isRevoked: body.isRevoked
   };
 };
 
