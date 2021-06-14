@@ -21,6 +21,9 @@ const ReturnModel = (sequelize) => {
       },
       nonTargetSpeciesToReport: {
         type: Sequelize.BOOLEAN
+      },
+      createdByLicensingOfficer: {
+        type: Sequelize.STRING
       }
     },
     {
