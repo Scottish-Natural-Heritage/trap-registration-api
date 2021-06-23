@@ -19,34 +19,35 @@
   },
   "license": "MIT",
   "dependencies": {
-    "babel-eslint": "^10.1.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "naturescot-utils": "^1.1.0",
     "node-jose": "^2.0.0",
-    "notifications-node-client": "^4.7.2",
-    "pg": "^7.18.2",
-    "pg-hstore": "^2.3.3",
-    "prettier": "^2.0.2",
-    "sequelize": "^5.21.5",
-    "sequelize-cli": "^5.5.1",
-    "winston": "^3.2.1",
-    "xo": "^0.28.0"
+    "notifications-node-client": "^5.1.0",
+    "on-finished": "^2.3.0",
+    "pg": "^8.6.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.6.2",
+    "sequelize-cli": "^6.2.0",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
-    "newman": "^4.6.0",
-    "sqlite3": "^5.0.0",
-    "start-server-and-test": "^1.10.11"
+    "newman": "^5.2.3",
+    "prettier": "^2.3.1",
+    "sqlite3": "^5.0.2",
+    "start-server-and-test": "^1.12.5",
+    "xo": "^0.40.3"
   },
   "xo": {
     "space": 2,
     "prettier": true,
-    "parser": "babel-eslint",
     "rules": {
       "unicorn/prefer-module": 0,
+      "unicorn/prefer-node-protocol": 0,
       "import/extensions": 0,
-      "new-cap": 0
+      "new-cap": 0,
+      "no-console": 0
     }
   },
   "prettier": {

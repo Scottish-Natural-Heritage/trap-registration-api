@@ -1,5 +1,4 @@
 import express from 'express';
-import config from './config/app.js';
 
 import jwt from 'jsonwebtoken';
 import jose from 'node-jose';
@@ -7,9 +6,12 @@ import jose from 'node-jose';
 import utils from 'naturescot-utils';
 import NotifyClient from 'notifications-node-client';
 
-const router = express.Router();
+import config from './config/app.js';
+
 import Registration from './controllers/registration.js';
 import Return from './controllers/return.js';
+
+const router = express.Router();
 
 // `/health` is a simple health-check end-point to test whether the service is up.
 router.get('/health', async (request, response) => {
@@ -82,7 +84,7 @@ const cleanInput = (body) => {
 router.get('/registrations/:id', async (request, response) => {
   try {
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -103,7 +105,7 @@ router.put('/registrations/:id', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -162,7 +164,7 @@ router.delete('/registrations/:id', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -201,7 +203,7 @@ router.get('/registrations/:id/return', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -227,7 +229,7 @@ router.get('/registrations/:id/return/:returnId', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -239,7 +241,7 @@ router.get('/registrations/:id/return/:returnId', async (request, response) => {
 
     // Try to parse the incoming ID to make sure it's really a number.
     const existingReturnId = Number(request.params.returnId);
-    if (isNaN(existingReturnId)) {
+    if (Number.isNaN(existingReturnId)) {
       return response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
     }
 
@@ -332,7 +334,7 @@ const postcodesMatch = (postcode1, postcode2) => {
 router.get('/registrations/:id/login', async (request, response) => {
   // Try to parse the incoming ID to make sure it's really a number.
   const existingId = Number(request.params.id);
-  const idInvalid = isNaN(existingId);
+  const idInvalid = Number.isNaN(existingId);
 
   // Check if there's a registration allocated at the specified ID.
   const existingReg = await Registration.findOne(existingId);
@@ -427,7 +429,7 @@ const cleanReturnInput = (id, body) => {
 router.post('/registrations/:id/return', async (request, response) => {
   // Try to parse the incoming ID to make sure it's really a number.
   const existingId = Number(request.params.id);
-  if (isNaN(existingId)) {
+  if (Number.isNaN(existingId)) {
     return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
   }
 
@@ -475,7 +477,7 @@ router.put('/registrations/:id/return/:returnId', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -486,7 +488,7 @@ router.put('/registrations/:id/return/:returnId', async (request, response) => {
     }
 
     const existingReturnId = Number(request.params.returnId);
-    if (isNaN(existingReturnId)) {
+    if (Number.isNaN(existingReturnId)) {
       return response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
     }
 

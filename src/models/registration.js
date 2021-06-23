@@ -1,5 +1,3 @@
-'use strict';
-
 import utils from 'naturescot-utils';
 
 const RegistrationModel = (sequelize, DataTypes) => {

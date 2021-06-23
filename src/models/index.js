@@ -1,5 +1,5 @@
-import dbConfig from '../config/database.js';
 import Sequelize from 'sequelize';
+import dbConfig from '../config/database.js';
 
 import Registration from './registration.js';
 import Return from './return.js';

@@ -1,7 +1,7 @@
-// eslint-disable-next-line unicorn/import-index, import/no-useless-path-segments
-import db from '../models/index.js';
 import Sequelize from 'sequelize';
 import NotifyClient from 'notifications-node-client';
+
+import db from '../models/index.js';
 import config from '../config/app.js';
 
 const {Registration, Return, NonTargetSpecies, Revocation} = db;
@@ -21,7 +21,7 @@ const tryCreate = async () => {
   try {
     // Generate a random 5 digit number and attempt to create a new record with
     // that ID.
-    const newReg = await Registration.create({id: Math.floor(Math.random() * 99999)});
+    const newReg = await Registration.create({id: Math.floor(Math.random() * 99_999)});
 
     // X.create only ever returns if it's successful, so we can just return our
     // new model.
