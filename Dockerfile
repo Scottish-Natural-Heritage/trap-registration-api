@@ -35,4 +35,4 @@ ENV TR_NOTIFY_API_KEY override_this_value
 EXPOSE $TR_API_PORT
 
 # run the default start script, which kicks off a few pre-start things too
-CMD ["npm", "start"]
+CMD ["npm", "start", "--silent"]

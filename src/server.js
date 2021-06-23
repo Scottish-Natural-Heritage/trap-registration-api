@@ -5,6 +5,4 @@ import config from './config/app.js';
 import app from './app.js';
 
 // Run it.
-app.listen(config.port, () => {
-  console.log(`Server listening on http://localhost:${config.port}${config.pathPrefix}.`);
-});
+app.listen(config.port);
