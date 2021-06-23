@@ -1,5 +1,6 @@
 import express from 'express';
 
+import apiLogger from './api-logger.js';
 import config from './config/app.js';
 import router from './router.js';
 
@@ -7,6 +8,8 @@ const app = express();
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+
+app.use(apiLogger);
 
 app.use(`${config.pathPrefix}/v1`, router);
 
