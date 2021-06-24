@@ -68,26 +68,28 @@ const buildExpiryDateString = (issueDate) => {
  * @param {any} reg an enhanced JSON version of the model
  */
 const sendSuccessEmail = async (reg) => {
-  const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
+  if (config.notifyApiKey) {
+    const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
 
-  await notifyClient.sendEmail('7b7a0810-a15d-4c72-8fcf-c1e7494641b3', reg.emailAddress, {
-    personalisation: {
-      regNo: reg.regNo,
-      convictions: reg.convictions ? 'yes' : 'no',
-      noConvictions: reg.convictions ? 'no' : 'yes',
-      general1: reg.usingGL01 ? 'yes' : 'no',
-      noGeneral1: reg.usingGL01 ? 'no' : 'yes',
-      general2: reg.usingGL02 ? 'yes' : 'no',
-      noGeneral2: reg.usingGL02 ? 'no' : 'yes',
-      comply: reg.complyWithTerms ? 'yes' : 'no',
-      noComply: reg.complyWithTerms ? 'no' : 'yes',
-      meatBait: reg.meatBaits ? 'yes' : 'no',
-      noMeatBait: reg.meatBaits ? 'no' : 'yes',
-      expiryDate: reg.expiryDate
-    },
-    reference: reg.regNo,
-    emailReplyToId: '4a9b34d1-ab1f-4806-83df-3e29afef4165'
-  });
+    await notifyClient.sendEmail('7b7a0810-a15d-4c72-8fcf-c1e7494641b3', reg.emailAddress, {
+      personalisation: {
+        regNo: reg.regNo,
+        convictions: reg.convictions ? 'yes' : 'no',
+        noConvictions: reg.convictions ? 'no' : 'yes',
+        general1: reg.usingGL01 ? 'yes' : 'no',
+        noGeneral1: reg.usingGL01 ? 'no' : 'yes',
+        general2: reg.usingGL02 ? 'yes' : 'no',
+        noGeneral2: reg.usingGL02 ? 'no' : 'yes',
+        comply: reg.complyWithTerms ? 'yes' : 'no',
+        noComply: reg.complyWithTerms ? 'no' : 'yes',
+        meatBait: reg.meatBaits ? 'yes' : 'no',
+        noMeatBait: reg.meatBaits ? 'no' : 'yes',
+        expiryDate: reg.expiryDate
+      },
+      reference: reg.regNo,
+      emailReplyToId: '4a9b34d1-ab1f-4806-83df-3e29afef4165'
+    });
+  }
 };
 
 /**

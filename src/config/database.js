@@ -1,4 +1,4 @@
-const config = require('./app');
+const config = require('./app.js');
 
 if (process.env.NODE_ENV === 'production') {
   module.exports = {

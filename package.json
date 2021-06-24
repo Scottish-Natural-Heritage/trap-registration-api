@@ -1,6 +1,6 @@
 {
   "name": "trap-registration-api",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "description": "",
   "author": "Mike Coats <mike.coats@nature.scot>",
   "repository": "github:Scottish-Natural-Heritage/trap-registration-api",
@@ -9,7 +9,7 @@
     "lint": "xo",
     "premigrations": "npx sequelize-cli db:migrate --env preMigrations --migrations-path util/db/pre-migrations >/dev/null",
     "migrations": "npx sequelize-cli db:migrate  --env database >/dev/null",
-    "prestart": "npm run lint && npm run migrations",
+    "prestart": "npm run migrations",
     "start": "node --no-warnings src/server.js",
     "nm:run": "newman run tests/trap-registration-api.postman_collection.json",
     "test": "start-server-and-test start http://localhost:3001/trap-registration-api/v1/health nm:run"
@@ -21,9 +21,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
-    "morgan": "^1.10.0",
+    "jwk-to-pem": "^2.0.5",
     "naturescot-utils": "^1.1.0",
-    "node-jose": "^2.0.0",
     "notifications-node-client": "^5.1.0",
     "on-finished": "^2.3.0",
     "pg": "^8.6.0",
@@ -44,10 +43,9 @@
     "prettier": true,
     "rules": {
       "unicorn/prefer-module": 0,
-      "unicorn/prefer-node-protocol": 0,
-      "import/extensions": 0,
+      "import/extensions": 1,
       "new-cap": 0,
-      "no-console": 0
+      "no-console": 1
     }
   },
   "prettier": {

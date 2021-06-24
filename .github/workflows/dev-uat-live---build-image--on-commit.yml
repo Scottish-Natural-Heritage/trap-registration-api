@@ -75,5 +75,4 @@ jobs:
     - name: Delete the public and private JWT key
       if: always()
       run: |
-        rm -f ./.secrets/jwt-key.pub
         rm -f ./.secrets/jwt-key
