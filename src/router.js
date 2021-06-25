@@ -404,6 +404,7 @@ const cleanReturnInput = (id, body) => {
     nonTargetSpeciesToReport: body.nonTargetSpeciesToReport,
     // The id passed in is set as the registration id.
     RegistrationId: id,
+    createdByLicensingOfficer: body.createdByLicensingOfficer,
 
     // We copy across the nonTargetSpeciesCaught, cleaning them as we go.
     nonTargetSpecies:
