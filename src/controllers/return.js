@@ -1,4 +1,3 @@
-// eslint-disable-next-line unicorn/import-index, import/no-useless-path-segments
 import db from '../models/index.js';
 
 const {Return, NonTargetSpecies} = db;

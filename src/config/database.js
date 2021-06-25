@@ -1,4 +1,4 @@
-const config = require('./app');
+const config = require('./app.js');
 
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
@@ -25,11 +25,13 @@ if (process.env.NODE_ENV === 'production') {
   module.exports = {
     preMigrations: {
       dialect: 'sqlite',
-      storage: './.development.db'
+      storage: './.development.db',
+      logging: false
     },
     database: {
       dialect: 'sqlite',
-      storage: './.development.db'
+      storage: './.development.db',
+      logging: false
     }
   };
 }

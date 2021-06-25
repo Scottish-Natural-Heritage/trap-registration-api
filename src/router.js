@@ -1,15 +1,17 @@
 import express from 'express';
-import config from './config/app.js';
 
 import jwt from 'jsonwebtoken';
-import jose from 'node-jose';
 
 import utils from 'naturescot-utils';
 import NotifyClient from 'notifications-node-client';
 
-const router = express.Router();
+import config from './config/app.js';
+import jwk from './config/jwk.js';
+
 import Registration from './controllers/registration.js';
 import Return from './controllers/return.js';
+
+const router = express.Router();
 
 // `/health` is a simple health-check end-point to test whether the service is up.
 router.get('/health', async (request, response) => {
@@ -82,7 +84,7 @@ const cleanInput = (body) => {
 router.get('/registrations/:id', async (request, response) => {
   try {
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -103,7 +105,7 @@ router.put('/registrations/:id', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -162,7 +164,7 @@ router.delete('/registrations/:id', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -201,7 +203,7 @@ router.get('/registrations/:id/return', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -227,7 +229,7 @@ router.get('/registrations/:id/return/:returnId', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -239,7 +241,7 @@ router.get('/registrations/:id/return/:returnId', async (request, response) => {
 
     // Try to parse the incoming ID to make sure it's really a number.
     const existingReturnId = Number(request.params.returnId);
-    if (isNaN(existingReturnId)) {
+    if (Number.isNaN(existingReturnId)) {
       return response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
     }
 
@@ -267,8 +269,7 @@ router.get('/registrations/:id/return/:returnId', async (request, response) => {
 // Allow an API consumer to retrieve the public half of our ECDSA key to
 // validate our signed JWTs.
 router.get('/public-key', async (request, response) => {
-  const key = await jose.JWK.asKey(config.jwtPublicKey, 'pem');
-  return response.status(200).send(key.toJSON());
+  return response.status(200).send(jwk.getPublicKey());
 });
 
 /**
@@ -292,15 +293,17 @@ const buildToken = (jwtPrivateKey, id) => {
  * @param {string} regNo trap registration number for notify's records
  */
 const sendLoginEmail = async (notifyApiKey, emailAddress, loginLink, regNo) => {
-  const notifyClient = new NotifyClient.NotifyClient(notifyApiKey);
+  if (notifyApiKey) {
+    const notifyClient = new NotifyClient.NotifyClient(notifyApiKey);
 
-  await notifyClient.sendEmail('a5901745-e01c-4e42-a726-ece91b63e593', emailAddress, {
-    personalisation: {
-      loginLink
-    },
-    reference: `${regNo}`,
-    emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
-  });
+    await notifyClient.sendEmail('a5901745-e01c-4e42-a726-ece91b63e593', emailAddress, {
+      personalisation: {
+        loginLink
+      },
+      reference: `${regNo}`,
+      emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
+    });
+  }
 };
 
 /**
@@ -332,7 +335,7 @@ const postcodesMatch = (postcode1, postcode2) => {
 router.get('/registrations/:id/login', async (request, response) => {
   // Try to parse the incoming ID to make sure it's really a number.
   const existingId = Number(request.params.id);
-  const idInvalid = isNaN(existingId);
+  const idInvalid = Number.isNaN(existingId);
 
   // Check if there's a registration allocated at the specified ID.
   const existingReg = await Registration.findOne(existingId);
@@ -354,7 +357,7 @@ router.get('/registrations/:id/login', async (request, response) => {
   // information, build them a token for logging in with.
   let token;
   if (!idInvalid && !idNotFound && !postcodeInvalid && !postcodeIncorrect) {
-    token = buildToken(config.jwtPrivateKey, existingId);
+    token = buildToken(jwk.getPrivateKey(), existingId);
   }
 
   // If the visitor has give us enough information, build them a link that will
@@ -427,7 +430,7 @@ const cleanReturnInput = (id, body) => {
 router.post('/registrations/:id/return', async (request, response) => {
   // Try to parse the incoming ID to make sure it's really a number.
   const existingId = Number(request.params.id);
-  if (isNaN(existingId)) {
+  if (Number.isNaN(existingId)) {
     return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
   }
 
@@ -459,15 +462,17 @@ router.post('/registrations/:id/return', async (request, response) => {
  * @param {string} regNo trap registration number for notify's records
  */
 const sendSuccessReturnEmail = async (apiKey, email, regNo) => {
-  const notifyClient = new NotifyClient.NotifyClient(apiKey);
+  if (apiKey) {
+    const notifyClient = new NotifyClient.NotifyClient(apiKey);
 
-  await notifyClient.sendEmail('dd023ad0-7168-44b6-86e2-f9795d3f78c5', email, {
-    personalisation: {
-      regNo: `${regNo}`
-    },
-    reference: `${regNo}`,
-    emailReplyToId: '4a9b34d1-ab1f-4806-83df-3e29afef4165'
-  });
+    await notifyClient.sendEmail('dd023ad0-7168-44b6-86e2-f9795d3f78c5', email, {
+      personalisation: {
+        regNo: `${regNo}`
+      },
+      reference: `${regNo}`,
+      emailReplyToId: '4a9b34d1-ab1f-4806-83df-3e29afef4165'
+    });
+  }
 };
 
 // Allow an API consumer to save a return against an allocated but un-assigned return number.
@@ -475,7 +480,7 @@ router.put('/registrations/:id/return/:returnId', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
-    if (isNaN(existingId)) {
+    if (Number.isNaN(existingId)) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
@@ -486,7 +491,7 @@ router.put('/registrations/:id/return/:returnId', async (request, response) => {
     }
 
     const existingReturnId = Number(request.params.returnId);
-    if (isNaN(existingReturnId)) {
+    if (Number.isNaN(existingReturnId)) {
       return response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
     }
 
