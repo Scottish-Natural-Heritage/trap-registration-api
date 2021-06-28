@@ -1,16 +1,16 @@
 import winston from 'winston';
 
-const logger = winston.createLogger({
-  level: 'info',
+const jsonConsoleLogger = winston.createLogger({
+  level: 'debug',
   format: winston.format.json(),
   defaultMeta: {service: 'trap-registration-api'},
   transports: [new winston.transports.Console({colorize: true})]
 });
 
-logger.stream = {
+jsonConsoleLogger.stream = {
   write: (message) => {
-    logger.info(message);
+    jsonConsoleLogger.info(message);
   }
 };
 
-export {logger as default};
+export {jsonConsoleLogger as default};

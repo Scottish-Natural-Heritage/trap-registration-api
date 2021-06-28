@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "3fe6ea53-8b14-4296-99cc-9283ddc03f01",
+		"_postman_id": "6726aaa5-a080-4d08-b1e7-dfa716289262",
 		"name": "trap-registration-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -601,7 +601,7 @@
 			"response": []
 		},
 		{
-			"name": "Create new Return",
+			"name": "Create new Return as a Visitor",
 			"event": [
 				{
 					"listen": "test",
@@ -650,7 +650,7 @@
 			"response": []
 		},
 		{
-			"name": "Update a Return",
+			"name": "Update a Return as a Visitor",
 			"event": [
 				{
 					"listen": "test",
@@ -705,7 +705,7 @@
 			"response": []
 		},
 		{
-			"name": "Get a Registration with Returns",
+			"name": "Get a Visitors Registration with Returns",
 			"event": [
 				{
 					"listen": "test",
@@ -781,7 +781,7 @@
 			"response": []
 		},
 		{
-			"name": "Create new Return for empty return",
+			"name": "Create new Return for empty return as a Visitor",
 			"event": [
 				{
 					"listen": "test",
@@ -830,7 +830,7 @@
 			"response": []
 		},
 		{
-			"name": "Update a Return with nothing to report",
+			"name": "Update a Return with nothing to report as a Visitor",
 			"event": [
 				{
 					"listen": "test",
@@ -879,6 +879,188 @@
 						"{{TR_NEW_REG_ID}}",
 						"return",
 						"{{TR_NEW_RET_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new Return as a Licensing officer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201 Created', function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.have.status('Created');\r",
+							"});\r",
+							"\r",
+							"pm.test('Location is present', function () {\r",
+							"    pm.response.to.have.header('Location');\r",
+							"    \r",
+							"    \r",
+							"    pm.expect(pm.response.headers.get('Location')).to.include(\r",
+							"        `http://localhost:3001/trap-registration-api/v1/registrations/`\r",
+							"    );\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"TR_NEW_RET_ID\", pm.response.headers.get('Location').split('/').pop());\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/{{TR_NEW_REG_ID}}/return",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"return"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a Return as a Licensing officer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('Returned object matches posted object', function () {\r",
+							"    \r",
+							"    var reqJsonData = JSON.parse(pm.request.body.raw);\r",
+							"    var resJsonData = pm.response.json();\r",
+							"    pm.expect(reqJsonData.nonTargetSpeciesToReport).to.eql(resJsonData.nonTargetSpeciesToReport);\r",
+							"    pm.expect(reqJsonData.createdByLicensingOfficer).to.eql(resJsonData.createdByLicensingOfficer);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nonTargetSpeciesToReport\": true,\r\n    \"createdByLicensingOfficer\": \"939123\",\r\n  \"nonTargetSpeciesCaught\": [\r\n  \t{\r\n  \t\t\"gridReference\": \"NH63054372\",\r\n        \"speciesCaught\": \"Buzzard\",\r\n  \t\t\"numberCaught\": 11,\r\n        \"trapType\": \"Larson pod\",\r\n        \"comment\": \"\"\r\n  \t},\r\n  \t{\r\n  \t\t\"gridReference\": \"NH63044379\",\r\n        \"speciesCaught\": \"barn owl\",\r\n  \t\t\"numberCaught\": 13,\r\n        \"trapType\": \"Larson mate\",\r\n        \"comment\": \"realesed all of them unharmed\"\r\n  \t}\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/{{TR_NEW_REG_ID}}/return/{{TR_NEW_RET_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"return",
+						"{{TR_NEW_RET_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a Licensing Officer's Registration with returns",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('JSON response has properties', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('convictions');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL01');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL02');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL03');\r",
+							"    pm.expect(jsonData).to.have.property('complyWithTerms');\r",
+							"    pm.expect(jsonData).to.have.property('meatBaits');\r",
+							"    pm.expect(jsonData).to.have.property('fullName');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine1');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine2');\r",
+							"    pm.expect(jsonData).to.have.property('addressTown');\r",
+							"    pm.expect(jsonData).to.have.property('addressCounty');\r",
+							"    pm.expect(jsonData).to.have.property('addressPostcode');\r",
+							"    pm.expect(jsonData).to.have.property('phoneNumber');\r",
+							"    pm.expect(jsonData).to.have.property('emailAddress');\r",
+							"    pm.expect(jsonData).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData).to.have.property('Returns');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('id');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('RegistrationId');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('nonTargetSpeciesToReport');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('NonTargetSpecies');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('id');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('ReturnId');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('gridReference');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('speciesCaught');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('numberCaught');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('trapType');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('comment');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData.Returns[2]).to.have.property('createdByLicensingOfficer');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v1/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v1",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
 					]
 				}
 			},

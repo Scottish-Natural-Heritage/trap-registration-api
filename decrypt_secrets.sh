@@ -11,12 +11,3 @@ gpg \
   --passphrase="$JWT_KEY_GPG_PASSPHRASE" \
   --output ./.secrets/jwt-key \
   ./.secrets/jwt-key.gpg
-
-gpg \
-  --quiet \
-  --batch \
-  --yes \
-  --decrypt \
-  --passphrase="$JWT_KEY_GPG_PASSPHRASE" \
-  --output ./.secrets/jwt-key.pub \
-  ./.secrets/jwt-key.pub.gpg

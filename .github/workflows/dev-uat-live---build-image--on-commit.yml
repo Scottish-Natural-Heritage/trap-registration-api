@@ -19,7 +19,7 @@ jobs:
 
     - uses: actions/setup-node@v2
       with:
-        node-version: '12'
+        node-version: '14'
 
     - name: Decrypt the secrets
       env:
@@ -75,5 +75,4 @@ jobs:
     - name: Delete the public and private JWT key
       if: always()
       run: |
-        rm -f ./.secrets/jwt-key.pub
         rm -f ./.secrets/jwt-key

@@ -1,5 +1,3 @@
-'use strict';
-
 import Sequelize from 'sequelize';
 
 const {Model} = Sequelize;
@@ -23,6 +21,9 @@ const ReturnModel = (sequelize) => {
       },
       nonTargetSpeciesToReport: {
         type: Sequelize.BOOLEAN
+      },
+      createdByLicensingOfficer: {
+        type: Sequelize.STRING
       }
     },
     {
