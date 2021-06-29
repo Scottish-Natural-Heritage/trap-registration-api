@@ -60,7 +60,7 @@ const getPrivateKey = () => {
     return jwkToPem(testKeyPair, {private: true});
   }
 
-  return fs.readFileSync('./.secrets/jwk-key');
+  return fs.readFileSync('./.secrets/jwt-key');
 };
 
 /**
