@@ -8,17 +8,17 @@ import NotifyClient from 'notifications-node-client';
 import config from './config/app.js';
 import jwk from './config/jwk.js';
 
-import Registration from './controllers/registration.js';
-import Return from './controllers/return.js';
+import Registration from './controllers/v1/registration.js';
+import Return from './controllers/v1/return.js';
 
-const router = express.Router();
+const v1router = express.Router();
 
 // `/health` is a simple health-check end-point to test whether the service is up.
-router.get('/health', async (request, response) => {
+v1router.get('/health', async (request, response) => {
   response.status(200).send({message: 'OK'});
 });
 
-router.get('/registrations', async (request, response) => {
+v1router.get('/registrations', async (request, response) => {
   try {
     const registrations = await Registration.findAll();
 
@@ -32,7 +32,7 @@ router.get('/registrations', async (request, response) => {
   }
 });
 // Allow an API consumer to allocate a new registration number.
-router.post('/registrations', async (request, response) => {
+v1router.post('/registrations', async (request, response) => {
   const baseUrl = new URL(
     `${request.protocol}://${request.hostname}:${config.port}${request.originalUrl}${
       request.originalUrl.endsWith('/') ? '' : '/'
@@ -81,7 +81,7 @@ const cleanInput = (body) => {
   };
 };
 
-router.get('/registrations/:id', async (request, response) => {
+v1router.get('/registrations/:id', async (request, response) => {
   try {
     const existingId = Number(request.params.id);
     if (Number.isNaN(existingId)) {
@@ -101,7 +101,7 @@ router.get('/registrations/:id', async (request, response) => {
 });
 
 // Allow an API consumer to save a registration against an allocated but un-assigned registration number.
-router.put('/registrations/:id', async (request, response) => {
+v1router.put('/registrations/:id', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
@@ -160,7 +160,7 @@ const cleanRevokeInput = (existingId, body) => {
 };
 
 // Allow an API consumer to delete a registration.
-router.delete('/registrations/:id', async (request, response) => {
+v1router.delete('/registrations/:id', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
@@ -185,7 +185,7 @@ router.delete('/registrations/:id', async (request, response) => {
   }
 });
 
-router.get('/returns', async (request, response) => {
+v1router.get('/returns', async (request, response) => {
   try {
     const returns = await Return.findAll();
 
@@ -199,7 +199,7 @@ router.get('/returns', async (request, response) => {
   }
 });
 
-router.get('/registrations/:id/return', async (request, response) => {
+v1router.get('/registrations/:id/return', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
@@ -225,7 +225,7 @@ router.get('/registrations/:id/return', async (request, response) => {
   }
 });
 
-router.get('/registrations/:id/return/:returnId', async (request, response) => {
+v1router.get('/registrations/:id/return/:returnId', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
@@ -268,7 +268,7 @@ router.get('/registrations/:id/return/:returnId', async (request, response) => {
 
 // Allow an API consumer to retrieve the public half of our ECDSA key to
 // validate our signed JWTs.
-router.get('/public-key', async (request, response) => {
+v1router.get('/public-key', async (request, response) => {
   return response.status(200).send(jwk.getPublicKey());
 });
 
@@ -332,7 +332,7 @@ const postcodesMatch = (postcode1, postcode2) => {
 
 // Allow the API consumer to provide enough personal information to allow us to
 // build and send a login link for the specified visitor.
-router.get('/registrations/:id/login', async (request, response) => {
+v1router.get('/registrations/:id/login', async (request, response) => {
   // Try to parse the incoming ID to make sure it's really a number.
   const existingId = Number(request.params.id);
   const idInvalid = Number.isNaN(existingId);
@@ -428,7 +428,7 @@ const cleanReturnInput = (id, body) => {
 };
 
 // Allow the API consumer to submit a return against a registration.
-router.post('/registrations/:id/return', async (request, response) => {
+v1router.post('/registrations/:id/return', async (request, response) => {
   // Try to parse the incoming ID to make sure it's really a number.
   const existingId = Number(request.params.id);
   if (Number.isNaN(existingId)) {
@@ -477,7 +477,7 @@ const sendSuccessReturnEmail = async (apiKey, email, regNo) => {
 };
 
 // Allow an API consumer to save a return against an allocated but un-assigned return number.
-router.put('/registrations/:id/return/:returnId', async (request, response) => {
+v1router.put('/registrations/:id/return/:returnId', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
@@ -524,4 +524,4 @@ router.put('/registrations/:id/return/:returnId', async (request, response) => {
   }
 });
 
-export {router as default};
+export {v1router as default};
