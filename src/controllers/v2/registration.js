@@ -1,8 +1,4 @@
-import Sequelize from 'sequelize';
-import NotifyClient from 'notifications-node-client';
-
 import db from '../../models/index.js';
-import config from '../../config/app.js';
 
 const {Registration, Return, NonTargetSpecies} = db;
 
@@ -31,10 +27,10 @@ const {Registration, Return, NonTargetSpecies} = db;
   },
 
   /**
-   * Replace a registration in the database with our new JSON model.
+   * Update a registration in the database with partial JSON model.
    *
    * @param {Number} id an existing registration's ID
-   * @param {any} reg a JSON version of the model to replace the database's copy
+   * @param {any} reg a JSON version of the model containing only the fields to be updated
    * @returns {boolean} true if the record is updated, otherwise false
    */
   update: async (id, reg) => {

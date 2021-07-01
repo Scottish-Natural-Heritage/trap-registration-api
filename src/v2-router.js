@@ -1,7 +1,5 @@
 import express from 'express';
-// import { any } from 'sequelize/types/lib/operators';
 import utils from 'naturescot-utils';
-// import config from './config/app.js';
 import Registration from './controllers/v2/registration.js';
 
 const v2Router = express.Router();
@@ -11,10 +9,12 @@ const v2Router = express.Router();
  * database and its validation rules.
  *
  * @param {any} body the incoming request's body
- * @returns {any} a json object that's just got our cleaned up fields on it
+ * @returns {any} cleanedBody a json object that's just got our cleaned up fields on it
  */
- const cleanPatchInput = (body) => {
-   let cleanedBody = {};
+const cleanPatchInput = (body) => {
+  let cleanedBody = {};
+
+  // Check for the existence of each field and if found clean it if required and add to the cleanedBody object.
   if (body.convictions) {
     cleanedBody.convictions = body.convictions;
   }
@@ -122,7 +122,7 @@ v2Router.put('/registrations/:id', async (request, response) => {
 /**
  * UPDATEs part of a single registration.
  */
- v2Router.patch('/registrations/:id', async (request, response) => {
+v2Router.patch('/registrations/:id', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
