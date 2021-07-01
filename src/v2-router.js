@@ -27,16 +27,8 @@ const cleanPatchInput = (body) => {
     cleanedBody.usingGL02 = body.usingGL02;
   }
 
-  if (body.complyWithTerms) {
-    cleanedBody.complyWithTerms = body.complyWithTerms;
-  }
-
   if (body.meatBaits) {
     cleanedBody.meatBaits = body.meatBaits;
-  }
-
-  if (body.createdByLicensingOfficer) {
-    cleanedBody.createdByLicensingOfficer = body.createdByLicensingOfficer;
   }
 
   if (body.fullName) {
