@@ -2,7 +2,7 @@ import express from 'express';
 // import { any } from 'sequelize/types/lib/operators';
 import utils from 'naturescot-utils';
 // import config from './config/app.js';
-import Registration from './controllers/v1/registration.js';
+import Registration from './controllers/v2/registration.js';
 
 const v2Router = express.Router();
 
@@ -14,7 +14,7 @@ const v2Router = express.Router();
  * @returns {any} a json object that's just got our cleaned up fields on it
  */
  const cleanPatchInput = (body) => {
-   let cleanedBody;
+   let cleanedBody = {};
   if (body.convictions) {
     cleanedBody.convictions = body.convictions;
   }
@@ -137,7 +137,7 @@ v2Router.put('/registrations/:id', async (request, response) => {
     }
 
     // Clean up the user's input before we store it in the database.
-    const cleanObject = cleanInput(request.body);
+    const cleanObject = cleanPatchInput(request.body);
 
     // Update the registration in the database with our client's values.
     const updatedReg = await Registration.update(existingId, cleanObject);
