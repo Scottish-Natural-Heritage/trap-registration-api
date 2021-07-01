@@ -1,6 +1,78 @@
 import express from 'express';
+// import { any } from 'sequelize/types/lib/operators';
+import utils from 'naturescot-utils';
+// import config from './config/app.js';
+import Registration from './controllers/v1/registration.js';
 
 const v2Router = express.Router();
+
+/**
+ * Clean an incoming PATCH request body to make it more compatible with the
+ * database and its validation rules.
+ *
+ * @param {any} body the incoming request's body
+ * @returns {any} a json object that's just got our cleaned up fields on it
+ */
+ const cleanPatchInput = (body) => {
+   let cleanedBody;
+  if (body.convictions) {
+    cleanedBody.convictions = body.convictions;
+  }
+
+  if (body.usingGL01) {
+    cleanedBody.usingGL01 = body.usingGL01;
+  }
+
+  if (body.usingGL02) {
+    cleanedBody.usingGL02 = body.usingGL02;
+  }
+
+  if (body.complyWithTerms) {
+    cleanedBody.complyWithTerms = body.complyWithTerms;
+  }
+
+  if (body.meatBaits) {
+    cleanedBody.meatBaits = body.meatBaits;
+  }
+
+  if (body.createdByLicensingOfficer) {
+    cleanedBody.createdByLicensingOfficer = body.createdByLicensingOfficer;
+  }
+
+  if (body.fullName) {
+    cleanedBody.fullName = body.fullName.trim();
+  }
+
+  if (body.addressLine1) {
+    cleanedBody.addressLine1 = body.addressLine1.trim();
+  }
+
+  if (body.addressLine2) {
+    cleanedBody.addressLine2 = body.addressLine2.trim();
+  }
+
+  if (body.addressTown) {
+    cleanedBody.addressTown = body.addressTown.trim();
+  }
+
+  if (body.addressCounty) {
+    cleanedBody.addressCounty = body.addressCounty.trim();
+  }
+
+  if (body.addressPostcode) {
+    cleanedBody.addressPostcode = body.addressPostcode.trim();
+  }
+
+  if (body.phoneNumber) {
+    cleanedBody.phoneNumber = body.phoneNumber.trim();
+  }
+
+  if (body.emailAddress) {
+    cleanedBody.emailAddress = utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase());
+  }
+
+  return cleanedBody;
+};
 
 // #region Health Check
 
@@ -45,6 +117,42 @@ v2Router.get('/registrations/:id', async (request, response) => {
  */
 v2Router.put('/registrations/:id', async (request, response) => {
   return response.status(501).send({message: 'Not implemented.'});
+});
+
+/**
+ * UPDATEs part of a single registration.
+ */
+ v2Router.patch('/registrations/:id', async (request, response) => {
+  try {
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingId = Number(request.params.id);
+    if (Number.isNaN(existingId)) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    }
+
+    // Check if there's a registration allocated at the specified ID.
+    const existingReg = await Registration.findOne(existingId);
+    if (existingReg === undefined || existingReg === null) {
+      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+    }
+
+    // Clean up the user's input before we store it in the database.
+    const cleanObject = cleanInput(request.body);
+
+    // Update the registration in the database with our client's values.
+    const updatedReg = await Registration.update(existingId, cleanObject);
+
+    // If they're not successful, send a 500 error.
+    if (updatedReg === undefined) {
+      return response.status(500).send({message: `Could not update registration ${existingId}.`});
+    }
+
+    // If they are, send back the finalised registration.
+    return response.status(200).send(updatedReg);
+  } catch (error) {
+    // If anything goes wrong (such as a validation error), tell the client.
+    return response.status(500).send({error});
+  }
 });
 
 /**
