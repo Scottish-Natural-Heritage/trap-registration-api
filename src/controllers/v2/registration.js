@@ -13,7 +13,18 @@ const RegistrationController = {
    * @returns an existing registration
    */
   findOne: async (id) => {
-    return Registration.findByPk(id, {include: [{model: Return, include: NonTargetSpecies}]});
+    return Registration.findByPk(id, {
+      include: [
+        {
+          model: Return,
+          include: [
+            {
+              model: NonTargetSpecies
+            }
+          ]
+        }
+      ]
+    });
   },
 
   /**
@@ -39,7 +50,8 @@ const RegistrationController = {
     // Check to make sure the saving process went OK.
     const success = result.length > 0 && result[0] === 1;
     if (success) {
-      return true;
+      // Return JSON with the updated fields on successful update.
+      return reg;
     }
 
     // If something went wrong, return undefined to signify this.
