@@ -12,7 +12,7 @@ const v2Router = express.Router();
  * @returns {any} cleanedBody a json object that's just got our cleaned up fields on it
  */
 const cleanPatchInput = (body) => {
-  let cleanedBody = {};
+  const cleanedBody = {};
 
   // Check for the existence of each field and if found clean it if required and add to the cleanedBody object.
   if (body.convictions) {

@@ -5,8 +5,7 @@ const {Registration, Return, NonTargetSpecies} = db;
 /**
  * An object to perform 'persistence' operations on our registration objects.
  */
- const RegistrationController = {
-
+const RegistrationController = {
   /**
    * Retrieve the specified registration from the database.
    *
@@ -45,7 +44,7 @@ const {Registration, Return, NonTargetSpecies} = db;
 
     // If something went wrong, return undefined to signify this.
     return undefined;
-  },
+  }
 };
 
 export {RegistrationController as default};
