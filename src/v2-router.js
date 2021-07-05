@@ -139,7 +139,7 @@ v2Router.patch('/registrations/:id', async (request, response) => {
       return response.status(500).send({message: `Could not update registration ${existingId}.`});
     }
 
-    // If they are, send back the finalised registration.
+    // If they are, send back the updated fields.
     return response.status(200).send(updatedReg);
   } catch (error) {
     // If anything goes wrong (such as a validation error), tell the client.
