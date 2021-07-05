@@ -118,36 +118,41 @@ v2Router.put('/registrations/:id', async (request, response) => {
  * UPDATEs part of a single registration.
  */
 v2Router.patch('/registrations/:id', async (request, response) => {
-  // Try to parse the incoming ID to make sure it's really a number.
-  const existingId = Number(request.params.id);
-  if (Number.isNaN(existingId)) {
-    return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
-  }
-
-  // Check if there's a registration allocated at the specified ID.
-  const existingReg = await Registration.findOne(existingId);
-  if (existingReg === undefined || existingReg === null) {
-    return response.status(404).send({message: `Registration ${existingId} not allocated.`});
-  }
-
-  // Clean up the user's input before we store it in the database.
-  let cleanObject;
   try {
-    cleanObject = cleanPatchInput(request.body);
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingId = Number(request.params.id);
+    if (Number.isNaN(existingId)) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    }
+
+    // Check if there's a registration allocated at the specified ID.
+    const existingReg = await Registration.findOne(existingId);
+    if (existingReg === undefined || existingReg === null) {
+      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+    }
+
+    // Clean up the user's input before we store it in the database.
+    let cleanObject;
+    try {
+      cleanObject = cleanPatchInput(request.body);
+    } catch (error) {
+      return response.status(400).send({message: `Could not update registration ${existingId}. ${error.message}`});
+    }
+
+    // Update the registration in the database with our client's values.
+    const updatedReg = await Registration.update(existingId, cleanObject);
+
+    // If they're not successful, send a 500 error.
+    if (updatedReg === undefined) {
+      return response.status(500).send({message: `Could not update registration ${existingId}.`});
+    }
+
+    // If they are, send back the updated fields.
+    return response.status(200).send(updatedReg);
   } catch (error) {
-    return response.status(400).send({message: `Could not update registration ${existingId}. ${error.message}`});
+    // When anything else goes wrong send the error to the client.
+    return response.status(500).send({error});
   }
-
-  // Update the registration in the database with our client's values.
-  const updatedReg = await Registration.update(existingId, cleanObject);
-
-  // If they're not successful, send a 500 error.
-  if (updatedReg === undefined) {
-    return response.status(500).send({message: `Could not update registration ${existingId}.`});
-  }
-
-  // If they are, send back the updated fields.
-  return response.status(200).send(updatedReg);
 });
 
 /**
