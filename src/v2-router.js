@@ -52,7 +52,10 @@ const cleanPatchInput = (body) => {
   }
 
   if (body.addressPostcode) {
-    cleanedBody.addressPostcode = body.addressPostcode.trim();
+    cleanedBody.addressPostcode = utils.postalAddress.formatPostcodeForPrinting(body.addressPostcode);
+    if (!utils.postalAddress.isaRealUkPostcode(cleanedBody.addressPostcode)) {
+      throw new Error(message, 'Invalid postcode');
+    }
   }
 
   if (body.phoneNumber) {
@@ -60,7 +63,7 @@ const cleanPatchInput = (body) => {
   }
 
   if (body.emailAddress) {
-    cleanedBody.emailAddress = utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase());
+      cleanedBody.emailAddress = utils.recipients.validateAndFormatEmailAddress(body.emailAddress);
   }
 
   return cleanedBody;
@@ -115,7 +118,6 @@ v2Router.put('/registrations/:id', async (request, response) => {
  * UPDATEs part of a single registration.
  */
 v2Router.patch('/registrations/:id', async (request, response) => {
-  try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
     if (Number.isNaN(existingId)) {
@@ -129,7 +131,12 @@ v2Router.patch('/registrations/:id', async (request, response) => {
     }
 
     // Clean up the user's input before we store it in the database.
-    const cleanObject = cleanPatchInput(request.body);
+    let cleanObject;
+    try {
+      cleanObject = cleanPatchInput(request.body);
+    } catch (error) {
+      return response.status(400).send({message: `Could not update registration ${existingId}. ${error.message}`});
+    }
 
     // Update the registration in the database with our client's values.
     const updatedReg = await Registration.update(existingId, cleanObject);
@@ -141,10 +148,6 @@ v2Router.patch('/registrations/:id', async (request, response) => {
 
     // If they are, send back the updated fields.
     return response.status(200).send(updatedReg);
-  } catch (error) {
-    // If anything goes wrong (such as a validation error), tell the client.
-    return response.status(500).send({error});
-  }
 });
 
 /**
