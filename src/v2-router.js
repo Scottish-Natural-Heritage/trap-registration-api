@@ -54,7 +54,7 @@ const cleanPatchInput = (body) => {
   if (body.addressPostcode) {
     cleanedBody.addressPostcode = utils.postalAddress.formatPostcodeForPrinting(body.addressPostcode);
     if (!utils.postalAddress.isaRealUkPostcode(cleanedBody.addressPostcode)) {
-      throw new Error(message, 'Invalid postcode');
+      throw new Error('Invalid postcode.');
     }
   }
 
