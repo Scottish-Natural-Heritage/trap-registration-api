@@ -1,8 +1,8 @@
 import Sequelize from 'sequelize';
 import NotifyClient from 'notifications-node-client';
 
-import db from '../models/index.js';
-import config from '../config/app.js';
+import db from '../../models/index.js';
+import config from '../../config/app.js';
 
 const {Registration, Return, NonTargetSpecies, Revocation} = db;
 
