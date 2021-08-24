@@ -10,7 +10,7 @@ if (process.env.NODE_ENV === 'production') {
 
   module.exports = {
     up: (queryInterface, Sequelize) => {
-      return queryInterface.sequelize.query('create role rotraps with noinherit login password :trapsPassword;', {
+      return queryInterface.sequelize.query('create role rosuperset with noinherit login password :trapsPassword;', {
         type: Sequelize.QueryTypes.RAW,
         replacements: {
           trapsPassword: config.password
@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === 'production') {
       });
     },
     down: (queryInterface, Sequelize) => {
-      return queryInterface.sequelize.query('drop role rotraps;', {
+      return queryInterface.sequelize.query('drop role rosuperset;', {
         type: Sequelize.QueryTypes.RAW
       });
     }

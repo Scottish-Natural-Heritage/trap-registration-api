@@ -5,20 +5,20 @@
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
     up: async (queryInterface, Sequelize) => {
-      await queryInterface.sequelize.query('grant connect on database licensing to rotraps;', {
+      await queryInterface.sequelize.query('grant connect on database licensing to rosuperset;', {
         type: Sequelize.QueryTypes.RAW
       });
 
-      await queryInterface.sequelize.query('grant usage on schema traps to rotraps;', {
+      await queryInterface.sequelize.query('grant usage on schema traps to rosuperset;', {
         type: Sequelize.QueryTypes.RAW
       });
 
-      await queryInterface.sequelize.query('grant select on all tables in schema traps to rotraps;', {
+      await queryInterface.sequelize.query('grant select on all tables in schema traps to rosuperset;', {
         type: Sequelize.QueryTypes.RAW
       });
 
       await queryInterface.sequelize.query(
-        'alter default privileges for role licensing, traps in schema traps grant select on tables to rotraps;',
+        'alter default privileges for role licensing, traps in schema traps grant select on tables to rosuperset;',
         {
           type: Sequelize.QueryTypes.RAW
         }
@@ -26,21 +26,21 @@ if (process.env.NODE_ENV === 'production') {
     },
     down: async (queryInterface, Sequelize) => {
       await queryInterface.sequelize.query(
-        'alter default privileges for role licensing, traps in schema traps revoke select on tables to rotraps;',
+        'alter default privileges for role licensing, traps in schema traps revoke select on tables to rosuperset;',
         {
           type: Sequelize.QueryTypes.RAW
         }
       );
 
-      await queryInterface.sequelize.query('revoke select on schema traps from rotraps;', {
+      await queryInterface.sequelize.query('revoke select on schema traps from rosuperset;', {
         type: Sequelize.QueryTypes.RAW
       });
 
-      await queryInterface.sequelize.query('revoke usage on schema traps from rotraps;', {
+      await queryInterface.sequelize.query('revoke usage on schema traps from rosuperset;', {
         type: Sequelize.QueryTypes.RAW
       });
 
-      await queryInterface.sequelize.query('revoke all on database licensing from rotraps;', {
+      await queryInterface.sequelize.query('revoke all on database licensing from rosuperset;', {
         type: Sequelize.QueryTypes.RAW
       });
     }
