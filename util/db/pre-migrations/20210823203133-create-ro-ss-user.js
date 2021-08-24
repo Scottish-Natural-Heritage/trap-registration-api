@@ -10,12 +10,15 @@ if (process.env.NODE_ENV === 'production') {
 
   module.exports = {
     up: (queryInterface, Sequelize) => {
-      return queryInterface.sequelize.query('create role rosuperset with noinherit login password :roSupersetPassword;', {
-        type: Sequelize.QueryTypes.RAW,
-        replacements: {
-          roSupersetPassword: config.password
+      return queryInterface.sequelize.query(
+        'create role rosuperset with noinherit login password :roSupersetPassword;',
+        {
+          type: Sequelize.QueryTypes.RAW,
+          replacements: {
+            roSupersetPassword: config.password
+          }
         }
-      });
+      );
     },
     down: (queryInterface, Sequelize) => {
       return queryInterface.sequelize.query('drop role rosuperset;', {
