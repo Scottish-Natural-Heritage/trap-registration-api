@@ -21,8 +21,8 @@ if (process.env.NODE_ENV === 'production') {
       logging: false
     },
     ssDatabase: {
-      username: 'rosuperset',
-      password: config.roSupersetPassword,
+      username: 'rotraps',
+      password: config.roTrapsPassword,
       database: 'licensing',
       host: config.databaseHost,
       dialect: 'postgres',
