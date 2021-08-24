@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === 'production') {
         {
           type: Sequelize.QueryTypes.RAW,
           replacements: {
-            roSupersetPassword: config.password
+            roTrapsPassword: config.password
           }
         }
       );
