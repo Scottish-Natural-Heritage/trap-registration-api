@@ -6,14 +6,14 @@ if (process.env.NODE_ENV === 'production') {
   // Even though this is a 'pre-migrations' migration, we need to import the
   // production config as we're setting the password the production account will
   // use.
-  const config = require('../../../src/config/database.js').database;
+  const config = require('../../../src/config/database.js').ssDatabase;
 
   module.exports = {
     up: (queryInterface, Sequelize) => {
-      return queryInterface.sequelize.query('create role rosuperset with noinherit login password :trapsPassword;', {
+      return queryInterface.sequelize.query('create role rosuperset with noinherit login password :roSupersetPassword;', {
         type: Sequelize.QueryTypes.RAW,
         replacements: {
-          trapsPassword: config.password
+          roSupersetPassword: config.password
         }
       });
     },

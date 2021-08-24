@@ -19,6 +19,15 @@ if (process.env.NODE_ENV === 'production') {
       dialect: 'postgres',
       schema: 'traps',
       logging: false
+    },
+    ssDatabase: {
+      username: 'rosuperset',
+      password: config.roSupersetPassword,
+      database: 'licensing',
+      host: config.databaseHost,
+      dialect: 'postgres',
+      schema: 'traps',
+      logging: false
     }
   };
 } else {
