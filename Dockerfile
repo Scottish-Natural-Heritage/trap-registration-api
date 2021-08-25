@@ -24,6 +24,7 @@ COPY --chown=node:node ./.secrets ./.secrets
 ENV LICENSING_DB_HOST override_this_value
 ENV LICENSING_DB_PASS override_this_value
 ENV TR_DB_PASS override_this_value
+ENV RO_TR_DB_PASS override_this_value
 ENV TR_NOTIFY_API_KEY override_this_value
 
 # let docker know about our listening port

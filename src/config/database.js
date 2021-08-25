@@ -19,6 +19,15 @@ if (process.env.NODE_ENV === 'production') {
       dialect: 'postgres',
       schema: 'traps',
       logging: false
+    },
+    ssDatabase: {
+      username: 'rotraps',
+      password: config.roTrapsPassword,
+      database: 'licensing',
+      host: config.databaseHost,
+      dialect: 'postgres',
+      schema: 'traps',
+      logging: false
     }
   };
 } else {
