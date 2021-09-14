@@ -186,13 +186,31 @@ const RegistrationController = {
    */
   delete: async (id, cleanObject) => {
     try {
+      // First find all attached returns.
+      const returns = await Return.findAll({where: {RegistrationId: id}});
+      // Create an array of the return ids.
+      const returnIds = returns.map((meatBaitReturn) => meatBaitReturn.id);
+      // Start the transaction.
       await db.sequelize.transaction(async (t) => {
+        // Check the registration exists.
         await Registration.findByPk(id, {transaction: t, rejectOnEmpty: true});
+        // Create the revocation entry.
         await Revocation.create(cleanObject, {transaction: t});
+        // If there was any returns found we need to delete them also.
+        if (returns) {
+          // Soft Delete any nonTargetSpecies attached to returns.
+          await NonTargetSpecies.destroy({where: {ReturnId: returnIds}, transaction: t});
+          // Soft Delete any returns.
+          await Return.destroy({where: {RegistrationId: id}, transaction: t});
+        }
+
+        // Soft Delete the Registration.
         await Registration.destroy({where: {id}, transaction: t});
+        // If everything worked then return true.
         return true;
       });
     } catch {
+      // If something during the transaction return false.
       return false;
     }
   }
