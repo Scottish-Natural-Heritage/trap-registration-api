@@ -74,11 +74,14 @@ const RegistrationModel = (sequelize, DataTypes) => {
       },
       createdByLicensingOfficer: {
         type: DataTypes.STRING
-      }
+      },
+      expiryDate: {
+        type: DataTypes.DATE,
+      },
     },
     {
       timestamps: true,
-      paranoid: true
+      paranoid: true,
     }
   );
   return Registration;

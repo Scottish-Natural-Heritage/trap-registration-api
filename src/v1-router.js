@@ -48,6 +48,20 @@ v1router.post('/registrations', async (request, response) => {
 });
 
 /**
+ * Calculates the expiry date by taking the current date and adding five years
+ * and subtracting a single day.
+ * @returns {Date} the calculated expiry date
+ */
+const calculateExpiryDate = () => {
+  // Get the current date.
+  const expiryDate = new Date();
+  // Add 5 years.
+  expiryDate.setFullYear(expiryDate.getFullYear() + 5);
+  // Subtract 1 day and return as expiry date.
+  return expiryDate.setDate(expiryDate.getDate() - 1);
+}
+
+/**
  * Clean the incoming POST request body to make it more compatible with the
  * database and its validation rules.
  *
@@ -77,7 +91,8 @@ const cleanInput = (body) => {
     emailAddress:
       body.emailAddress === undefined
         ? undefined
-        : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase())
+        : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
+    expiryDate: calculateExpiryDate()
   };
 };
 
