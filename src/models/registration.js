@@ -76,8 +76,8 @@ const RegistrationModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING
       },
       expiryDate: {
-        type: DataTypes.DATE,
-      },
+        type: DataTypes.DATE
+      }
     },
     {
       timestamps: true,

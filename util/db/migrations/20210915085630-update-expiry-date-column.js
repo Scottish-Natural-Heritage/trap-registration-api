@@ -14,9 +14,11 @@ if (process.env.NODE_ENV === 'production') {
         result.expiryDate = new Date(result.createdAt);
         // Add 5 years.
         result.expiryDate.setFullYear(result.expiryDate.getFullYear() + 5);
-        //Subtract 1 day.
+        // Subtract 1 day.
         result.expiryDate.setDate(result.expiryDate.getDate() - 1);
       }
+
+      /* eslint-disable no-await-in-loop */
 
       // Loop through the updated results and update the expiryDate field with the new value.
       for (const result of resultsArray) {
@@ -60,7 +62,7 @@ if (process.env.NODE_ENV === 'production') {
         result.expiryDate = new Date(result.createdAt);
         // Add 5 years.
         result.expiryDate.setFullYear(result.expiryDate.getFullYear() + 5);
-        //Subtract 1 day.
+        // Subtract 1 day.
         result.expiryDate.setDate(result.expiryDate.getDate() - 1);
       }
 
@@ -90,6 +92,8 @@ if (process.env.NODE_ENV === 'production') {
           type: Sequelize.QueryTypes.UPDATE
         });
       }
+
+      /* eslint-enable no-await-in-loop */
     }
   };
 }

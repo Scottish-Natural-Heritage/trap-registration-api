@@ -59,7 +59,7 @@ const calculateExpiryDate = () => {
   expiryDate.setFullYear(expiryDate.getFullYear() + 5);
   // Subtract 1 day and return as expiry date.
   return expiryDate.setDate(expiryDate.getDate() - 1);
-}
+};
 
 /**
  * Clean the incoming POST request body to make it more compatible with the
