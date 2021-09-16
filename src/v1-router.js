@@ -48,8 +48,8 @@ v1router.post('/registrations', async (request, response) => {
 });
 
 /**
- * Calculates the expiry date by taking the current date and adding five years
- * and subtracting a single day.
+ * Calculates the expiry date by taking the current date and adding five years,
+ * then subtracting a single day.
  * @returns {Date} the calculated expiry date
  */
 const calculateExpiryDate = () => {

@@ -81,7 +81,7 @@ const RegistrationModel = (sequelize, DataTypes) => {
     },
     {
       timestamps: true,
-      paranoid: true,
+      paranoid: true
     }
   );
   return Registration;
