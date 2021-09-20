@@ -10,23 +10,23 @@ if (process.env.NODE_ENV === 'production') {
 
       // Loop through the results and add an expiry date value, calculated from the createdAt field.
       for (const result of resultsArray) {
-        // Get the createdAt timestamp.
-        result.expiryDate = new Date(result.createdAt);
-        // Add 5 years.
-        result.expiryDate.setFullYear(result.expiryDate.getFullYear() + 5);
-        // Subtract 1 day.
-        result.expiryDate.setDate(result.expiryDate.getDate() - 1);
+        // Get the current date.
+        result.expiryDate = new Date();
+        // Add 4 years.
+        result.expiryDate.setFullYear(result.expiryDate.getFullYear() + 4);
+        // Set the month to December and the date to the 31st.
+        result.expiryDate.setMonth(11, 31);
       }
 
-      /* eslint-disable no-await-in-loop */
-
+      const updateQueries = [];
       // Loop through the updated results and update the expiryDate field with the new value.
       for (const result of resultsArray) {
-        await queryInterface.sequelize.query(`UPDATE traps."Registrations" SET "expiryDate" = ? WHERE id = ?;`, {
+        updateQueries.push(queryInterface.sequelize.query(`UPDATE traps."Registrations" SET "expiryDate" = ? WHERE id = ?;`, {
           replacements: [result.expiryDate, result.id],
           type: Sequelize.QueryTypes.UPDATE
-        });
+        }));
       }
+      await Promise.all(updateQueries);
     },
     down: async (queryInterface, Sequelize) => {
       // For the opposite set all expiry date values to null.
@@ -45,28 +45,29 @@ if (process.env.NODE_ENV === 'production') {
 
       // Loop through the results and add an expiry date value, calculated from the createdAt field.
       for (const result of resultsArray) {
-        // Get the createdAt timestamp.
-        result.expiryDate = new Date(result.createdAt);
-        // Add 5 years.
-        result.expiryDate.setFullYear(result.expiryDate.getFullYear() + 5);
-        // Subtract 1 day.
-        result.expiryDate.setDate(result.expiryDate.getDate() - 1);
+        // Get the current date.
+        result.expiryDate = new Date();
+        // Add 4 years.
+        result.expiryDate.setFullYear(result.expiryDate.getFullYear() + 4);
+        // Set the month to December and the date to the 31st.
+        result.expiryDate.setMonth(11, 31);
       }
 
+      const updateQueries = [];
       // Loop through the updated results and update the expiryDate field with the new value.
       for (const result of resultsArray) {
-        await queryInterface.sequelize.query(`UPDATE Registrations SET expiryDate = ? WHERE id = ?;`, {
+        updateQueries.push(queryInterface.sequelize.query(`UPDATE Registrations SET expiryDate = ? WHERE id = ?;`, {
           replacements: [result.expiryDate, result.id],
           type: Sequelize.QueryTypes.UPDATE
-        });
+        }));
       }
+      await Promise.all(updateQueries);
     },
     down: async (queryInterface, Sequelize) => {
       // For the opposite set all expiry date values to null.
       await queryInterface.sequelize.query(`UPDATE Registrations SET expiryDate = null;`, {
         type: Sequelize.QueryTypes.UPDATE
       });
-      /* eslint-enable no-await-in-loop */
     }
   };
 }
