@@ -29,23 +29,10 @@ if (process.env.NODE_ENV === 'production') {
       }
     },
     down: async (queryInterface, Sequelize) => {
-      // Put the opposite here.
-      const resultsArray = await queryInterface.sequelize.query('SELECT * FROM traps."Registrations";', {
-        type: Sequelize.QueryTypes.SELECT
+      // For the opposite set all expiry date values to null.
+      await queryInterface.sequelize.query(`UPDATE traps."Registrations" SET "expiryDate" = null;`, {
+        type: Sequelize.QueryTypes.UPDATE
       });
-
-      // Loop through the results and set the expiry date to null.
-      for (const result of resultsArray) {
-        result.expiryDate = null;
-      }
-
-      // Loop through the updated results and update the expiryDate field with null.
-      for (const result of resultsArray) {
-        await queryInterface.sequelize.query(`UPDATE traps."Registrations" SET "expiryDate" = ? WHERE id = ?;`, {
-          replacements: [result.expiryDate, result.id],
-          type: Sequelize.QueryTypes.UPDATE
-        });
-      }
     }
   };
 } else {
@@ -75,24 +62,10 @@ if (process.env.NODE_ENV === 'production') {
       }
     },
     down: async (queryInterface, Sequelize) => {
-      // Put the opposite here.
-      const resultsArray = await queryInterface.sequelize.query('SELECT * FROM Registrations;', {
-        type: Sequelize.QueryTypes.SELECT
+      // For the opposite set all expiry date values to null.
+      await queryInterface.sequelize.query(`UPDATE Registrations SET expiryDate = null;`, {
+        type: Sequelize.QueryTypes.UPDATE
       });
-
-      // Loop through the results and set the expiry date to null.
-      for (const result of resultsArray) {
-        result.expiryDate = null;
-      }
-
-      // Loop through the updated results and update the expiryDate field with null.
-      for (const result of resultsArray) {
-        await queryInterface.sequelize.query(`UPDATE Registrations SET expiryDate = ? WHERE id = ?;`, {
-          replacements: [result.expiryDate, result.id],
-          type: Sequelize.QueryTypes.UPDATE
-        });
-      }
-
       /* eslint-enable no-await-in-loop */
     }
   };
