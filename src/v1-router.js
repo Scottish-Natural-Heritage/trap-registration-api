@@ -48,17 +48,19 @@ v1router.post('/registrations', async (request, response) => {
 });
 
 /**
- * Calculates the expiry date by taking the current date and adding five years,
- * then subtracting a single day.
+ * Every registration has a 5 year expiry, tied to the issue date of that
+ * year's General Licenses. General Licenses are always issued on January 1st,
+ * so registrations last for four whole years, plus the rest of the issued
+ * year.
  * @returns {Date} the calculated expiry date
  */
 const calculateExpiryDate = () => {
   // Get the current date.
   const expiryDate = new Date();
-  // Add 5 years.
-  expiryDate.setFullYear(expiryDate.getFullYear() + 5);
-  // Subtract 1 day and return as expiry date.
-  return expiryDate.setDate(expiryDate.getDate() - 1);
+  // Add 4 years.
+  expiryDate.setFullYear(expiryDate.getFullYear() + 4);
+  // Set the month to December and the day to the 31st and return the updated date.
+  return expiryDate.setMonth(11, 31);
 };
 
 /**
