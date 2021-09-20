@@ -1,6 +1,7 @@
 import express from 'express';
 import utils from 'naturescot-utils';
 import Registration from './controllers/v2/registration.js';
+import Return from './controllers/v2/return.js';
 
 const v2Router = express.Router();
 
@@ -195,7 +196,17 @@ v2Router.delete('/registrations/:id', async (request, response) => {
  * READs all the returns in the application.
  */
 v2Router.get('/returns', async (request, response) => {
-  return response.status(501).send({message: 'Not implemented.'});
+  try {
+    const returns = await Return.findAll();
+
+    if (returns === undefined || returns === null) {
+      return response.status(404).send({message: `No returns found.`});
+    }
+
+    return response.status(200).send(returns);
+  } catch (error) {
+    return response.status(500).send({error});
+  }
 });
 
 /**
