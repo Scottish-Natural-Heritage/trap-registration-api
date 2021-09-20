@@ -86,7 +86,17 @@ v2Router.get('/health', async (request, response) => {
  * READs all the registrations in the application.
  */
 v2Router.get('/registrations', async (request, response) => {
-  return response.status(501).send({message: 'Not implemented.'});
+  try {
+    const registrations = await Registration.findAll();
+
+    if (registrations === undefined || registrations === null) {
+      return response.status(404).send({message: `No registrations found.`});
+    }
+
+    return response.status(200).send(registrations);
+  } catch (error) {
+    return response.status(500).send({error});
+  }
 });
 
 // #endregion
