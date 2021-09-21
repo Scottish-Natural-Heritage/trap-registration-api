@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === 'production') {
       );
     },
 
-    down: () => {
+    down: async (_queryInterface, _Sequelize) => {
       return Promise.resolve();
     }
   };
@@ -43,7 +43,7 @@ if (process.env.NODE_ENV === 'production') {
       );
     },
 
-    down: () => {
+    down: async (_queryInterface, _Sequelize) => {
       return Promise.resolve();
     }
   };
