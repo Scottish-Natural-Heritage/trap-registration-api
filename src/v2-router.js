@@ -213,7 +213,29 @@ v2Router.get('/returns', async (request, response) => {
  * READs all the returns in a single registration.
  */
 v2Router.get('/registrations/:id/returns', async (request, response) => {
-  return response.status(501).send({message: 'Not implemented.'});
+  try {
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingId = Number(request.params.id);
+    if (Number.isNaN(existingId)) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    }
+
+    // Check if there's a registration allocated at the specified ID.
+    const existingReg = await Registration.findOne(existingId);
+    if (existingReg === undefined || existingReg === null) {
+      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+    }
+
+    const returns = await Return.findRegReturns(existingId);
+
+    if (returns === undefined || returns === null) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    }
+
+    return response.status(200).send(returns);
+  } catch (error) {
+    return response.status(500).send({error});
+  }
 });
 
 // #endregion
