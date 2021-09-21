@@ -21,11 +21,14 @@ if (process.env.NODE_ENV === 'production') {
       const updateQueries = [];
       // Loop through the updated results and update the expiryDate field with the new value.
       for (const result of resultsArray) {
-        updateQueries.push(queryInterface.sequelize.query(`UPDATE traps."Registrations" SET "expiryDate" = ? WHERE id = ?;`, {
-          replacements: [result.expiryDate, result.id],
-          type: Sequelize.QueryTypes.UPDATE
-        }));
+        updateQueries.push(
+          queryInterface.sequelize.query(`UPDATE traps."Registrations" SET "expiryDate" = ? WHERE id = ?;`, {
+            replacements: [result.expiryDate, result.id],
+            type: Sequelize.QueryTypes.UPDATE
+          })
+        );
       }
+
       await Promise.all(updateQueries);
     },
     down: async (queryInterface, Sequelize) => {
@@ -56,11 +59,14 @@ if (process.env.NODE_ENV === 'production') {
       const updateQueries = [];
       // Loop through the updated results and update the expiryDate field with the new value.
       for (const result of resultsArray) {
-        updateQueries.push(queryInterface.sequelize.query(`UPDATE Registrations SET expiryDate = ? WHERE id = ?;`, {
-          replacements: [result.expiryDate, result.id],
-          type: Sequelize.QueryTypes.UPDATE
-        }));
+        updateQueries.push(
+          queryInterface.sequelize.query(`UPDATE Registrations SET expiryDate = ? WHERE id = ?;`, {
+            replacements: [result.expiryDate, result.id],
+            type: Sequelize.QueryTypes.UPDATE
+          })
+        );
       }
+
       await Promise.all(updateQueries);
     },
     down: async (queryInterface, Sequelize) => {
