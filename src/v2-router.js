@@ -6,6 +6,40 @@ import Return from './controllers/v2/return.js';
 const v2Router = express.Router();
 
 /**
+ * Clean the incoming POST request body to make it more compatible with the
+ * database and its validation rules.
+ *
+ * @param {any} body the incoming request's body
+ * @returns {any} a json object that's just got our cleaned up fields on it
+ */
+ const cleanInput = (body) => {
+  return {
+    // The booleans are just copied across.
+    convictions: body.convictions,
+    usingGL01: body.usingGL01,
+    usingGL02: body.usingGL02,
+    usingGL03: null,
+    complyWithTerms: body.complyWithTerms,
+    meatBaits: body.meatBaits,
+    createdByLicensingOfficer: body.createdByLicensingOfficer,
+    // The strings are trimmed for leading and trailing whitespace and then
+    // copied across if they're in the POST body or are set to undefined if
+    // they're missing.
+    fullName: body.fullName === undefined ? undefined : body.fullName.trim(),
+    addressLine1: body.addressLine1 === undefined ? undefined : body.addressLine1.trim(),
+    addressLine2: body.addressLine2 === undefined ? undefined : body.addressLine2.trim(),
+    addressTown: body.addressTown === undefined ? undefined : body.addressTown.trim(),
+    addressCounty: body.addressCounty === undefined ? undefined : body.addressCounty.trim(),
+    addressPostcode: body.addressPostcode === undefined ? undefined : body.addressPostcode.trim(),
+    phoneNumber: body.phoneNumber === undefined ? undefined : body.phoneNumber.trim(),
+    emailAddress:
+      body.emailAddress === undefined
+        ? undefined
+        : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase())
+  };
+};
+
+/**
  * Clean an incoming PATCH request body to make it more compatible with the
  * database and its validation rules.
  *
@@ -128,7 +162,21 @@ v2Router.get('/registrations', async (request, response) => {
  * CREATEs a single registration.
  */
 v2Router.post('/registrations', async (request, response) => {
-  return response.status(501).send({message: 'Not implemented.'});
+  const baseUrl = new URL(
+    `${request.protocol}://${request.hostname}:${config.port}${request.originalUrl}${
+      request.originalUrl.endsWith('/') ? '' : '/'
+    }`
+  );
+
+  try {
+    // Clean up the user's input before we store it in the database.
+    const cleanObject = cleanInput(request.body);
+
+    const newId = await Registration.create(cleanObject);
+    return response.status(201).location(new URL(newId, baseUrl)).send();
+  } catch (error) {
+    return response.status(500).send({error});
+  }
 });
 
 /**
