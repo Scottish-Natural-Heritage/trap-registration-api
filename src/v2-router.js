@@ -253,7 +253,44 @@ v2Router.post('/registrations/:id/returns', async (request, response) => {
  * READs a single return in a single registration.
  */
 v2Router.get('/registrations/:id/returns/:returnId', async (request, response) => {
-  return response.status(501).send({message: 'Not implemented.'});
+  try {
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingId = Number(request.params.id);
+    if (Number.isNaN(existingId)) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    }
+
+    // Check if there's a registration allocated at the specified ID.
+    const existingReg = await Registration.findOne(existingId);
+    if (existingReg === undefined || existingReg === null) {
+      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+    }
+
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingReturnId = Number(request.params.returnId);
+    if (Number.isNaN(existingReturnId)) {
+      return response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
+    }
+
+    // Check if there's a return allocated at the specified ID.
+    const existingReturn = await Return.findOne(existingReturnId);
+
+    if (existingReturn === undefined || existingReturn === null) {
+      return response.status(404).send({message: `Return ${existingReturnId} not allocated.`});
+    }
+
+    // Check if the return is allocated to the specified registration.
+    if (existingReturn.RegistrationId !== existingId) {
+      return response
+        .status(404)
+        .send({message: `Return ${existingReturnId} not found against Registration ${existingId}.`});
+    }
+
+    // If they are, send back the finalised return.
+    return response.status(200).send(existingReturn);
+  } catch (error) {
+    return response.status(500).send({error});
+  }
 });
 
 /**
