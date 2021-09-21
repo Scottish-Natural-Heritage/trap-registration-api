@@ -10,8 +10,8 @@ if (process.env.NODE_ENV === 'production') {
 
       // Loop through the results and add an expiry date value, calculated from the createdAt field.
       for (const result of resultsArray) {
-        // Get the current date.
-        result.expiryDate = new Date();
+        // Get the date the registration was created on.
+        result.expiryDate = new Date(result.createdAt);
         // Add 4 years.
         result.expiryDate.setFullYear(result.expiryDate.getFullYear() + 4);
         // Set the month to December and the date to the 31st.
@@ -48,8 +48,8 @@ if (process.env.NODE_ENV === 'production') {
 
       // Loop through the results and add an expiry date value, calculated from the createdAt field.
       for (const result of resultsArray) {
-        // Get the current date.
-        result.expiryDate = new Date();
+        // Get the date the registration was created on.
+        result.expiryDate = new Date(result.createdAt);
         // Add 4 years.
         result.expiryDate.setFullYear(result.expiryDate.getFullYear() + 4);
         // Set the month to December and the date to the 31st.
