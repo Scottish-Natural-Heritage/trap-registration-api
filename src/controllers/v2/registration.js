@@ -1,6 +1,6 @@
 import db from '../../models/index.js';
 
-const {Registration, Return, NonTargetSpecies} = db;
+const {Registration, Return, NonTargetSpecies, Revocation} = db;
 
 /**
  * An object to perform 'persistence' operations on our registration objects.
@@ -56,6 +56,26 @@ const RegistrationController = {
 
     // If something went wrong, return undefined to signify this.
     return undefined;
+  },
+
+  /**
+   * Soft delete a registration in the database.
+   *
+   * @param {Number} id a possible ID of a registration.
+   * @param {Object} cleanObject an new revocation object to be added to the database.
+   * @returns {boolean} true if the record is deleted, otherwise false
+   */
+   delete: async (id, cleanObject) => {
+    try {
+      await db.sequelize.transaction(async (t) => {
+        await Registration.findByPk(id, {transaction: t, rejectOnEmpty: true});
+        await Revocation.create(cleanObject, {transaction: t});
+        await Registration.destroy({where: {id}, transaction: t});
+        return true;
+      });
+    } catch {
+      return false;
+    }
   }
 };
 

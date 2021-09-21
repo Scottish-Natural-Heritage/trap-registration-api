@@ -70,6 +70,26 @@ const cleanPatchInput = (body) => {
   return cleanedBody;
 };
 
+/**
+ * Clean the incoming request body to make it more compatible with the
+ * database and its validation rules.
+ *
+ * @param {any} existingId the Registration that is being revoked
+ * @param {any} body the incoming request's body
+ * @returns {any} a json object that's just got our cleaned up fields on it
+ */
+ const cleanRevokeInput = (existingId, body) => {
+  return {
+    RegistrationId: existingId,
+    // The strings are trimmed for leading and trailing whitespace and then
+    // copied across if they're in the POST body or are set to undefined if
+    // they're missing.
+    reason: body.reason === undefined ? undefined : body.reason.trim(),
+    createdBy: body.createdBy === undefined ? undefined : body.createdBy.trim(),
+    isRevoked: body.isRevoked
+  };
+};
+
 // #region Health Check
 
 /**
@@ -185,7 +205,28 @@ v2Router.patch('/registrations/:id', async (request, response) => {
  * DELETEs a single registration.
  */
 v2Router.delete('/registrations/:id', async (request, response) => {
-  return response.status(501).send({message: 'Not implemented.'});
+  try {
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingId = Number(request.params.id);
+    if (Number.isNaN(existingId)) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    }
+
+    // Clean up the user's input before we store it in the database.
+    const cleanObject = cleanRevokeInput(existingId, request.body);
+
+    const deleteRegistration = await Registration.delete(existingId, cleanObject);
+
+    if (deleteRegistration === false) {
+      return response.status(500).send({message: `Could not delete Registration ${existingId}.`});
+    }
+
+    // If they are, send back true.
+    return response.status(200).send();
+  } catch (error) {
+    // If anything goes wrong (such as a validation error), tell the client.
+    return response.status(500).send({error});
+  }
 });
 
 // #endregion
