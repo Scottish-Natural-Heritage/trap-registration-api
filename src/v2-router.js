@@ -2,6 +2,7 @@ import express from 'express';
 import utils from 'naturescot-utils';
 import Registration from './controllers/v2/registration.js';
 import Return from './controllers/v2/return.js';
+import config from './config/app.js';
 
 const v2Router = express.Router();
 
@@ -162,6 +163,7 @@ v2Router.get('/registrations', async (request, response) => {
  * CREATEs a single registration.
  */
 v2Router.post('/registrations', async (request, response) => {
+  // Work out the base URL for returning later in the location header.
   const baseUrl = new URL(
     `${request.protocol}://${request.hostname}:${config.port}${request.originalUrl}${
       request.originalUrl.endsWith('/') ? '' : '/'
@@ -171,8 +173,9 @@ v2Router.post('/registrations', async (request, response) => {
   try {
     // Clean up the user's input before we store it in the database.
     const cleanObject = cleanInput(request.body);
-
+    // Try to create the new registration entry.
     const newId = await Registration.create(cleanObject);
+    // On success return 201 with the location of the new entry in the response header.
     return response.status(201).location(new URL(newId, baseUrl)).send();
   } catch (error) {
     return response.status(500).send({error});

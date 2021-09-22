@@ -36,6 +36,44 @@ const RegistrationController = {
     return Registration.findAll();
   },
 
+  create: async (reg) => {
+    let newReg;
+    let remainingAttempts = 10;
+    // Loop until we have a new empty registration or we run out of attempts,
+    // whichever happens first.
+    while (newReg === undefined && remainingAttempts > 0) {
+      try {
+        // Generate a random ID for the registration.
+        const regId = Math.floor(Math.random() * 99_999);
+        // Begin the database transaction.
+        await db.sequelize.transaction(async (t) => {
+          // First check if the ID has already been used by another registration.
+          newReg = await Registration.findByPk(regId, {transaction: t})
+          // If the ID already exists set to undefined to continue the loop and try again.
+          if (newReg !== null) {
+            newReg = undefined;
+          }
+
+          // If the ID was not assigned then send the details of the new registration to the database.
+          if (!newReg) {
+            reg.id = regId;
+            newReg = await Registration.create(reg, {transaction: t});
+          }
+        });
+        remainingAttempts--;
+      } catch (error) {
+        newReg = undefined;
+      }
+    }
+    // If we run out of attempts let the calling code know by raising an error.
+    if (newReg === undefined) {
+      throw new Error('Unable to generate new registration number.');
+    }
+
+    // On success, return the new registration's ID.
+    return newReg.id
+  },
+
   /**
    * Update a registration in the database with partial JSON model.
    *
