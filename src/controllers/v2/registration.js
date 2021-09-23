@@ -1,5 +1,5 @@
-import db from '../../models/index.js';
 import NotifyClient from 'notifications-node-client';
+import db from '../../models/index.js';
 import config from '../../config/app.js';
 import jsonConsoleLogger, {unErrorJson} from '../../json-console-logger.js';
 
@@ -83,7 +83,9 @@ const RegistrationController = {
     let newReg;
     let remainingAttempts = 10;
     // Loop until we have a new empty registration or we run out of attempts,
-    // whichever happens first.
+    // whichever happens first. We want to wait until we know if an ID is in
+    // use here so disable the no-await-in-loop rule.
+    /* eslint-disable no-await-in-loop */
     while (newReg === undefined && remainingAttempts > 0) {
       try {
         // Generate a random ID for the registration.
@@ -102,10 +104,11 @@ const RegistrationController = {
           }
         });
         remainingAttempts--;
-      } catch (error) {
+      } catch {
         newReg = undefined;
       }
     }
+    /* eslint-enable no-await-in-loop */
 
     // If we run out of attempts let the calling code know by raising an error.
     if (newReg === undefined) {

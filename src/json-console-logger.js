@@ -22,7 +22,7 @@ jsonConsoleLogger.stream = {
  * new object with the same keys and values as the Error, but as a plain JSON
  * object.
  */
- const unErrorJson = (json) => {
+const unErrorJson = (json) => {
   if (json instanceof Error) {
     const unError = {};
     for (const key of Object.getOwnPropertyNames(json)) {
