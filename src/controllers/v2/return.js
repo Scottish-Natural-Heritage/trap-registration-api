@@ -73,9 +73,9 @@ const ReturnController = {
           })
         );
       });
-    } catch (error) {
-      // When anything goes wrong throw the error up.
-      throw new Error('Unable to create new return: ' + error);
+    } catch {
+      // When anything goes return undefined to the router so it can tell the client.
+      return undefined;
     }
 
     // Return the ID of the newly created return.

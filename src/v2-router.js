@@ -397,6 +397,9 @@ v2Router.post('/registrations/:id/returns', async (request, response) => {
 
   try {
     const newId = await Return.create(cleanObject);
+    if (newId = undefined) {
+      return response.status(500).send({message: 'Return could not be created.'});
+    }
     return response.status(201).location(new URL(newId, baseUrl)).send();
   } catch (error) {
     return response.status(500).send({error});
