@@ -49,15 +49,13 @@ const RegistrationController = {
         await db.sequelize.transaction(async (t) => {
           // First check if the ID has already been used by another registration.
           newReg = await Registration.findByPk(regId, {transaction: t})
-          // If the ID already exists set to undefined to continue the loop and try again.
-          if (newReg !== null) {
-            newReg = undefined;
-          }
-
-          // If the ID was not assigned then send the details of the new registration to the database.
-          if (!newReg) {
+          // If the ID is not in use we can use it.
+          if (newReg === null) {
             reg.id = regId;
             newReg = await Registration.create(reg, {transaction: t});
+          } else {
+            // If the ID is in use set newReg to undefined and try again.
+            newReg = undefined;
           }
         });
         remainingAttempts--;

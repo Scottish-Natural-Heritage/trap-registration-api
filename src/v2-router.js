@@ -13,7 +13,7 @@ const v2Router = express.Router();
  * @param {any} body the incoming request's body
  * @returns {any} a json object that's just got our cleaned up fields on it
  */
- const cleanInput = (body) => {
+const cleanInput = (body) => {
   return {
     // The booleans are just copied across.
     convictions: body.convictions,
@@ -106,6 +106,42 @@ const cleanPatchInput = (body) => {
 };
 
 /**
+ * Clean the incoming POST request body to make it more compatible with the
+ * database and its validation rules.
+ *
+ * @param {any} body The incoming request's body.
+ * @returns {any} A json object that's just got our cleaned up fields on it.
+ */
+const cleanReturnInput = (id, body) => {
+  return {
+    // The booleans are just copied across.
+    nonTargetSpeciesToReport: body.nonTargetSpeciesToReport,
+    // The id passed in is set as the registration id.
+    RegistrationId: id,
+    createdByLicensingOfficer: body.createdByLicensingOfficer,
+
+    // We copy across the nonTargetSpeciesCaught, cleaning them as we go.
+    nonTargetSpecies:
+      body.nonTargetSpeciesCaught === undefined
+        ? undefined
+        : body.nonTargetSpeciesCaught.map((nonTargetSpecies) => {
+            return {
+              // The number is just copied across.
+              numberCaught: nonTargetSpecies.numberCaught,
+
+              // The strings are trimmed then copied.
+              gridReference:
+                nonTargetSpecies.gridReference === undefined ? undefined : nonTargetSpecies.gridReference.trim(),
+              speciesCaught:
+                nonTargetSpecies.speciesCaught === undefined ? undefined : nonTargetSpecies.speciesCaught.trim(),
+              trapType: nonTargetSpecies.trapType === undefined ? undefined : nonTargetSpecies.trapType.trim(),
+              comment: nonTargetSpecies.comment === undefined ? undefined : nonTargetSpecies.comment.trim()
+            };
+          })
+  };
+};
+
+/**
  * Clean the incoming request body to make it more compatible with the
  * database and its validation rules.
  *
@@ -113,7 +149,7 @@ const cleanPatchInput = (body) => {
  * @param {any} body the incoming request's body
  * @returns {any} a json object that's just got our cleaned up fields on it
  */
- const cleanRevokeInput = (existingId, body) => {
+const cleanRevokeInput = (existingId, body) => {
   return {
     RegistrationId: existingId,
     // The strings are trimmed for leading and trailing whitespace and then
@@ -338,7 +374,33 @@ v2Router.get('/registrations/:id/returns', async (request, response) => {
  * CREATEs a single return in a single registration.
  */
 v2Router.post('/registrations/:id/returns', async (request, response) => {
-  return response.status(501).send({message: 'Not implemented.'});
+  // Try to parse the incoming ID to make sure it's really a number.
+  const existingId = Number(request.params.id);
+  if (Number.isNaN(existingId)) {
+    return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+  }
+
+  // Check if there's a registration allocated at the specified ID.
+  const existingReg = await Registration.findOne(existingId);
+  if (existingReg === undefined || existingReg === null) {
+    return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+  }
+
+  const baseUrl = new URL(
+    `${request.protocol}://${request.hostname}:${config.port}${request.originalUrl}${
+      request.originalUrl.endsWith('/') ? '' : '/'
+    }`
+  );
+
+  // Clean up the user's input before we store it in the database.
+  const cleanObject = cleanReturnInput(existingId, request.body);
+
+  try {
+    const newId = await Return.create(cleanObject);
+    return response.status(201).location(new URL(newId, baseUrl)).send();
+  } catch (error) {
+    return response.status(500).send({error});
+  }
 });
 
 /**
