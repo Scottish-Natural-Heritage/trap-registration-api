@@ -6,27 +6,6 @@ import jsonConsoleLogger, {unErrorJson} from '../../json-console-logger.js';
 const {Registration, Return, NonTargetSpecies, Revocation} = db;
 
 /**
- * Takes an issue date, calculates an expiry date based on that and converts it
- * in to a formatted string.
- *
- * @param {Date} issueDate when the registration is issued
- * @returns {String} a formatted date string
- */
-const buildExpiryDateString = (issueDate) => {
-  // Every registration has a 5 year expiry, tied to the issue date of that
-  // year's General Licenses. General Licenses are always issued on January 1st,
-  // so registrations last for four whole years, plus the rest of the issued
-  // year.
-  const expiryYear = issueDate.getFullYear() + 4;
-
-  const d = 31;
-  const m = 12;
-  const y = String(expiryYear).padStart(4, '0');
-
-  return `${d}/${m}/${y}`;
-};
-
-/**
  * Send emails to the applicant to let them know it was successful.
  *
  * @param {any} reg an enhanced JSON version of the model
@@ -34,6 +13,11 @@ const buildExpiryDateString = (issueDate) => {
 const sendSuccessEmail = async (reg) => {
   if (config.notifyApiKey) {
     try {
+      // Every registration has a 5 year expiry, tied to the issue date of that
+      // year's General Licenses. General Licenses are always issued on January 1st,
+      // so registrations last for four whole years, plus the rest of the issued
+      // year.
+      const yearExpires = new Date().getFullYear() + 4;
       const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
 
       await notifyClient.sendEmail('7b7a0810-a15d-4c72-8fcf-c1e7494641b3', reg.emailAddress, {
@@ -49,7 +33,7 @@ const sendSuccessEmail = async (reg) => {
           noComply: reg.complyWithTerms ? 'no' : 'yes',
           meatBait: reg.meatBaits ? 'yes' : 'no',
           noMeatBait: reg.meatBaits ? 'no' : 'yes',
-          expiryDate: reg.expiryDate
+          expiryDate: `31/12/${yearExpires}`
         },
         reference: reg.regNo,
         emailReplyToId: '4a9b34d1-ab1f-4806-83df-3e29afef4165'
@@ -129,10 +113,7 @@ const RegistrationController = {
     }
 
     // Generate and save  the human-readable version of the reg no.
-    newReg.regNo = `NS-TRP-${String(id).padStart(5, '0')}`;
-
-    // Generate and save the registration's expiry date.
-    newReg.expiryDate = buildExpiryDateString(new Date());
+    newReg.regNo = `NS-TRP-${String(newReg.id).padStart(5, '0')}`;
 
     // Send the applicant their confirmation email.
     await sendSuccessEmail(newReg);

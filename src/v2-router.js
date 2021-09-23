@@ -308,7 +308,7 @@ v2Router.delete('/registrations/:id', async (request, response) => {
       return response.status(500).send({message: `Could not delete Registration ${existingId}.`});
     }
 
-    // If they are, send back true.
+    // If we are able to delete the registration return 200 OK to the client.
     return response.status(200).send();
   } catch (error) {
     // If anything goes wrong (such as a validation error), tell the client.
@@ -400,6 +400,7 @@ v2Router.post('/registrations/:id/return', async (request, response) => {
     if (newId === undefined) {
       return response.status(500).send({message: 'Return could not be created.'});
     }
+
     return response.status(201).location(new URL(newId, baseUrl)).send();
   } catch (error) {
     return response.status(500).send({error});
