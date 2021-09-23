@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "91e5a67c-e526-40e5-a8e2-5aeab5a1a751",
+		"_postman_id": "67d5c2ee-bc02-49db-b91d-71e9519af845",
 		"name": "trap-registration-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -275,6 +275,7 @@
 							"    pm.expect(jsonData).to.have.property('createdAt');\r",
 							"    pm.expect(jsonData).to.have.property('updatedAt');\r",
 							"    pm.expect(jsonData).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData).to.have.property('expiryDate');\r",
 							"    pm.expect(jsonData).to.have.property('Returns');\r",
 							"    pm.expect(jsonData.Returns.length).to.equal(0);\r",
 							"    pm.expect(jsonData).to.have.property('createdByLicensingOfficer');\r",
@@ -495,6 +496,7 @@
 							"    pm.expect(jsonData).to.have.property('createdAt');\r",
 							"    pm.expect(jsonData).to.have.property('updatedAt');\r",
 							"    pm.expect(jsonData).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData).to.have.property('expiryDate');\r",
 							"    pm.expect(jsonData).to.have.property('Returns');\r",
 							"    pm.expect(jsonData.Returns.length).to.equal(0);\r",
 							"    pm.expect(jsonData).to.have.property('createdByLicensingOfficer');\r",
@@ -789,6 +791,7 @@
 							"    pm.expect(jsonData).to.have.property('createdAt');\r",
 							"    pm.expect(jsonData).to.have.property('updatedAt');\r",
 							"    pm.expect(jsonData).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData).to.have.property('expiryDate');\r",
 							"    pm.expect(jsonData).to.have.property('Returns');\r",
 							"    pm.expect(jsonData.Returns[0]).to.have.property('id');\r",
 							"    pm.expect(jsonData.Returns[0]).to.have.property('RegistrationId');\r",
@@ -1074,6 +1077,7 @@
 							"    pm.expect(jsonData).to.have.property('createdAt');\r",
 							"    pm.expect(jsonData).to.have.property('updatedAt');\r",
 							"    pm.expect(jsonData).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData).to.have.property('expiryDate');\r",
 							"    pm.expect(jsonData).to.have.property('Returns');\r",
 							"    pm.expect(jsonData.Returns[0]).to.have.property('id');\r",
 							"    pm.expect(jsonData.Returns[0]).to.have.property('RegistrationId');\r",
