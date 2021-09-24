@@ -340,7 +340,7 @@ v2Router.get('/returns', async (request, response) => {
 /**
  * READs all the returns in a single registration.
  */
-v2Router.get('/registrations/:id/return', async (request, response) => {
+v2Router.get('/registrations/:id/returns', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
@@ -373,7 +373,7 @@ v2Router.get('/registrations/:id/return', async (request, response) => {
 /**
  * CREATEs a single return in a single registration.
  */
-v2Router.post('/registrations/:id/return', async (request, response) => {
+v2Router.post('/registrations/:id/returns', async (request, response) => {
   // Try to parse the incoming ID to make sure it's really a number.
   const existingId = Number(request.params.id);
   if (Number.isNaN(existingId)) {
@@ -410,7 +410,7 @@ v2Router.post('/registrations/:id/return', async (request, response) => {
 /**
  * READs a single return in a single registration.
  */
-v2Router.get('/registrations/:id/return/:returnId', async (request, response) => {
+v2Router.get('/registrations/:id/returns/:returnId', async (request, response) => {
   try {
     // Try to parse the incoming ID to make sure it's really a number.
     const existingId = Number(request.params.id);
@@ -454,14 +454,14 @@ v2Router.get('/registrations/:id/return/:returnId', async (request, response) =>
 /**
  * UPDATEs a single return in a single registration.
  */
-v2Router.put('/registrations/:id/return/:returnId', async (request, response) => {
+v2Router.put('/registrations/:id/returns/:returnId', async (request, response) => {
   return response.status(501).send({message: 'Not implemented.'});
 });
 
 /**
  * DELETEs a single return in a single registration.
  */
-v2Router.delete('/registrations/:id/return/:returnId', async (request, response) => {
+v2Router.delete('/registrations/:id/returns/:returnId', async (request, response) => {
   return response.status(501).send({message: 'Not implemented.'});
 });
 
