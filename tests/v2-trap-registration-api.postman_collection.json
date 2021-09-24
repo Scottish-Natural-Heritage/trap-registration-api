@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0de00b63-8696-4a91-aa12-0efb2ec68838",
+		"_postman_id": "dc15ea2a-c976-405c-bfee-c506ba91dc01",
 		"name": "v2-trap-registration-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -374,7 +374,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/return",
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -385,7 +385,7 @@
 						"v2",
 						"registrations",
 						"{{TR_NEW_REG_ID}}",
-						"return"
+						"returns"
 					]
 				}
 			},
@@ -508,7 +508,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/return",
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -519,7 +519,7 @@
 						"v2",
 						"registrations",
 						"{{TR_NEW_REG_ID}}",
-						"return"
+						"returns"
 					]
 				}
 			},
@@ -566,7 +566,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/return",
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -577,7 +577,7 @@
 						"v2",
 						"registrations",
 						"{{TR_NEW_REG_ID}}",
-						"return"
+						"returns"
 					]
 				}
 			},
@@ -765,7 +765,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/return",
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -776,7 +776,7 @@
 						"v2",
 						"registrations",
 						"{{TR_NEW_REG_ID}}",
-						"return"
+						"returns"
 					]
 				}
 			},
@@ -814,7 +814,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/return/{{TR_NEW_RET_ID}}",
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns/{{TR_NEW_RET_ID}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -825,7 +825,7 @@
 						"v2",
 						"registrations",
 						"{{TR_NEW_REG_ID}}",
-						"return",
+						"returns",
 						"{{TR_NEW_RET_ID}}"
 					]
 				}
