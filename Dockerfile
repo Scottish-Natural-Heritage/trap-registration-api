@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:16-alpine
 
 # drop back to the non-privileged user for run-time
 WORKDIR /home/node
