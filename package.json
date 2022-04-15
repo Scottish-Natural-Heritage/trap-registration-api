@@ -15,8 +15,7 @@
     "test": "start-server-and-test start http://localhost:3001/trap-registration-api/v1/health nm:run"
   },
   "engines": {
-    "node": "16.14.2",
-    "npm": "8.5.0"
+    "node": ">=16.0.0"
   },
   "license": "MIT",
   "dependencies": {
