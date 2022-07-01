@@ -70,33 +70,31 @@ const calculateExpiryDate = () => {
  * @param {any} body the incoming request's body
  * @returns {any} a json object that's just got our cleaned up fields on it
  */
-const cleanInput = (body) => {
-  return {
-    // The booleans are just copied across.
-    convictions: body.convictions,
-    usingGL01: body.usingGL01,
-    usingGL02: body.usingGL02,
-    usingGL03: null,
-    complyWithTerms: body.complyWithTerms,
-    meatBaits: body.meatBaits,
-    createdByLicensingOfficer: body.createdByLicensingOfficer,
-    // The strings are trimmed for leading and trailing whitespace and then
-    // copied across if they're in the POST body or are set to undefined if
-    // they're missing.
-    fullName: body.fullName === undefined ? undefined : body.fullName.trim(),
-    addressLine1: body.addressLine1 === undefined ? undefined : body.addressLine1.trim(),
-    addressLine2: body.addressLine2 === undefined ? undefined : body.addressLine2.trim(),
-    addressTown: body.addressTown === undefined ? undefined : body.addressTown.trim(),
-    addressCounty: body.addressCounty === undefined ? undefined : body.addressCounty.trim(),
-    addressPostcode: body.addressPostcode === undefined ? undefined : body.addressPostcode.trim(),
-    phoneNumber: body.phoneNumber === undefined ? undefined : body.phoneNumber.trim(),
-    emailAddress:
-      body.emailAddress === undefined
-        ? undefined
-        : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
-    expiryDate: calculateExpiryDate()
-  };
-};
+const cleanInput = (body) => ({
+  // The booleans are just copied across.
+  convictions: body.convictions,
+  usingGL01: body.usingGL01,
+  usingGL02: body.usingGL02,
+  usingGL03: null,
+  complyWithTerms: body.complyWithTerms,
+  meatBaits: body.meatBaits,
+  createdByLicensingOfficer: body.createdByLicensingOfficer,
+  // The strings are trimmed for leading and trailing whitespace and then
+  // copied across if they're in the POST body or are set to undefined if
+  // they're missing.
+  fullName: body.fullName === undefined ? undefined : body.fullName.trim(),
+  addressLine1: body.addressLine1 === undefined ? undefined : body.addressLine1.trim(),
+  addressLine2: body.addressLine2 === undefined ? undefined : body.addressLine2.trim(),
+  addressTown: body.addressTown === undefined ? undefined : body.addressTown.trim(),
+  addressCounty: body.addressCounty === undefined ? undefined : body.addressCounty.trim(),
+  addressPostcode: body.addressPostcode === undefined ? undefined : body.addressPostcode.trim(),
+  phoneNumber: body.phoneNumber === undefined ? undefined : body.phoneNumber.trim(),
+  emailAddress:
+    body.emailAddress === undefined
+      ? undefined
+      : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
+  expiryDate: calculateExpiryDate()
+});
 
 v1router.get('/registrations/:id', async (request, response) => {
   try {
@@ -164,17 +162,15 @@ v1router.put('/registrations/:id', async (request, response) => {
  * @param {any} body the incoming request's body
  * @returns {any} a json object that's just got our cleaned up fields on it
  */
-const cleanRevokeInput = (existingId, body) => {
-  return {
-    RegistrationId: existingId,
-    // The strings are trimmed for leading and trailing whitespace and then
-    // copied across if they're in the POST body or are set to undefined if
-    // they're missing.
-    reason: body.reason === undefined ? undefined : body.reason.trim(),
-    createdBy: body.createdBy === undefined ? undefined : body.createdBy.trim(),
-    isRevoked: body.isRevoked
-  };
-};
+const cleanRevokeInput = (existingId, body) => ({
+  RegistrationId: existingId,
+  // The strings are trimmed for leading and trailing whitespace and then
+  // copied across if they're in the POST body or are set to undefined if
+  // they're missing.
+  reason: body.reason === undefined ? undefined : body.reason.trim(),
+  createdBy: body.createdBy === undefined ? undefined : body.createdBy.trim(),
+  isRevoked: body.isRevoked
+});
 
 // Allow an API consumer to delete a registration.
 v1router.delete('/registrations/:id', async (request, response) => {
@@ -285,9 +281,7 @@ v1router.get('/registrations/:id/return/:returnId', async (request, response) =>
 
 // Allow an API consumer to retrieve the public half of our ECDSA key to
 // validate our signed JWTs.
-v1router.get('/public-key', async (request, response) => {
-  return response.status(200).send(jwk.getPublicKey());
-});
+v1router.get('/public-key', async (request, response) => response.status(200).send(jwk.getPublicKey()));
 
 /**
  * Build a JWT to allow a visitor to log in to the supply a return flow.
@@ -296,9 +290,8 @@ v1router.get('/public-key', async (request, response) => {
  * @param {string} id
  * @returns {string} a signed JWT
  */
-const buildToken = (jwtPrivateKey, id) => {
-  return jwt.sign({}, jwtPrivateKey, {subject: `${id}`, algorithm: 'ES256', expiresIn: '30m', noTimestamp: true});
-};
+const buildToken = (jwtPrivateKey, id) =>
+  jwt.sign({}, jwtPrivateKey, {subject: `${id}`, algorithm: 'ES256', expiresIn: '30m', noTimestamp: true});
 
 /**
  * Send an email to the visitor that contains a link which allows them to log in
@@ -415,34 +408,30 @@ v1router.get('/registrations/:id/login', async (request, response) => {
  * @param {any} body The incoming request's body.
  * @returns {any} A json object that's just got our cleaned up fields on it.
  */
-const cleanReturnInput = (id, body) => {
-  return {
-    // The booleans are just copied across.
-    nonTargetSpeciesToReport: body.nonTargetSpeciesToReport,
-    // The id passed in is set as the registration id.
-    RegistrationId: id,
-    createdByLicensingOfficer: body.createdByLicensingOfficer,
+const cleanReturnInput = (id, body) => ({
+  // The booleans are just copied across.
+  nonTargetSpeciesToReport: body.nonTargetSpeciesToReport,
+  // The id passed in is set as the registration id.
+  RegistrationId: id,
+  createdByLicensingOfficer: body.createdByLicensingOfficer,
 
-    // We copy across the nonTargetSpeciesCaught, cleaning them as we go.
-    nonTargetSpecies:
-      body.nonTargetSpeciesCaught === undefined
-        ? undefined
-        : body.nonTargetSpeciesCaught.map((nonTargetSpecies) => {
-            return {
-              // The number is just copied across.
-              numberCaught: nonTargetSpecies.numberCaught,
+  // We copy across the nonTargetSpeciesCaught, cleaning them as we go.
+  nonTargetSpecies:
+    body.nonTargetSpeciesCaught === undefined
+      ? undefined
+      : body.nonTargetSpeciesCaught.map((nonTargetSpecies) => ({
+          // The number is just copied across.
+          numberCaught: nonTargetSpecies.numberCaught,
 
-              // The strings are trimmed then copied.
-              gridReference:
-                nonTargetSpecies.gridReference === undefined ? undefined : nonTargetSpecies.gridReference.trim(),
-              speciesCaught:
-                nonTargetSpecies.speciesCaught === undefined ? undefined : nonTargetSpecies.speciesCaught.trim(),
-              trapType: nonTargetSpecies.trapType === undefined ? undefined : nonTargetSpecies.trapType.trim(),
-              comment: nonTargetSpecies.comment === undefined ? undefined : nonTargetSpecies.comment.trim()
-            };
-          })
-  };
-};
+          // The strings are trimmed then copied.
+          gridReference:
+            nonTargetSpecies.gridReference === undefined ? undefined : nonTargetSpecies.gridReference.trim(),
+          speciesCaught:
+            nonTargetSpecies.speciesCaught === undefined ? undefined : nonTargetSpecies.speciesCaught.trim(),
+          trapType: nonTargetSpecies.trapType === undefined ? undefined : nonTargetSpecies.trapType.trim(),
+          comment: nonTargetSpecies.comment === undefined ? undefined : nonTargetSpecies.comment.trim()
+        }))
+});
 
 // Allow the API consumer to submit a return against a registration.
 v1router.post('/registrations/:id/return', async (request, response) => {

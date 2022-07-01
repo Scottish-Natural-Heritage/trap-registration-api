@@ -55,8 +55,8 @@ const RegistrationController = {
    * @param {Number} id an existing registration's ID
    * @returns an existing registration
    */
-  findOne: async (id) => {
-    return Registration.findByPk(id, {
+  findOne: async (id) =>
+    Registration.findByPk(id, {
       include: [
         {
           model: Return,
@@ -67,17 +67,14 @@ const RegistrationController = {
           ]
         }
       ]
-    });
-  },
+    }),
 
   /**
    * Retrieve all registrations from the database.
    *
    * @returns all existing registrations
    */
-  findAll: async () => {
-    return Registration.findAll();
-  },
+  findAll: async () => Registration.findAll(),
 
   create: async (reg) => {
     let newReg;

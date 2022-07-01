@@ -47,11 +47,7 @@ if (process.env.NODE_ENV === 'production') {
   };
 } else {
   module.exports = {
-    up: () => {
-      return Promise.resolve();
-    },
-    down: () => {
-      return Promise.resolve();
-    }
+    up: () => Promise.resolve(),
+    down: () => Promise.resolve()
   };
 }

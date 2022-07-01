@@ -19,9 +19,7 @@ if (process.env.NODE_ENV === 'production') {
       );
     },
 
-    down: async (_queryInterface, _Sequelize) => {
-      return Promise.resolve();
-    }
+    down: async (_queryInterface, _Sequelize) => Promise.resolve()
   };
 } else {
   module.exports = {
@@ -43,8 +41,6 @@ if (process.env.NODE_ENV === 'production') {
       );
     },
 
-    down: async (_queryInterface, _Sequelize) => {
-      return Promise.resolve();
-    }
+    down: async (_queryInterface, _Sequelize) => Promise.resolve()
   };
 }

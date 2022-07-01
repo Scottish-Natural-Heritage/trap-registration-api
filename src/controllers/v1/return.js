@@ -30,27 +30,22 @@ const ReturnController = {
    * @param {Number} id an existing Return's ID
    * @returns an existing Return
    */
-  findOne: async (id) => {
-    return Return.findByPk(id, {include: NonTargetSpecies});
-  },
+  findOne: async (id) => Return.findByPk(id, {include: NonTargetSpecies}),
 
-  findRegReturns: async (id) => {
-    return Return.findAll({
+  findRegReturns: async (id) =>
+    Return.findAll({
       where: {
         RegistrationId: id
       },
       include: NonTargetSpecies
-    });
-  },
+    }),
 
   /**
    * Retrieve all returns from the database.
    *
    * @returns all existing returns
    */
-  findAll: async () => {
-    return Return.findAll();
-  },
+  findAll: async () => Return.findAll(),
 
   /**
    * Replace a return in the database with our new JSON model.

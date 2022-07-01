@@ -4,20 +4,12 @@
 // environment. They are not required for the development SQLite DB.
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
-    up: (queryInterface) => {
-      return queryInterface.createSchema('traps');
-    },
-    down: (queryInterface) => {
-      return queryInterface.dropSchema('traps');
-    }
+    up: (queryInterface) => queryInterface.createSchema('traps'),
+    down: (queryInterface) => queryInterface.dropSchema('traps')
   };
 } else {
   module.exports = {
-    up: () => {
-      return Promise.resolve();
-    },
-    down: () => {
-      return Promise.resolve();
-    }
+    up: () => Promise.resolve(),
+    down: () => Promise.resolve()
   };
 }
