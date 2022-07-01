@@ -128,18 +128,14 @@ const RegistrationController = {
    * @param {Number} id an existing registration's ID
    * @returns an existing registration
    */
-  findOne: async (id) => {
-    return Registration.findByPk(id, {include: [{model: Return, include: NonTargetSpecies}]});
-  },
+  findOne: async (id) => Registration.findByPk(id, {include: [{model: Return, include: NonTargetSpecies}]}),
 
   /**
    * Retrieve all registrations from the database.
    *
    * @returns all existing registrations
    */
-  findAll: async () => {
-    return Registration.findAll();
-  },
+  findAll: async () => Registration.findAll(),
 
   /**
    * Replace a registration in the database with our new JSON model.

@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Revocations', {
+  up: (queryInterface, Sequelize) =>
+    queryInterface.createTable('Revocations', {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -32,9 +32,6 @@ module.exports = {
       deletedAt: {
         type: Sequelize.DATE
       }
-    });
-  },
-  down: (queryInterface) => {
-    return queryInterface.dropTable('Revocations');
-  }
+    }),
+  down: (queryInterface) => queryInterface.dropTable('Revocations')
 };

@@ -9,27 +9,21 @@ if (process.env.NODE_ENV === 'production') {
   const config = require('../../../src/config/database.js').ssDatabase;
 
   module.exports = {
-    up: (queryInterface, Sequelize) => {
-      return queryInterface.sequelize.query('create role rotraps with noinherit login password :roTrapsPassword;', {
+    up: (queryInterface, Sequelize) =>
+      queryInterface.sequelize.query('create role rotraps with noinherit login password :roTrapsPassword;', {
         type: Sequelize.QueryTypes.RAW,
         replacements: {
           roTrapsPassword: config.password
         }
-      });
-    },
-    down: (queryInterface, Sequelize) => {
-      return queryInterface.sequelize.query('drop role rotraps;', {
+      }),
+    down: (queryInterface, Sequelize) =>
+      queryInterface.sequelize.query('drop role rotraps;', {
         type: Sequelize.QueryTypes.RAW
-      });
-    }
+      })
   };
 } else {
   module.exports = {
-    up: () => {
-      return Promise.resolve();
-    },
-    down: () => {
-      return Promise.resolve();
-    }
+    up: () => Promise.resolve(),
+    down: () => Promise.resolve()
   };
 }
