@@ -9,27 +9,21 @@ if (process.env.NODE_ENV === 'production') {
   const config = require('../../../src/config/database.js').database;
 
   module.exports = {
-    up: (queryInterface, Sequelize) => {
-      return queryInterface.sequelize.query('create role traps with noinherit login password :trapsPassword;', {
+    up: (queryInterface, Sequelize) =>
+      queryInterface.sequelize.query('create role traps with noinherit login password :trapsPassword;', {
         type: Sequelize.QueryTypes.RAW,
         replacements: {
           trapsPassword: config.password
         }
-      });
-    },
-    down: (queryInterface, Sequelize) => {
-      return queryInterface.sequelize.query('drop role traps;', {
+      }),
+    down: (queryInterface, Sequelize) =>
+      queryInterface.sequelize.query('drop role traps;', {
         type: Sequelize.QueryTypes.RAW
-      });
-    }
+      })
   };
 } else {
   module.exports = {
-    up: () => {
-      return Promise.resolve();
-    },
-    down: () => {
-      return Promise.resolve();
-    }
+    up: () => Promise.resolve(),
+    down: () => Promise.resolve()
   };
 }
