@@ -24,6 +24,18 @@ const ReturnModel = (sequelize) => {
       },
       createdByLicensingOfficer: {
         type: Sequelize.STRING
+      },
+      year: {
+        type: Sequelize.STRING
+      },
+      numberLarsenMate: {
+        type: Sequelize.INTEGER
+      },
+      numberLarsenPod: {
+        type: Sequelize.INTEGER
+      },
+      noMeatBaitsUsed: {
+        type: Sequelize.BOOLEAN
       }
     },
     {

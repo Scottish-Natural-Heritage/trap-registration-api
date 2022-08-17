@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "dc15ea2a-c976-405c-bfee-c506ba91dc01",
+		"_postman_id": "c603aad6-e28f-4027-be92-39050a091c07",
 		"name": "v2-trap-registration-api",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5746803"
 	},
 	"item": [
 		{
@@ -366,7 +367,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"nonTargetSpeciesToReport\": true,\r\n  \"nonTargetSpeciesCaught\": [\r\n  \t{\r\n  \t\t\"gridReference\": \"NH63054372\",\r\n        \"speciesCaught\": \"Buzzard\",\r\n  \t\t\"numberCaught\": 11,\r\n        \"trapType\": \"Larson pod\",\r\n        \"comment\": \"\"\r\n  \t},\r\n  \t{\r\n  \t\t\"gridReference\": \"NH63044379\",\r\n        \"speciesCaught\": \"barn owl\",\r\n  \t\t\"numberCaught\": 13,\r\n        \"trapType\": \"Larson mate\",\r\n        \"comment\": \"realesed all of them unharmed\"\r\n  \t}\r\n  ]\r\n}",
+					"raw": "{\r\n   \"noMeatBaitsUsed\": false,\r\n   \"nonTargetSpeciesToReport\": true,\r\n   \"year\": \"2013\",\r\n   \"numberLarsenMate\": 13,\r\n   \"numberLarsenPod\": 0,\r\n   \"nonTargetSpeciesCaught\": [\r\n      {\r\n         \"gridReference\": \"NH63054372\",\r\n         \"speciesCaught\": \"Buzzard\",\r\n         \"numberCaught\": 11,\r\n         \"trapType\": \"Larson pod\",\r\n         \"comment\": \"\"\r\n      },\r\n      {\r\n         \"gridReference\": \"NH63044379\",\r\n         \"speciesCaught\": \"barn owl\",\r\n         \"numberCaught\": 13,\r\n         \"trapType\": \"Larson mate\",\r\n         \"comment\": \"realesed all of them unharmed\"\r\n      }\r\n   ]\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -500,7 +501,65 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"nonTargetSpeciesToReport\": false,\r\n  \"nonTargetSpeciesCaught\": []\r\n}",
+					"raw": "{\r\n  \"noMeatBaitsUsed\": true,\r\n  \"nonTargetSpeciesToReport\": false,\r\n  \"year\": \"2013\",\r\n  \"nonTargetSpeciesCaught\": []\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"returns"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new Return for no non-target-species as Visitor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201 Created', function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.have.status('Created');\r",
+							"});\r",
+							"\r",
+							"pm.test('Location is present', function () {\r",
+							"    pm.response.to.have.header('Location');\r",
+							"    \r",
+							"    \r",
+							"    pm.expect(pm.response.headers.get('Location')).to.include(\r",
+							"        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
+							"    );\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"TR_NEW_RET_ID\", pm.response.headers.get('Location').split('/').pop());\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"noMeatBaitsUsed\": false,\r\n  \"nonTargetSpeciesToReport\": false,\r\n  \"year\": \"2013\",\r\n  \"numberLarsenMate\": 13,\r\n  \"numberLarsePod\": 3,\r\n  \"nonTargetSpeciesCaught\": []\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -558,7 +617,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"nonTargetSpeciesToReport\": true,\r\n    \"createdByLicensingOfficer\": \"939123\",\r\n  \"nonTargetSpeciesCaught\": [\r\n  \t{\r\n  \t\t\"gridReference\": \"NH63054372\",\r\n        \"speciesCaught\": \"Buzzard\",\r\n  \t\t\"numberCaught\": 11,\r\n        \"trapType\": \"Larson pod\",\r\n        \"comment\": \"\"\r\n  \t},\r\n  \t{\r\n  \t\t\"gridReference\": \"NH63044379\",\r\n        \"speciesCaught\": \"barn owl\",\r\n  \t\t\"numberCaught\": 13,\r\n        \"trapType\": \"Larson mate\",\r\n        \"comment\": \"realesed all of them unharmed\"\r\n  \t}\r\n  ]\r\n}",
+					"raw": "{\r\n   \"noMeatBaitsUsed\": false,\r\n   \"nonTargetSpeciesToReport\": true,\r\n   \"year\": \"2013\",\r\n   \"numberLarsenMate\": 13,\r\n   \"numberLarsenPod\": 0,\r\n   \"createdByLicensingOfficer\": \"939123\",\r\n   \"nonTargetSpeciesCaught\": [\r\n      {\r\n         \"gridReference\": \"NH63054372\",\r\n         \"speciesCaught\": \"Buzzard\",\r\n         \"numberCaught\": 11,\r\n         \"trapType\": \"Larson pod\",\r\n         \"comment\": \"\"\r\n      },\r\n      {\r\n         \"gridReference\": \"NH63044379\",\r\n         \"speciesCaught\": \"barn owl\",\r\n         \"numberCaught\": 13,\r\n         \"trapType\": \"Larson mate\",\r\n         \"comment\": \"realesed all of them unharmed\"\r\n      }\r\n   ]\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"

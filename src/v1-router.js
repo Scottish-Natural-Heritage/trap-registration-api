@@ -411,9 +411,16 @@ v1router.get('/registrations/:id/login', async (request, response) => {
 const cleanReturnInput = (id, body) => ({
   // The booleans are just copied across.
   nonTargetSpeciesToReport: body.nonTargetSpeciesToReport,
+  noMeatBaitsUsed: body.noMeatBaitsUsed,
+
   // The id passed in is set as the registration id.
   RegistrationId: id,
   createdByLicensingOfficer: body.createdByLicensingOfficer,
+
+  // Copy across the year the return is for and the number of larsen mate / pod traps in which meat baits were used.
+  year: body.year ? body.year : undefined,
+  numberLarsenMate: body.numberLarsenMate ? body.numberLarsenMate : undefined,
+  numberLarsenPod: body.numberLarsenPod ? body.numberLarsenPod : undefined,
 
   // We copy across the nonTargetSpeciesCaught, cleaning them as we go.
   nonTargetSpecies:
