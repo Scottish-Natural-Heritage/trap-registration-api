@@ -35,7 +35,8 @@ const cleanInput = (body) => ({
   emailAddress:
     body.emailAddress === undefined
       ? undefined
-      : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase())
+      : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
+  uprn: body.uprn === undefined ? undefined : String(body.uprn)
 });
 
 /**
