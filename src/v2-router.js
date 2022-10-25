@@ -7,6 +7,22 @@ import config from './config/app.js';
 const v2Router = express.Router();
 
 /**
+ * Every registration has a 5 year expiry, tied to the issue date of that
+ * year's General Licenses. General Licenses are always issued on January 1st,
+ * so registrations last for four whole years, plus the rest of the issued
+ * year.
+ * @returns {Date} the calculated expiry date
+ */
+ const calculateExpiryDate = () => {
+  // Get the current date.
+  const expiryDate = new Date();
+  // Add 4 years.
+  expiryDate.setFullYear(expiryDate.getFullYear() + 4);
+  // Set the month to December and the day to the 31st and return the updated date.
+  return expiryDate.setMonth(11, 31);
+};
+
+/**
  * Clean the incoming POST request body to make it more compatible with the
  * database and its validation rules.
  *
@@ -36,7 +52,8 @@ const cleanInput = (body) => ({
     body.emailAddress === undefined
       ? undefined
       : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
-  uprn: body.uprn === undefined ? undefined : String(body.uprn)
+  uprn: body.uprn === undefined ? undefined : String(body.uprn),
+  expiryDate: calculateExpiryDate()
 });
 
 /**
@@ -209,10 +226,15 @@ v2Router.post('/registrations', async (request, response) => {
   try {
     // Clean up the user's input before we store it in the database.
     const cleanObject = cleanInput(request.body);
+
     // Try to create the new registration entry.
-    const newId = await Registration.create(cleanObject);
+    const newRegistration = await Registration.create(cleanObject);
+
+    // Grab the new registration ID.
+    const newId = newRegistration.id;
+
     // On success return 201 with the location of the new entry in the response header.
-    return response.status(201).location(new URL(newId, baseUrl)).send();
+    return response.status(201).location(new URL(newId, baseUrl)).send(newRegistration);
   } catch (error) {
     return response.status(500).send({error});
   }
