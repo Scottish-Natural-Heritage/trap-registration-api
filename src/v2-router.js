@@ -13,7 +13,7 @@ const v2Router = express.Router();
  * year.
  * @returns {Date} the calculated expiry date
  */
- const calculateExpiryDate = () => {
+const calculateExpiryDate = () => {
   // Get the current date.
   const expiryDate = new Date();
   // Add 4 years.
