@@ -34,7 +34,9 @@ const initScheduledJobs = () => {
     // on the 1st of February and 1st of March.
     if (currentDate.getDate() === 1 && (currentDate.getMonth() === 1 || currentDate.getMonth() === 2)) {
       try {
-        await axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/valid-licence-no-returns-previous-year-reminder`);
+        await axios.post(
+          `http://localhost:${config.port}${config.pathPrefix}/v2/valid-licence-no-returns-previous-year-reminder`
+        );
       } catch (error) {
         jsonConsoleLogger.error(unErrorJson(error));
       }

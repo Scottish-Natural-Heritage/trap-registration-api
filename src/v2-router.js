@@ -4,8 +4,19 @@ import Registration from './controllers/v2/registration.js';
 import ScheduledController from './controllers/v2/scheduled.js';
 import Return from './controllers/v2/return.js';
 import config from './config/app.js';
+import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
 
 const v2Router = express.Router();
+
+const hasReturnForPreviousYear = (returns, currentYear) => {
+  for (const currentReturn of returns) {
+    if (currentReturn.year === String(currentYear - 1)) {
+      return true;
+    }
+  }
+
+  return false;
+};
 
 /**
  * Every registration has a 5 year expiry, tied to the issue date of that
@@ -477,7 +488,7 @@ v2Router.get('/registrations/:id/returns/:returnId', async (request, response) =
 /**
  * Send out a reminder email on valid licences that returns are due.
  */
- v2Router.post('/valid-licence-returns-due-reminder', async (request, response) => {
+v2Router.post('/valid-licence-returns-due-reminder', async (request, response) => {
   // We need to know the date and year.
   const currentDate = new Date();
   // const currentYear = currentDate.getFullYear();
@@ -487,16 +498,49 @@ v2Router.get('/registrations/:id/returns/:returnId', async (request, response) =
 
     // Filter the registrations so only those that are valid and are using meat baits are left.
     const filteredRegistrations = registrations.filter((registration) => {
-      return (
-        new Date(registration.expiryDate) > currentDate &&
-        registration.meatBaits === true
-      );
+      return new Date(registration.expiryDate) > currentDate && registration.meatBaits === true;
     });
 
     // Try to send out reminder emails.
     const emailsSent = await ScheduledController.sendReturnReminder(filteredRegistrations);
 
-    return response.status(200).send({message: `Sent ${emailsSent} valid licence with meat baits return reminder emails.`});
+    return response
+      .status(200)
+      .send({message: `Sent ${emailsSent} valid licence with meat baits return reminder emails.`});
+  } catch (error) {
+    jsonConsoleLogger.error(unErrorJson(error));
+    return response.status(500).send({error});
+  }
+});
+
+/**
+ * Send out a reminder email on valid licences with no returns submitted on the previous year
+ * that returns are due.
+ */
+v2Router.post('/valid-licence-no-returns-previous-year-reminder', async (request, response) => {
+  // We need to know the date and year.
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+
+  try {
+    const registrations = await ScheduledController.findAll();
+
+    // Filter the registrations so only those that are valid, using meat baits and
+    // have no return against the previous year are left.
+    const filteredRegistrations = registrations.filter((registration) => {
+      return (
+        new Date(registration.expiryDate) > currentDate &&
+        registration.meatBaits === true &&
+        !hasReturnForPreviousYear(registration.Returns, currentYear)
+      );
+    });
+
+    // Try to send out reminder emails.
+    const emailsSent = await ScheduledController.sendPreviousYearReturnReminder(filteredRegistrations);
+
+    return response
+      .status(200)
+      .send({message: `Sent ${emailsSent} valid licence with meat baits but no previous year return reminder emails.`});
   } catch (error) {
     jsonConsoleLogger.error(unErrorJson(error));
     return response.status(500).send({error});
