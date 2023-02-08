@@ -474,6 +474,35 @@ v2Router.get('/registrations/:id/returns/:returnId', async (request, response) =
 });
 
 /**
+ * Send out a reminder email on valid licences that returns are due.
+ */
+ v2Router.post('/valid-licence-returns-due-reminder', async (request, response) => {
+  // We need to know the date and year.
+  const currentDate = new Date();
+  // const currentYear = currentDate.getFullYear();
+
+  try {
+    const registrations = await ScheduledController.findAll();
+
+    // Filter the registrations so only those that are valid and are using meat baits are left.
+    const filteredRegistrations = registrations.filter((registration) => {
+      return (
+        new Date(registration.expiryDate) > currentDate &&
+        registration.meatBaits === true
+      );
+    });
+
+    // Try to send out reminder emails.
+    const emailsSent = await ScheduledController.sendReturnReminder(filteredRegistrations);
+
+    return response.status(200).send({message: `Sent ${emailsSent} valid licence with meat baits return reminder emails.`});
+  } catch (error) {
+    jsonConsoleLogger.error(unErrorJson(error));
+    return response.status(500).send({error});
+  }
+});
+
+/**
  * UPDATEs a single return in a single registration.
  */
 v2Router.put('/registrations/:id/returns/:returnId', async (request, response) =>
