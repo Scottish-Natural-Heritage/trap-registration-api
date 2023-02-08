@@ -1,6 +1,7 @@
 import express from 'express';
 import utils from 'naturescot-utils';
 import Registration from './controllers/v2/registration.js';
+import ScheduledController from './controllers/v2/scheduled.js';
 import Return from './controllers/v2/return.js';
 import config from './config/app.js';
 
