@@ -22,7 +22,7 @@ const isRecentlyExpired = (expiryDate) => {
   const currentDate = new Date();
   // If the expiry date year is the same as the current year and the
   // expiry date month is no more than 2 months before today the licence is recently expired.
-  if (expiryDate.getFullYear() === currentDate.getFullYear() && expiryDate.getMonth() + 2 < currentDate.getMonth()) {
+  if (expiryDate.getFullYear() === currentDate.getFullYear() && currentDate.getMonth() - expiryDate.getMonth() < 2) {
     return true;
   }
 
@@ -619,7 +619,7 @@ v2Router.post('/expired-licence-no-returns-reminder', async (request, response) 
 
     return response
       .status(200)
-      .send({message: `Sent ${emailsSent} valid licence with meat baits but no returns reminder emails.`});
+      .send({message: `Sent ${emailsSent} recently expired licence with meat baits but no returns reminder emails.`});
   } catch (error) {
     jsonConsoleLogger.error(unErrorJson(error));
     return response.status(500).send({error});
