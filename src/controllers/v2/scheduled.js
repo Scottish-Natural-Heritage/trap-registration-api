@@ -2,6 +2,13 @@ import NotifyClient from 'notifications-node-client';
 import database from '../../models/index.js';
 import config from '../../config/app.js';
 import jsonConsoleLogger, {unErrorJson} from '../../json-console-logger.js';
+import {
+  RETURN_REMINDER_NOTIFY_TEMPLATE_ID,
+  PREVIOUS_YEAR_RETURN_NOTIFY_TEMPLATE_ID,
+  NEVER_SUBMITTED_RETURN_NOTIFY_TEMPLATE_ID,
+  EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID,
+  LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
+} from '../../notify-template-ids.js';
 
 const {Registration, Return} = database;
 
@@ -33,9 +40,9 @@ const sendReturnReminderEmail = async (emailDetails, emailAddress) => {
       const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
 
       // Send the email via notify.
-      await notifyClient.sendEmail('18e9ce0c-ea52-4c70-a5ef-01ef16590d8c', emailAddress, {
+      await notifyClient.sendEmail(RETURN_REMINDER_NOTIFY_TEMPLATE_ID, emailAddress, {
         personalisation: emailDetails,
-        emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
+        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
       });
     } catch (error) {
       jsonConsoleLogger.error(unErrorJson(error));
@@ -57,9 +64,9 @@ const sendPreviousYearReturnReminderEmail = async (emailDetails, emailAddress) =
       const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
 
       // Send the email via notify.
-      await notifyClient.sendEmail('5223cf17-75e1-4ee6-b0b1-93fd4d4da8df', emailAddress, {
+      await notifyClient.sendEmail(PREVIOUS_YEAR_RETURN_NOTIFY_TEMPLATE_ID, emailAddress, {
         personalisation: emailDetails,
-        emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
+        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
       });
     } catch (error) {
       jsonConsoleLogger.error(unErrorJson(error));
@@ -81,9 +88,9 @@ const sendNoReturnReminderEmail = async (emailDetails, emailAddress) => {
       const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
 
       // Send the email via notify.
-      await notifyClient.sendEmail('9318c092-aaea-4df2-ad04-e909cce8a683', emailAddress, {
+      await notifyClient.sendEmail(NEVER_SUBMITTED_RETURN_NOTIFY_TEMPLATE_ID, emailAddress, {
         personalisation: emailDetails,
-        emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
+        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
       });
     } catch (error) {
       jsonConsoleLogger.error(unErrorJson(error));
@@ -105,9 +112,9 @@ const sendExpiredNoReturnReminderEmail = async (emailDetails, emailAddress) => {
       const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
 
       // Send the email via notify.
-      await notifyClient.sendEmail('7f80c081-bf2b-4f23-a7db-6ac581888b44', emailAddress, {
+      await notifyClient.sendEmail(EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID, emailAddress, {
         personalisation: emailDetails,
-        emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
+        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
       });
     } catch (error) {
       jsonConsoleLogger.error(unErrorJson(error));
