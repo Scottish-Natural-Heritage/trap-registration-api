@@ -20,9 +20,8 @@ const hasReturnForPreviousYear = (returns, currentYear) => {
 
 const isRecentlyExpired = (expiryDate) => {
   const currentDate = new Date();
-  // If the expiry date year is the same as the current year and the
-  // expiry date month is no more than 2 months before today the licence is recently expired.
-  if (expiryDate.getFullYear() === currentDate.getFullYear() && currentDate.getMonth() - expiryDate.getMonth() < 2) {
+  // An expiry date is recently expired if it is less than two months ago.
+  if (expiryDate.setMonth(expiryDate.getMonth() + 2) > currentDate) {
     return true;
   }
 
