@@ -501,15 +501,14 @@ v2Router.get('/registrations/:id/returns/:returnId', async (request, response) =
 v2Router.post('/valid-licence-returns-due-reminder', async (request, response) => {
   // We need to know the date and year.
   const currentDate = new Date();
-  // const currentYear = currentDate.getFullYear();
 
   try {
     const registrations = await ScheduledController.findAll();
 
     // Filter the registrations so only those that are valid and are using meat baits are left.
-    const filteredRegistrations = registrations.filter((registration) => {
-      return new Date(registration.expiryDate) > currentDate && registration.meatBaits === true;
-    });
+    const filteredRegistrations = registrations.filter(
+      (registration) => new Date(registration.expiryDate) > currentDate && registration.meatBaits === true
+    );
 
     // Try to send out reminder emails.
     const emailsSent = await ScheduledController.sendReturnReminder(filteredRegistrations);
@@ -537,13 +536,12 @@ v2Router.post('/valid-licence-no-returns-previous-year-reminder', async (request
 
     // Filter the registrations so only those that are valid, using meat baits and
     // have no return against the previous year are left.
-    const filteredRegistrations = registrations.filter((registration) => {
-      return (
+    const filteredRegistrations = registrations.filter(
+      (registration) =>
         new Date(registration.expiryDate) > currentDate &&
         registration.meatBaits === true &&
         !hasReturnForPreviousYear(registration.Returns, currentYear)
-      );
-    });
+    );
 
     // Try to send out reminder emails.
     const emailsSent = await ScheduledController.sendPreviousYearReturnReminder(filteredRegistrations);
@@ -571,8 +569,8 @@ v2Router.post('/valid-licence-no-returns-reminder', async (request, response) =>
 
     // Filter the registrations so only those that are valid, using meat baits,
     // did not start this year, and have no returns against them are left.
-    const filteredRegistrations = registrations.filter((registration) => {
-      return (
+    const filteredRegistrations = registrations.filter(
+      (registration) =>
         new Date(registration.expiryDate) > currentDate &&
         !(
           new Date(registration.createdAt).getFullYear() === currentYear &&
@@ -580,8 +578,7 @@ v2Router.post('/valid-licence-no-returns-reminder', async (request, response) =>
         ) &&
         registration.meatBaits === true &&
         registration.Returns.length === 0
-      );
-    });
+    );
 
     // Try to send out reminder emails.
     const emailsSent = await ScheduledController.sendNoReturnReminder(filteredRegistrations);
@@ -605,13 +602,12 @@ v2Router.post('/expired-licence-no-returns-reminder', async (request, response) 
 
     // Filter the registrations so only those that are recently expired, using meat baits,
     // and have no returns against them are left.
-    const filteredRegistrations = registrations.filter((registration) => {
-      return (
+    const filteredRegistrations = registrations.filter(
+      (registration) =>
         isRecentlyExpired(new Date(registration.expiryDate)) &&
         registration.meatBaits === true &&
         registration.Returns.length === 0
-      );
-    });
+    );
 
     // Try to send out reminder emails.
     const emailsSent = await ScheduledController.sendExpiredNoReturnReminder(filteredRegistrations);

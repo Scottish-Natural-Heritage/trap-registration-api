@@ -12,20 +12,16 @@ import {
 
 const {Registration, Return} = database;
 
-const setReturnReminderEmailDetails = (registration) => {
-  return {
-    id: registration.id,
-    lhName: registration.fullName
-  };
-};
+const setReturnReminderEmailDetails = (registration) => ({
+  id: registration.id,
+  lhName: registration.fullName
+});
 
-const setPreviousYearReturnReminderEmailDetails = (registration) => {
-  return {
-    id: registration.id,
-    lhName: registration.fullName,
-    PreviousYear: new Date().getFullYear() - 1
-  };
-};
+const setPreviousYearReturnReminderEmailDetails = (registration) => ({
+  id: registration.id,
+  lhName: registration.fullName,
+  PreviousYear: new Date().getFullYear() - 1
+});
 
 /**
  * Send reminder email to applicant informing them their returns
