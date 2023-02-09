@@ -21,7 +21,7 @@ const hasReturnForPreviousYear = (returns, currentYear) => {
 const isRecentlyExpired = (expiryDate) => {
   const currentDate = new Date();
   // An expiry date is recently expired if it is less than two months ago.
-  if (expiryDate.setMonth(expiryDate.getMonth() + 2) > currentDate) {
+  if (expiryDate < currentDate && expiryDate.setMonth(expiryDate.getMonth() + 2) > currentDate) {
     return true;
   }
 
@@ -499,7 +499,7 @@ v2Router.get('/registrations/:id/returns/:returnId', async (request, response) =
  * Send out a reminder email on valid licences that returns are due.
  */
 v2Router.post('/valid-licence-returns-due-reminder', async (request, response) => {
-  // We need to know the date and year.
+  // We need to know the date.
   const currentDate = new Date();
 
   try {
