@@ -64,14 +64,18 @@ const ScheduledController = {
   async sendReturnReminder(registrations) {
     // A count of the number of emails sent.
     let sentCount = 0;
+    const promises = [];
 
     for (const registration of registrations) {
       const emailDetails = setReturnReminderEmailDetails(registration);
 
-      // eslint-disable-next-line no-await-in-loop
-      await sendReturnReminderEmail(emailDetails, registration.emailAddress, RETURN_REMINDER_NOTIFY_TEMPLATE_ID);
+      promises.push(
+        sendReturnReminderEmail(emailDetails, registration.emailAddress, RETURN_REMINDER_NOTIFY_TEMPLATE_ID)
+      );
       sentCount++;
     }
+
+    await Promise.all(promises);
 
     return sentCount;
   },
@@ -80,13 +84,18 @@ const ScheduledController = {
     // A count of the number of emails sent.
     let sentCount = 0;
 
+    const promises = [];
+
     for (const registration of registrations) {
       const emailDetails = setPreviousYearReturnReminderEmailDetails(registration);
 
-      // eslint-disable-next-line no-await-in-loop
-      await sendReturnReminderEmail(emailDetails, registration.emailAddress, PREVIOUS_YEAR_RETURN_NOTIFY_TEMPLATE_ID);
+      promises.push(
+        sendReturnReminderEmail(emailDetails, registration.emailAddress, PREVIOUS_YEAR_RETURN_NOTIFY_TEMPLATE_ID)
+      );
       sentCount++;
     }
+
+    await Promise.all(promises);
 
     return sentCount;
   },
@@ -95,13 +104,18 @@ const ScheduledController = {
     // A count of the number of emails sent.
     let sentCount = 0;
 
+    const promises = [];
+
     for (const registration of registrations) {
       const emailDetails = setReturnReminderEmailDetails(registration);
 
-      // eslint-disable-next-line no-await-in-loop
-      await sendReturnReminderEmail(emailDetails, registration.emailAddress, NEVER_SUBMITTED_RETURN_NOTIFY_TEMPLATE_ID);
+      promises.push(
+        sendReturnReminderEmail(emailDetails, registration.emailAddress, NEVER_SUBMITTED_RETURN_NOTIFY_TEMPLATE_ID)
+      );
       sentCount++;
     }
+
+    await Promise.all(promises);
 
     return sentCount;
   },
@@ -110,17 +124,22 @@ const ScheduledController = {
     // A count of the number of emails sent.
     let sentCount = 0;
 
+    const promises = [];
+
     for (const registration of registrations) {
       const emailDetails = setReturnReminderEmailDetails(registration);
 
-      // eslint-disable-next-line no-await-in-loop
-      await sendReturnReminderEmail(
-        emailDetails,
-        registration.emailAddress,
-        EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID
+      promises.push(
+        await sendReturnReminderEmail(
+          emailDetails,
+          registration.emailAddress,
+          EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID
+        )
       );
       sentCount++;
     }
+
+    await Promise.all(promises);
 
     return sentCount;
   }
