@@ -10,8 +10,6 @@ import {
   LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
 } from '../../notify-template-ids.js';
 
-const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
-
 const {Registration, Return} = database;
 
 const setReturnReminderEmailDetails = (registration) => ({
@@ -36,6 +34,8 @@ const setPreviousYearReturnReminderEmailDetails = (registration) => ({
 const sendReturnReminderEmail = async (emailDetails, emailAddress, notifyTemplate) => {
   if (config.notifyApiKey) {
     try {
+      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
+
       // Send the email via notify.
       await notifyClient.sendEmail(notifyTemplate, emailAddress, {
         personalisation: emailDetails,
