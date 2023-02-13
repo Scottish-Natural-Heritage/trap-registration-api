@@ -61,6 +61,8 @@ const ScheduledController = {
     });
   },
 
+
+
   async sendReturnReminder(registrations) {
     // A count of the number of emails sent.
     let sentCount = 0;

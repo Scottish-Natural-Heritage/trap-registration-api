@@ -21,11 +21,7 @@ const hasReturnForPreviousYear = (returns, currentYear) => {
 const isRecentlyExpired = (expiryDate) => {
   const currentDate = new Date();
   // An expiry date is recently expired if it is less than two months ago.
-  if (expiryDate < currentDate && expiryDate.setMonth(expiryDate.getMonth() + 2) > currentDate) {
-    return true;
-  }
-
-  return false;
+  return expiryDate < currentDate && expiryDate.setMonth(expiryDate.getMonth() + 2) > currentDate;
 };
 
 /**
