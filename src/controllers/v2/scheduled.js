@@ -10,6 +10,8 @@ import {
   LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
 } from '../../notify-template-ids.js';
 
+const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
+
 const {Registration, Return} = database;
 
 const setReturnReminderEmailDetails = (registration) => ({
@@ -33,8 +35,6 @@ const setPreviousYearReturnReminderEmailDetails = (registration) => ({
 const sendReturnReminderEmail = async (emailDetails, emailAddress) => {
   if (config.notifyApiKey) {
     try {
-      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
-
       // Send the email via notify.
       await notifyClient.sendEmail(RETURN_REMINDER_NOTIFY_TEMPLATE_ID, emailAddress, {
         personalisation: emailDetails,
@@ -57,8 +57,6 @@ const sendReturnReminderEmail = async (emailDetails, emailAddress) => {
 const sendPreviousYearReturnReminderEmail = async (emailDetails, emailAddress) => {
   if (config.notifyApiKey) {
     try {
-      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
-
       // Send the email via notify.
       await notifyClient.sendEmail(PREVIOUS_YEAR_RETURN_NOTIFY_TEMPLATE_ID, emailAddress, {
         personalisation: emailDetails,
@@ -81,8 +79,6 @@ const sendPreviousYearReturnReminderEmail = async (emailDetails, emailAddress) =
 const sendNoReturnReminderEmail = async (emailDetails, emailAddress) => {
   if (config.notifyApiKey) {
     try {
-      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
-
       // Send the email via notify.
       await notifyClient.sendEmail(NEVER_SUBMITTED_RETURN_NOTIFY_TEMPLATE_ID, emailAddress, {
         personalisation: emailDetails,
@@ -105,8 +101,6 @@ const sendNoReturnReminderEmail = async (emailDetails, emailAddress) => {
 const sendExpiredNoReturnReminderEmail = async (emailDetails, emailAddress) => {
   if (config.notifyApiKey) {
     try {
-      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
-
       // Send the email via notify.
       await notifyClient.sendEmail(EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID, emailAddress, {
         personalisation: emailDetails,
