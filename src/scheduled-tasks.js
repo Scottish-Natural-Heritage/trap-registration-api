@@ -21,40 +21,40 @@ const initScheduledJobs = () => {
 
     // Tasks here.
 
-    // Check for valid licences of meat bait users, on the 1st of December.
-    if (currentDate.getDate() === 1 && currentDate.getMonth() === 11) {
-      try {
-        await axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/valid-licence-returns-due-reminder`);
-      } catch (error) {
-        jsonConsoleLogger.error(unErrorJson(error));
-      }
-    }
-
-    // Check for valid licences of meat bait users that did not submit a return the previous year,
-    // on the 1st of February and 1st of March.
-    if (currentDate.getDate() === 1 && (currentDate.getMonth() === 1 || currentDate.getMonth() === 2)) {
-      try {
-        await axios.post(
-          `http://localhost:${config.port}${config.pathPrefix}/v2/valid-licence-no-returns-previous-year-reminder`
-        );
-      } catch (error) {
-        jsonConsoleLogger.error(unErrorJson(error));
-      }
-    }
-
-    // Check for valid licences of meat bait users that did not submit a return, on the 1st of April.
-    if (currentDate.getDate() === 1 && currentDate.getMonth() === 3) {
-      try {
-        await axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/valid-licence-no-returns-reminder`);
-      } catch (error) {
-        jsonConsoleLogger.error(unErrorJson(error));
-      }
-    }
-
-    // Check for expired licences of meat bait users that did not submit a return, on the 1st of every month.
     if (currentDate.getDate() === 1) {
+      const promises = [];
+
+      // Check for expired licences of meat bait users that did not submit a return, on the 1st of every month.
+      promises.push(
+        axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/expired-licence-no-returns-reminder`)
+      );
+
+      // Check for valid licences of meat bait users that did not submit a return the previous year,
+      // on the 1st of February and 1st of March.
+      if (currentDate.getMonth() === 1 || currentDate.getMonth() === 2) {
+        promises.push(
+          axios.post(
+            `http://localhost:${config.port}${config.pathPrefix}/v2/valid-licence-no-returns-previous-year-reminder`
+          )
+        );
+      }
+
+      // Check for valid licences of meat bait users that did not submit a return, on the 1st of April.
+      if (currentDate.getMonth() === 3) {
+        promises.push(
+          axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/valid-licence-no-returns-reminder`)
+        );
+      }
+
+      // Check for valid licences of meat bait users, on the 1st of December.
+      if (currentDate.getMonth() === 11) {
+        promises.push(
+          axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/valid-licence-returns-due-reminder`)
+        );
+      }
+
       try {
-        await axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/expired-licence-no-returns-reminder`);
+        await Promise.all(promises);
       } catch (error) {
         jsonConsoleLogger.error(unErrorJson(error));
       }
