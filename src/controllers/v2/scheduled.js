@@ -61,8 +61,6 @@ const ScheduledController = {
     });
   },
 
-
-
   async sendReturnReminder(registrations) {
     // A count of the number of emails sent.
     let sentCount = 0;
@@ -132,11 +130,7 @@ const ScheduledController = {
       const emailDetails = setReturnReminderEmailDetails(registration);
 
       promises.push(
-        await sendReturnReminderEmail(
-          emailDetails,
-          registration.emailAddress,
-          EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID
-        )
+        sendReturnReminderEmail(emailDetails, registration.emailAddress, EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID)
       );
       sentCount++;
     }
