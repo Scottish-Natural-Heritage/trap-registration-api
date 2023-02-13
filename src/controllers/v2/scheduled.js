@@ -31,78 +31,13 @@ const setPreviousYearReturnReminderEmailDetails = (registration) => ({
  *
  * @param {string} emailDetails The details to use in personalisation of email.
  * @param {any} emailAddress The email address of the recipient.
+ * @param {string} notifyTemplate The Notify template to use for the email.
  */
-const sendReturnReminderEmail = async (emailDetails, emailAddress) => {
+const sendReturnReminderEmail = async (emailDetails, emailAddress, notifyTemplate) => {
   if (config.notifyApiKey) {
     try {
       // Send the email via notify.
-      await notifyClient.sendEmail(RETURN_REMINDER_NOTIFY_TEMPLATE_ID, emailAddress, {
-        personalisation: emailDetails,
-        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
-      });
-    } catch (error) {
-      jsonConsoleLogger.error(unErrorJson(error));
-      throw error;
-    }
-  }
-};
-
-/**
- * Send reminder email to applicant informing them their returns
- * are due for the previous year.
- *
- * @param {string} emailDetails The details to use in personalisation of email.
- * @param {any} emailAddress The email address of the recipient.
- */
-const sendPreviousYearReturnReminderEmail = async (emailDetails, emailAddress) => {
-  if (config.notifyApiKey) {
-    try {
-      // Send the email via notify.
-      await notifyClient.sendEmail(PREVIOUS_YEAR_RETURN_NOTIFY_TEMPLATE_ID, emailAddress, {
-        personalisation: emailDetails,
-        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
-      });
-    } catch (error) {
-      jsonConsoleLogger.error(unErrorJson(error));
-      throw error;
-    }
-  }
-};
-
-/**
- * Send reminder email to applicant informing them they have never
- * submitted any returns against their licence.
- *
- * @param {string} emailDetails The details to use in personalisation of email.
- * @param {any} emailAddress The email address of the recipient.
- */
-const sendNoReturnReminderEmail = async (emailDetails, emailAddress) => {
-  if (config.notifyApiKey) {
-    try {
-      // Send the email via notify.
-      await notifyClient.sendEmail(NEVER_SUBMITTED_RETURN_NOTIFY_TEMPLATE_ID, emailAddress, {
-        personalisation: emailDetails,
-        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
-      });
-    } catch (error) {
-      jsonConsoleLogger.error(unErrorJson(error));
-      throw error;
-    }
-  }
-};
-
-/**
- * Send reminder email to applicant informing them they have never
- * submitted any returns against their recently expired licence.
- *
- * @param {string} emailDetails The details to use in personalisation of email.
- * @param {any} emailAddress The email address of the recipient.
- */
-const sendExpiredNoReturnReminderEmail = async (emailDetails, emailAddress) => {
-  if (config.notifyApiKey) {
-    try {
-      // Send the email via notify.
-      await notifyClient.sendEmail(EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID, emailAddress, {
+      await notifyClient.sendEmail(notifyTemplate, emailAddress, {
         personalisation: emailDetails,
         emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
       });
@@ -134,7 +69,7 @@ const ScheduledController = {
       const emailDetails = setReturnReminderEmailDetails(registration);
 
       // eslint-disable-next-line no-await-in-loop
-      await sendReturnReminderEmail(emailDetails, registration.emailAddress);
+      await sendReturnReminderEmail(emailDetails, registration.emailAddress, RETURN_REMINDER_NOTIFY_TEMPLATE_ID);
       sentCount++;
     }
 
@@ -149,7 +84,7 @@ const ScheduledController = {
       const emailDetails = setPreviousYearReturnReminderEmailDetails(registration);
 
       // eslint-disable-next-line no-await-in-loop
-      await sendPreviousYearReturnReminderEmail(emailDetails, registration.emailAddress);
+      await sendReturnReminderEmail(emailDetails, registration.emailAddress, PREVIOUS_YEAR_RETURN_NOTIFY_TEMPLATE_ID);
       sentCount++;
     }
 
@@ -164,7 +99,7 @@ const ScheduledController = {
       const emailDetails = setReturnReminderEmailDetails(registration);
 
       // eslint-disable-next-line no-await-in-loop
-      await sendNoReturnReminderEmail(emailDetails, registration.emailAddress);
+      await sendReturnReminderEmail(emailDetails, registration.emailAddress, NEVER_SUBMITTED_RETURN_NOTIFY_TEMPLATE_ID);
       sentCount++;
     }
 
@@ -179,7 +114,11 @@ const ScheduledController = {
       const emailDetails = setReturnReminderEmailDetails(registration);
 
       // eslint-disable-next-line no-await-in-loop
-      await sendExpiredNoReturnReminderEmail(emailDetails, registration.emailAddress);
+      await sendReturnReminderEmail(
+        emailDetails,
+        registration.emailAddress,
+        EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID
+      );
       sentCount++;
     }
 
