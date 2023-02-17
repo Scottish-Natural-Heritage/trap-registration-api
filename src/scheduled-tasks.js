@@ -21,7 +21,7 @@ const initScheduledJobs = () => {
 
     // Tasks here.
 
-    if (currentDate.getDate() === 17) {
+    if (currentDate.getDate() === 1) {
       const promises = [];
 
       // Check for expired licences of meat bait users that did not submit a return, on the 1st of every month.
@@ -40,14 +40,14 @@ const initScheduledJobs = () => {
       }
 
       // Check for valid licences of meat bait users that did not submit a return, on the 1st of April.
-      if (currentDate.getMonth() === 1) {
+      if (currentDate.getMonth() === 3) {
         promises.push(
           axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/valid-licence-no-returns-reminder`)
         );
       }
 
       // Check for valid licences of meat bait users, on the 1st of December.
-      if (currentDate.getMonth() === 1) {
+      if (currentDate.getMonth() === 11) {
         promises.push(
           axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/valid-licence-returns-due-reminder`)
         );
