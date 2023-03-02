@@ -85,54 +85,54 @@ const cleanPatchInput = (body) => {
   const cleanedBody = {};
 
   // Check for the existence of each field and if found clean it if required and add to the cleanedBody object.
-  if (body.convictions) {
+  if (body.hasOwnProperty('convictions')) {
     cleanedBody.convictions = body.convictions;
   }
 
-  if (body.usingGL01) {
+  if (body.hasOwnProperty('usingGL01')) {
     cleanedBody.usingGL01 = body.usingGL01;
   }
 
-  if (body.usingGL02) {
+  if (body.hasOwnProperty('usingGL02')) {
     cleanedBody.usingGL02 = body.usingGL02;
   }
 
-  if (body.meatBaits) {
+  if (body.hasOwnProperty('meatBaits')) {
     cleanedBody.meatBaits = body.meatBaits;
   }
 
-  if (body.fullName) {
+  if (body.hasOwnProperty('fullName')) {
     cleanedBody.fullName = body.fullName.trim();
   }
 
-  if (body.addressLine1) {
+  if (body.hasOwnProperty('addressLine1')) {
     cleanedBody.addressLine1 = body.addressLine1.trim();
   }
 
-  if (body.addressLine2) {
+  if (body.hasOwnProperty('addressLine2')) {
     cleanedBody.addressLine2 = body.addressLine2.trim();
   }
 
-  if (body.addressTown) {
+  if (body.hasOwnProperty('addressTown')) {
     cleanedBody.addressTown = body.addressTown.trim();
   }
 
-  if (body.addressCounty) {
+  if (body.hasOwnProperty('addressCounty')) {
     cleanedBody.addressCounty = body.addressCounty.trim();
   }
 
-  if (body.addressPostcode) {
+  if (body.hasOwnProperty('addressPostcode')) {
     cleanedBody.addressPostcode = utils.postalAddress.formatPostcodeForPrinting(body.addressPostcode);
     if (!utils.postalAddress.isaRealUkPostcode(cleanedBody.addressPostcode)) {
       throw new Error('Invalid postcode.');
     }
   }
 
-  if (body.phoneNumber) {
+  if (body.hasOwnProperty('phoneNumber')) {
     cleanedBody.phoneNumber = body.phoneNumber.trim();
   }
 
-  if (body.emailAddress) {
+  if (body.hasOwnProperty('emailAddress')) {
     cleanedBody.emailAddress = utils.recipients.validateAndFormatEmailAddress(body.emailAddress);
   }
 
