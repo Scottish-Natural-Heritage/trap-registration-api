@@ -80,7 +80,8 @@ const RegistrationController = {
     Registration.findByPk(id, {
       include: [
         {
-          model: Note
+          model: Note,
+          as: "stringTest"
         },
         {
           model: Return,
