@@ -81,7 +81,7 @@ const RegistrationController = {
       include: [
         {
           model: Note,
-          as: "stringTest"
+          as: 'stringTest'
         },
         {
           model: Return,
