@@ -5,6 +5,7 @@ import ScheduledController from './controllers/v2/scheduled.js';
 import Return from './controllers/v2/return.js';
 import config from './config/app.js';
 import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
+import Note from './controllers/v2/note.js';
 
 const v2Router = express.Router();
 
@@ -72,6 +73,17 @@ const cleanInput = (body) => ({
       : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
   uprn: body.uprn === undefined ? undefined : String(body.uprn),
   expiryDate: calculateExpiryDate()
+});
+
+/**
+ * Clean an incoming request body to make it more compatible with the database and its validation rules.
+ *
+ * @param {any} body The incoming request's body.
+ * @returns {any} CleanedBody a json object that's just got our cleaned up fields on it.
+ */
+const cleanNoteInput = (body) => ({
+  Note: body.note.trim(),
+  createdBy: body.createdBy
 });
 
 /**
@@ -253,6 +265,43 @@ v2Router.post('/registrations', async (request, response) => {
 
     // On success return 201 with the location of the new entry in the response header.
     return response.status(201).location(new URL(newId, baseUrl)).send(newRegistration);
+  } catch (error) {
+    return response.status(500).send({error});
+  }
+});
+
+/**
+ * CREATEs a single note in a single registration.
+ */
+v2Router.post('/registrations/:id/note', async (request, response) => {
+  // Try to parse the incoming ID to make sure it's really a number.
+  const existingId = Number(request.params.id);
+  if (Number.isNaN(existingId)) {
+    return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+  }
+
+  // Check if there's a registration allocated at the specified ID.
+  const existingReg = await Registration.findOne(existingId);
+  if (existingReg === undefined || existingReg === null) {
+    return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+  }
+
+  const baseUrl = new URL(
+    `${request.protocol}://${request.hostname}:${config.port}${request.originalUrl}${
+      request.originalUrl.endsWith('/') ? '' : '/'
+    }`
+  );
+
+  // Clean up the user's input before we store it in the database.
+  const cleanObject = cleanNoteInput(existingId, request.body);
+
+  try {
+    const newId = await Note.create(cleanObject);
+    if (newId === undefined) {
+      return response.status(500).send({message: 'Note could not be created.'});
+    }
+
+    return response.status(201).location(new URL(newId, baseUrl)).send();
   } catch (error) {
     return response.status(500).send({error});
   }
