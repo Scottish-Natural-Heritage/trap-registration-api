@@ -234,8 +234,8 @@
 							"\r",
 							"pm.test('JSON response has properties', function () {\r",
 							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData).to.have.property('note');\r",
-							"    pm.expect(jsonData.note.length).to.equal(1);\r",
+							"    pm.expect(jsonData).to.have.property('newNote');\r",
+							"    pm.expect(jsonData.newNote.length).to.equal(1);\r",
 							"});"
 						],
 						"type": "text/javascript"
