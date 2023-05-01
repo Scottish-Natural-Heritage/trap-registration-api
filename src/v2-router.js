@@ -324,6 +324,8 @@ v2Router.get('/registrations/:id', async (request, response) => {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
+    registration.Returns.sort((a, b) => a.id - b.id);
+
     return response.status(200).send(registration);
   } catch (error) {
     return response.status(500).send({error});
