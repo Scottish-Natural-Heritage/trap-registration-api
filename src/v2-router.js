@@ -81,9 +81,10 @@ const cleanInput = (body) => ({
  * @param {any} body The incoming request's body.
  * @returns {any} CleanedBody a json object that's just got our cleaned up fields on it.
  */
-const cleanNoteInput = (body) => ({
+const cleanNoteInput = (regId, body) => ({
   Note: body.note.trim(),
-  createdBy: body.createdBy
+  createdBy: body.createdBy,
+  RegistrationId: regId
 });
 
 /**
