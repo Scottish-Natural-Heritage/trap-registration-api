@@ -35,12 +35,11 @@ const NoteController = {
    *
    * @returns {Number} ID of the new Note
    */
-  create: async (registrationId, incomingNote) => {
+  create: async (incomingNote) => {
     // Split the incoming json blob in to each object to be persisted.
     let newNote;
     // Start the database transaction.
     await db.sequelize.transaction(async (t) => {
-      incomingNote.RegistrationId = registrationId;
       // Add the note to the database.
       newNote = await Note.create(incomingNote, {transaction: t});
     });
