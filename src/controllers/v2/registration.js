@@ -3,7 +3,7 @@ import db from '../../models/index.js';
 import config from '../../config/app.js';
 import jsonConsoleLogger, {unErrorJson} from '../../json-console-logger.js';
 
-const {Registration, Return, NonTargetSpecies, Revocation} = db;
+const {Registration, Return, NonTargetSpecies, Revocation, Note} = db;
 
 /**
  * Takes an issue date, calculates an expiry date based on that and converts it
@@ -79,6 +79,9 @@ const RegistrationController = {
   findOne: async (id) =>
     Registration.findByPk(id, {
       include: [
+        {
+          model: Note
+        },
         {
           model: Return,
           include: [
