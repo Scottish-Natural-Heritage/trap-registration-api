@@ -133,9 +133,9 @@ const RegistrationController = {
   /**
    * Retrieve all registrations from the database.
    *
-   * @returns all existing registrations
+   * @returns {Sequelize.Model} All existing registrations
    */
-  findAll: async () => Registration.findAll(),
+  findAll: async () => Registration.findAll({paranoid: false}),
 
   /**
    * Replace a registration in the database with our new JSON model.

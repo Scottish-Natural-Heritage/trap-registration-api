@@ -82,6 +82,7 @@ const RegistrationController = {
         {
           model: Note
         },
+        {model: Revocation, paranoid: false},
         {
           model: Return,
           include: [
@@ -90,15 +91,16 @@ const RegistrationController = {
             }
           ]
         }
-      ]
+      ],
+      paranoid: false
     }),
 
   /**
    * Retrieve all registrations from the database.
    *
-   * @returns all existing registrations
+   * @returns {Sequelize.Model} All existing registrations
    */
-  findAll: async () => Registration.findAll(),
+  findAll: async () => Registration.findAll({include: [{model: Revocation, paranoid: false}], paranoid: false}),
 
   create: async (reg) => {
     let newReg;
