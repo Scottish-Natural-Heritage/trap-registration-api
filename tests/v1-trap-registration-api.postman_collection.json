@@ -1168,9 +1168,9 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
+              "pm.test('Status code is 404 Not Found', function () {\r",
+              "    pm.response.to.have.status(404);\r",
+              "    pm.response.to.have.status('Not Found');\r",
               "});\r",
               ""
             ],
