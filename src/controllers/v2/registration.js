@@ -100,7 +100,12 @@ const RegistrationController = {
    *
    * @returns {Sequelize.Model} All existing registrations
    */
-  findAll: async () => Registration.findAll({include: [{model: Revocation, paranoid: false}], paranoid: false}),
+  findAll: async () =>
+    Registration.findAll({
+      include: [{model: Revocation, paranoid: false}],
+      paranoid: false,
+      order: [['createdAt', 'DESC']]
+    }),
 
   create: async (reg) => {
     let newReg;
