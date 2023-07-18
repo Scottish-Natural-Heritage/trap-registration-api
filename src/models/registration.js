@@ -80,7 +80,7 @@ const RegistrationModel = (sequelize, DataTypes) => {
       },
       uprn: {
         type: DataTypes.STRING
-      },
+      }
     },
     {
       timestamps: true,
