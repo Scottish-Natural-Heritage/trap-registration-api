@@ -102,7 +102,7 @@ const RegistrationController = {
    */
   findAll: async () =>
     Registration.findAll({
-      include: [{model: Revocation, paranoid: false}],
+      include: [{model: Revocation}],
       paranoid: false,
       order: [['createdAt', 'DESC']]
     }),
