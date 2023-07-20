@@ -199,15 +199,17 @@ const cleanReturnInput = (id, body) => ({
  * @param {any} body the incoming request's body
  * @returns {any} a json object that's just got our cleaned up fields on it
  */
-const cleanRevokeInput = (existingId, body) => ({
-  RegistrationId: existingId,
-  // The strings are trimmed for leading and trailing whitespace and then
-  // copied across if they're in the POST body or are set to undefined if
-  // they're missing.
-  reason: body.reason === undefined ? undefined : body.reason.trim(),
-  createdBy: body.createdBy === undefined ? undefined : body.createdBy.trim(),
-  isRevoked: body.isRevoked
-});
+const cleanRevokeInput = (existingId, body) => {
+  return {
+    RegistrationId: existingId,
+    // The strings are trimmed for leading and trailing whitespace and then
+    // copied across if they're in the POST body or are set to undefined if
+    // they're missing.
+    reason: body.reason === undefined ? undefined : body.reason.trim(),
+    createdBy: body.createdBy === undefined ? undefined : body.createdBy.trim(),
+    isRevoked: body.isRevoked
+  };
+};
 
 // #region Health Check
 
