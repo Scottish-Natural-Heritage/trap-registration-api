@@ -89,7 +89,8 @@ const RegistrationController = {
             {
               model: NonTargetSpecies
             }
-          ]
+          ],
+          paranoid: false
         }
       ],
       paranoid: false
