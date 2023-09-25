@@ -2,42 +2,40 @@ name: On-PR build of image
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 env:
   ECR_REPOSITORY: naturescot/trap-registration-api
 
 jobs:
-
   build_and_push:
     name: Build the Image
     runs-on: ubuntu-20.04
 
     steps:
+      - uses: actions/checkout@v2
 
-    - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '20'
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '16'
+      - name: Install all the pre-requisites
+        run: |
+          npm ci
 
-    - name: Install all the pre-requisites
-      run: |
-        npm ci
+      - name: Check the linter
+        run: |
+          npm run lint
 
-    - name: Check the linter
-      run: |
-        npm run lint
+      - name: Check the integration tests
+        run: |
+          npm run test
 
-    - name: Check the integration tests
-      run: |
-        npm run test
+      - name: Build and tag the Docker Image
+        run: |
+          docker build -t naturescot/$ECR_REPOSITORY:prerelease .
 
-    - name: Build and tag the Docker Image
-      run: |
-        docker build -t naturescot/$ECR_REPOSITORY:prerelease .
-
-    - name: Delete the public and private JWT key
-      if: always()
-      run: |
-        rm -f ./.secrets/jwt-key
+      - name: Delete the public and private JWT key
+        if: always()
+        run: |
+          rm -f ./.secrets/jwt-key
