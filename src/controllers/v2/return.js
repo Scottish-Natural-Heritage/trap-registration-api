@@ -75,6 +75,52 @@ const ReturnController = {
 
     // Return the ID of the newly created return.
     return createdReturn.id;
+  },
+
+  /**
+   * Replace a return in the database with our new JSON model.
+   *
+   * @param {number} id An existing returns ID.
+   * @param {any} jsonReturn A JSON version of the model to replace the database's copy.
+   * @returns {Sequelize.Model} The updated return.
+   */
+   update: async (id, jsonReturn) => {
+    // Grab the already existing object from the database.
+    const existingReturn = await Return.findByPk(id);
+
+    // It doesn't exist, you say?
+    if (existingReturn === undefined) {
+      // Tell the caller.
+      return undefined;
+    }
+
+    // Split the incoming json blob in to each object to be persisted.
+    const {nonTargetSpecies, ...returnObject} = jsonReturn;
+
+    // Update the application object with the new fields.
+    const updatedReturn = await existingReturn.update(returnObject);
+
+    // Loop over the array of non target species we've received and map them into an array
+    // of promises and then resolve them all so that they...
+    await Promise.all(
+      nonTargetSpecies.map(async (jsonNonTargetSpecies) => {
+        // Create the new sett object.
+        const speciesCaught = await NonTargetSpecies.create({
+          ReturnId: id,
+          gridReference: jsonNonTargetSpecies.gridReference,
+          speciesCaught: jsonNonTargetSpecies.speciesCaught,
+          numberCaught: jsonNonTargetSpecies.numberCaught,
+          trapType: jsonNonTargetSpecies.trapType,
+          comment: jsonNonTargetSpecies.comment
+        });
+
+        // Associate the speciesCaught to the return.
+        await speciesCaught.setReturn(updatedReturn);
+      })
+    );
+
+    // Fetch the now fully updated return object and return it
+    return Return.findByPk(id, {include: NonTargetSpecies});
   }
 };
 

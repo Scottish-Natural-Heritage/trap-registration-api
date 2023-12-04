@@ -544,6 +544,62 @@ v2Router.get('/registrations/:id/returns/:returnId', async (request, response) =
 });
 
 /**
+ * UPDATEs part of a meat bait return.
+ */
+v2Router.patch('/registrations/:id/returns/:returnId', async (request, response) => {
+  try {
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingId = Number(request.params.id);
+    if (Number.isNaN(existingId)) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    }
+
+    // Try to parse the incoming ID to make sure it's really a number.
+    const existingReturnId = Number(request.params.returnId);
+    if (Number.isNaN(existingReturnId)) {
+      return response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
+    }
+
+    // Check if there's a registration allocated at the specified ID.
+    const existingReg = await Registration.findOne(existingId);
+
+    // Did we get an application?
+    if (existingReg === undefined || existingReg === null) {
+      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+    }
+
+    // Check if the return is allocated to the specified registration.
+    if (existingReturn.RegistrationId !== existingId) {
+      return response
+        .status(404)
+        .send({message: `Return ${existingReturnId} not found against Registration ${existingId}.`});
+    }
+
+    // Clean up the user's input before we store it in the database.
+    let cleanObject;
+    try {
+      cleanObject = cleanPatchInput(request.body);
+    } catch (error) {
+      return response.status(400).send({message: `Could not update registration ${existingId}. ${error.message}`});
+    }
+
+    // Update the registration in the database with our client's values.
+    const updatedReg = await Registration.update(existingId, cleanObject);
+
+    // If they're not successful, send a 500 error.
+    if (updatedReg === undefined) {
+      return response.status(500).send({message: `Could not update registration ${existingId}.`});
+    }
+
+    // If they are, send back the updated fields.
+    return response.status(200).send(updatedReg);
+  } catch (error) {
+    // When anything else goes wrong send the error to the client.
+    return response.status(500).send({error});
+  }
+});
+
+/**
  * Send out a reminder email on valid licences that returns are due.
  */
 v2Router.post('/valid-licence-returns-due-reminder', async (request, response) => {
