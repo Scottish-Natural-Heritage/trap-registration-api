@@ -78,50 +78,54 @@ const ReturnController = {
   },
 
   /**
+   * Update a registration in the database with partial JSON model.
+   *
+   * @param {Number} id an existing registration's ID
+   * @param {any} jsonReturn a JSON version of the model containing only the fields to be updated
+   * @returns {boolean} true if the record is updated, otherwise false
+   */
+  updates: async (id, jsonReturn) => {
+    // Save the new values to the database.
+    const result = await Return.update(jsonReturn, {where: {id}});
+
+    // Check to make sure the saving process went OK.
+    const success = result.length > 0 && result[0] === 1;
+    if (success) {
+      // Return JSON with the updated fields on successful update.
+      return jsonReturn;
+    }
+
+    // If something went wrong, return undefined to signify this.
+    return undefined;
+  },
+
+    /**
    * Replace a return in the database with our new JSON model.
    *
    * @param {number} id An existing returns ID.
    * @param {any} jsonReturn A JSON version of the model to replace the database's copy.
    * @returns {Sequelize.Model} The updated return.
    */
-   update: async (id, jsonReturn) => {
-    // Grab the already existing object from the database.
-    const existingReturn = await Return.findByPk(id);
+     update: async (id, jsonReturn) => {
+      // Grab the already existing object from the database.
+      const existingReturn = await Return.findByPk(id);
 
-    // It doesn't exist, you say?
-    if (existingReturn === undefined) {
-      // Tell the caller.
-      return undefined;
+      // It doesn't exist, you say?
+      if (existingReturn === undefined) {
+        // Tell the caller.
+        return undefined;
+      }
+
+      // Save the incoming json blob in to an object to be persisted.
+      const {returnObject} = jsonReturn;
+
+      // Update the application object with the new fields.
+      const updatedReturn = await existingReturn.update(returnObject);
+
+      // Fetch the now fully updated return object and return it
+      //return Return.findByPk(id);
+      return updatedReturn;
     }
-
-    // Split the incoming json blob in to each object to be persisted.
-    const {nonTargetSpecies, ...returnObject} = jsonReturn;
-
-    // Update the application object with the new fields.
-    const updatedReturn = await existingReturn.update(returnObject);
-
-    // Loop over the array of non target species we've received and map them into an array
-    // of promises and then resolve them all so that they...
-    await Promise.all(
-      nonTargetSpecies.map(async (jsonNonTargetSpecies) => {
-        // Create the new sett object.
-        const speciesCaught = await NonTargetSpecies.create({
-          ReturnId: id,
-          gridReference: jsonNonTargetSpecies.gridReference,
-          speciesCaught: jsonNonTargetSpecies.speciesCaught,
-          numberCaught: jsonNonTargetSpecies.numberCaught,
-          trapType: jsonNonTargetSpecies.trapType,
-          comment: jsonNonTargetSpecies.comment
-        });
-
-        // Associate the speciesCaught to the return.
-        await speciesCaught.setReturn(updatedReturn);
-      })
-    );
-
-    // Fetch the now fully updated return object and return it
-    return Return.findByPk(id, {include: NonTargetSpecies});
-  }
 };
 
 export {ReturnController as default};

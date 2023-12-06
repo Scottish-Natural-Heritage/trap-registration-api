@@ -192,6 +192,28 @@ const cleanReturnInput = (id, body) => ({
 });
 
 /**
+ * Clean the incoming POST request body to make it more compatible with the
+ * database and its validation rules.
+ *
+ * @param {any} body The incoming request's body.
+ * @returns {any} A json object that's just got our cleaned up fields on it.
+ */
+ const cleanPatchReturnInput = (id, body) => ({
+  // The booleans are just copied across.
+  nonTargetSpeciesToReport: body.nonTargetSpeciesToReport,
+  noMeatBaitsUsed: body.noMeatBaitsUsed,
+
+  // The id passed in is set as the registration id.
+  RegistrationId: id,
+  createdByLicensingOfficer: body.createdByLicensingOfficer,
+
+  // Copy across the year the return is for and the number of larsen mate / pod traps in which meat baits were used.
+  year: body.year ? body.year : undefined,
+  numberLarsenMate: body.numberLarsenMate ? body.numberLarsenMate : undefined,
+  numberLarsenPod: body.numberLarsenPod ? body.numberLarsenPod : undefined,
+});
+
+/**
  * Clean the incoming request body to make it more compatible with the
  * database and its validation rules.
  *
@@ -578,7 +600,7 @@ v2Router.patch('/registrations/:id/returns/:returnId', async (request, response)
     // Clean up the user's input before we store it in the database.
     let cleanObject;
     try {
-      cleanObject = cleanPatchInput(request.body);
+      cleanObject = cleanPatchReturnInput(request.body);
     } catch (error) {
       return response.status(400).send({message: `Could not update registration ${existingId}. ${error.message}`});
     }
