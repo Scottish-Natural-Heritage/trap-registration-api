@@ -26,7 +26,7 @@ const RevocationModel = (sequelize) => {
         type: Sequelize.BOOLEAN
       },
       reason: {
-        type: Sequelize.TEXT
+        type: Sequelize.STRING
       }
     },
     {
