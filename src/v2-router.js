@@ -198,7 +198,7 @@ const cleanReturnInput = (id, body) => ({
  * @param {any} body The incoming request's body.
  * @returns {any} A json object that's just got our cleaned up fields on it.
  */
- const cleanPatchReturnInput = (id, body) => ({
+const cleanPatchReturnInput = (id, body) => ({
   // The booleans are just copied across.
   nonTargetSpeciesToReport: body.nonTargetSpeciesToReport,
   noMeatBaitsUsed: body.noMeatBaitsUsed,
@@ -210,7 +210,7 @@ const cleanReturnInput = (id, body) => ({
   // Copy across the year the return is for and the number of larsen mate / pod traps in which meat baits were used.
   year: body.year ? body.year : undefined,
   numberLarsenMate: body.numberLarsenMate ? body.numberLarsenMate : undefined,
-  numberLarsenPod: body.numberLarsenPod ? body.numberLarsenPod : undefined,
+  numberLarsenPod: body.numberLarsenPod ? body.numberLarsenPod : undefined
 });
 
 /**
@@ -576,45 +576,43 @@ v2Router.patch('/registrations/:id/returns/:returnId', async (request, response)
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
+    // Check if there's a return allocated at the specified ID.
+    const existingReg = await Registration.findOne(existingId);
+    // Did we get an application?
+    if (existingReg === undefined || existingReg === null) {
+      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+    }
+
     // Try to parse the incoming ID to make sure it's really a number.
     const existingReturnId = Number(request.params.returnId);
     if (Number.isNaN(existingReturnId)) {
       return response.status(404).send({message: `Return ${request.params.returnId} not valid.`});
     }
 
-    // Check if there's a registration allocated at the specified ID.
-    const existingReg = await Registration.findOne(existingId);
-
-    // Did we get an application?
-    if (existingReg === undefined || existingReg === null) {
-      return response.status(404).send({message: `Registration ${existingId} not allocated.`});
-    }
-
-    // Check if the return is allocated to the specified registration.
-    if (existingReturn.RegistrationId !== existingId) {
-      return response
-        .status(404)
-        .send({message: `Return ${existingReturnId} not found against Registration ${existingId}.`});
+    // Check if there's a return allocated at the specified ID.
+    const existingReturn = await Return.findOne(existingReturnId);
+    if (existingReturn === undefined || existingReturn === null) {
+      return response.status(404).send({message: `Return ${existingReturnId} not allocated.`});
     }
 
     // Clean up the user's input before we store it in the database.
     let cleanObject;
     try {
-      cleanObject = cleanPatchReturnInput(request.body);
+      cleanObject = cleanPatchReturnInput(existingId, request.body);
     } catch (error) {
       return response.status(400).send({message: `Could not update registration ${existingId}. ${error.message}`});
     }
 
-    // Update the registration in the database with our client's values.
-    const updatedReg = await Registration.update(existingId, cleanObject);
+    // Update the return in the database with our client's values.
+    const updatedReturn = await Return.update(existingReturnId, cleanObject);
 
     // If they're not successful, send a 500 error.
-    if (updatedReg === undefined) {
-      return response.status(500).send({message: `Could not update registration ${existingId}.`});
+    if (updatedReturn === undefined) {
+      return response.status(500).send({message: `Could not update return ${existingReturnId}.`});
     }
 
     // If they are, send back the updated fields.
-    return response.status(200).send(updatedReg);
+    return response.status(200).send(updatedReturn);
   } catch (error) {
     // When anything else goes wrong send the error to the client.
     return response.status(500).send({error});

@@ -1,6 +1,6 @@
 import db from '../../models/index.js';
 
-const {Return, NonTargetSpecies} = db;
+const {Return, Revocation, Note, NonTargetSpecies} = db;
 
 const ReturnController = {
   /**
@@ -25,6 +25,14 @@ const ReturnController = {
    */
   findRegReturns: async (id) =>
     Return.findAll({
+      where: {
+        RegistrationId: id
+      },
+      include: NonTargetSpecies
+    }),
+
+  findRegReturn: async (id) =>
+    Return.findByPk({
       where: {
         RegistrationId: id
       },
@@ -84,7 +92,7 @@ const ReturnController = {
    * @param {any} jsonReturn a JSON version of the model containing only the fields to be updated
    * @returns {boolean} true if the record is updated, otherwise false
    */
-  updates: async (id, jsonReturn) => {
+  update: async (id, jsonReturn) => {
     // Save the new values to the database.
     const result = await Return.update(jsonReturn, {where: {id}});
 
@@ -97,35 +105,7 @@ const ReturnController = {
 
     // If something went wrong, return undefined to signify this.
     return undefined;
-  },
-
-    /**
-   * Replace a return in the database with our new JSON model.
-   *
-   * @param {number} id An existing returns ID.
-   * @param {any} jsonReturn A JSON version of the model to replace the database's copy.
-   * @returns {Sequelize.Model} The updated return.
-   */
-     update: async (id, jsonReturn) => {
-      // Grab the already existing object from the database.
-      const existingReturn = await Return.findByPk(id);
-
-      // It doesn't exist, you say?
-      if (existingReturn === undefined) {
-        // Tell the caller.
-        return undefined;
-      }
-
-      // Save the incoming json blob in to an object to be persisted.
-      const {returnObject} = jsonReturn;
-
-      // Update the application object with the new fields.
-      const updatedReturn = await existingReturn.update(returnObject);
-
-      // Fetch the now fully updated return object and return it
-      //return Return.findByPk(id);
-      return updatedReturn;
-    }
+  }
 };
 
 export {ReturnController as default};
