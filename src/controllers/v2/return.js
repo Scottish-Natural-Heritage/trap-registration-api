@@ -1,6 +1,6 @@
 import db from '../../models/index.js';
 
-const {Return, Revocation, Note, NonTargetSpecies} = db;
+const {Return, NonTargetSpecies} = db;
 
 const ReturnController = {
   /**
