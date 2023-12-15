@@ -31,6 +31,14 @@ const ReturnController = {
       include: NonTargetSpecies
     }),
 
+  findRegReturn: async (id) =>
+    Return.findByPk({
+      where: {
+        RegistrationId: id
+      },
+      include: NonTargetSpecies
+    }),
+
   /**
    * Create a new Return.
    *
@@ -75,6 +83,28 @@ const ReturnController = {
 
     // Return the ID of the newly created return.
     return createdReturn.id;
+  },
+
+  /**
+   * Update a registration in the database with partial JSON model.
+   *
+   * @param {Number} id an existing registration's ID
+   * @param {any} jsonReturn a JSON version of the model containing only the fields to be updated
+   * @returns {boolean} true if the record is updated, otherwise false
+   */
+  update: async (id, jsonReturn) => {
+    // Save the new values to the database.
+    const result = await Return.update(jsonReturn, {where: {id}});
+
+    // Check to make sure the saving process went OK.
+    const success = result.length > 0 && result[0] === 1;
+    if (success) {
+      // Return JSON with the updated fields on successful update.
+      return jsonReturn;
+    }
+
+    // If something went wrong, return undefined to signify this.
+    return undefined;
   }
 };
 
