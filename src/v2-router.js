@@ -209,8 +209,8 @@ const cleanPatchReturnInput = (id, body) => ({
 
   // Copy across the year the return is for and the number of larsen mate / pod traps in which meat baits were used.
   year: body.year ? body.year : undefined,
-  numberLarsenMate: body.numberLarsenMate ? body.numberLarsenMate : undefined,
-  numberLarsenPod: body.numberLarsenPod ? body.numberLarsenPod : undefined
+  numberLarsenMate: Number.isNaN(body.numberLarsenMate) ? undefined : body.numberLarsenMate,
+  numberLarsenPod: Number.isNaN(body.numberLarsenPod) ? undefined : body.numberLarsenPod
 });
 
 /**
