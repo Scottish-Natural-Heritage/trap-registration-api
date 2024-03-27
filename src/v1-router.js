@@ -325,7 +325,7 @@ const sendLoginEmail = async (notifyApiKey, emailAddress, loginLink, regNo) => {
  * @param {string} loginLink link to log in via
  * @param {string} regNo trap registration number for notify's records
  */
- const sendRenewalEmail = async (notifyApiKey, emailAddress, loginLink, regNo) => {
+const sendRenewalEmail = async (notifyApiKey, emailAddress, loginLink, regNo) => {
   if (notifyApiKey) {
     const notifyClient = new NotifyClient.NotifyClient(notifyApiKey);
 
