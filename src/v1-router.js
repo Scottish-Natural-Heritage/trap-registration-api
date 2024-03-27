@@ -317,6 +317,29 @@ const sendLoginEmail = async (notifyApiKey, emailAddress, loginLink, regNo) => {
 };
 
 /**
+ * Send an email to the visitor that contains a link which allows them to log in
+ * to the rest of the meat bait return system.
+ *
+ * @param {string} notifyApiKey API key for sending emails
+ * @param {string} emailAddress where to send the log in email
+ * @param {string} loginLink link to log in via
+ * @param {string} regNo trap registration number for notify's records
+ */
+ const sendRenewalEmail = async (notifyApiKey, emailAddress, loginLink, regNo) => {
+  if (notifyApiKey) {
+    const notifyClient = new NotifyClient.NotifyClient(notifyApiKey);
+
+    await notifyClient.sendEmail('173ce02f-b78f-44eb-ac72-2a58af3606a9', emailAddress, {
+      personalisation: {
+        loginLink
+      },
+      reference: `${regNo}`,
+      emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
+    });
+  }
+};
+
+/**
  * Test if two postcodes match.
  *
  * A match is when the alphanumeric characters in the supplied strings equal
@@ -370,7 +393,7 @@ v1router.get('/registrations/:id/login', async (request, response) => {
     token = buildToken(jwk.getPrivateKey(), existingId);
   }
 
-  // If the visitor has give us enough information, build them a link that will
+  // If the visitor has given us enough information, build them a link that will
   // allow them to click-to-log-in.
   let loginLink;
   if (!urlInvalid && token !== undefined) {
@@ -381,6 +404,67 @@ v1router.get('/registrations/:id/login', async (request, response) => {
   // with that link included.
   if (loginLink !== undefined) {
     await sendLoginEmail(config.notifyApiKey, existingReg.emailAddress, loginLink, existingId);
+  }
+
+  // If we're in production, no matter what, tell the API consumer that everything went well.
+  if (process.env.NODE_ENV === 'production') {
+    return response.status(200).send();
+  }
+
+  // If we're in development mode, send back a debug message, with the link for
+  // the developer, to avoid sending unnecessary emails.
+  return response.status(200).send({
+    idInvalid,
+    idNotFound,
+    postcodeInvalid,
+    postcodeIncorrect,
+    urlInvalid,
+    token,
+    loginLink
+  });
+});
+
+// Allow the API consumer to provide enough personal information to allow us to
+// build and send a login link for the specified visitor.
+v1router.get('/registrations/:id/renewal', async (request, response) => {
+  // Try to parse the incoming ID to make sure it's really a number.
+  const existingId = Number(request.params.id);
+  const idInvalid = Number.isNaN(existingId);
+
+  // Check if there's a registration allocated at the specified ID.
+  const existingReg = await Registration.findOne(existingId);
+  const idNotFound = existingReg === undefined || existingReg === null;
+
+  // Check that the visitor's given us a postcode.
+  const {postcode} = request.query;
+  const postcodeInvalid = postcode === undefined;
+
+  // Check that the visitor's supplied postcode matches their stored one.
+  const postcodeIncorrect =
+    existingReg !== undefined && existingReg !== null && !postcodesMatch(existingReg.addressPostcode, postcode);
+
+  // Check that the visitor's given us a base url.
+  const {redirectBaseUrl} = request.query;
+  const urlInvalid = redirectBaseUrl === undefined || redirectBaseUrl === null;
+
+  // As long as we're happy that the visitor's provided use with valid
+  // information, build them a token for logging in with.
+  let token;
+  if (!idInvalid && !idNotFound && !postcodeInvalid && !postcodeIncorrect) {
+    token = buildToken(jwk.getPrivateKey(), existingId);
+  }
+
+  // If the visitor has given us enough information, build them a link that will
+  // allow them to click-to-log-in.
+  let loginLink;
+  if (!urlInvalid && token !== undefined) {
+    loginLink = `${redirectBaseUrl}${token}`;
+  }
+
+  // As long as we've managed to build a login link, send the visitor an email
+  // with that link included.
+  if (loginLink !== undefined) {
+    await sendRenewalEmail(config.notifyApiKey, existingReg.emailAddress, loginLink, existingId);
   }
 
   // If we're in production, no matter what, tell the API consumer that everything went well.
