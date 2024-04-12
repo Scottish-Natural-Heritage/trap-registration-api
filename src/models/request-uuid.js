@@ -3,7 +3,7 @@ const RequestUUIDModel = (sequelize, DataTypes) => {
     'RequestUUID',
     {
       uuid: {
-        type: UUID,
+        type: DataTypes.UUID,
         allowNull: false,
         primaryKey: true
       }
