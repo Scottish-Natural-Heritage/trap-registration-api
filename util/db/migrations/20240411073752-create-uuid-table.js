@@ -6,19 +6,19 @@ module.exports = {
       uuid: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID,
+        type: Sequelize.UUID
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATE
       },
       deletedAt: {
-        type: Sequelize.DATE,
-      },
+        type: Sequelize.DATE
+      }
     }),
   down: (queryInterface) => queryInterface.dropTable('RequestUUID')
 };

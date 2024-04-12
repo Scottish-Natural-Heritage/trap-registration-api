@@ -6,7 +6,7 @@ import Return from './return.js';
 import NonTargetSpecies from './non-target-species.js';
 import Revocation from './revocation.js';
 import Note from './note.js';
-import RequestUUID from './request-uuid.js'
+import RequestUUID from './request-uuid.js';
 
 const sequelize = new Sequelize(dbConfig.database);
 

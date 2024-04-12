@@ -531,7 +531,7 @@ const cleanReturnInput = (id, body) => ({
 // Allow the API consumer to submit a return against a registration.
 v1router.post('/registrations/:id/return', async (request, response) => {
   // Grab the UUID from the payload.
-  const uuid = request.body.uuid;
+  const {uuid} = request.body;
   // Check this is the first time we've received this application.
   const isPreviousRequest = await RequestUUID.findOne({where: {uuid}});
 
