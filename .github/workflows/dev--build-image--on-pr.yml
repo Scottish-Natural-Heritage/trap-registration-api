@@ -19,6 +19,13 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Decrypt the secrets
+        env:
+          JWT_KEY_GPG_PASSPHRASE: ${{ secrets.TR_JWT_KEY_GPG_PASSPHRASE }}
+        run: |
+          chmod +x ./decrypt_secrets.sh
+          ./decrypt_secrets.sh
+
       - name: Install all the pre-requisites
         run: |
           npm ci
