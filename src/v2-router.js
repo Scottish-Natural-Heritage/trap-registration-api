@@ -767,7 +767,7 @@ v2Router.delete('/registrations/:id/returns/:returnId', async (request, response
  * Gets the application's public key to allow other applications to
  * verify our signed tokens.
  */
-v2Router.get('/public-key', async (request, response) => response.status(501).send({message: 'Not implemented.'}));
+v2Router.get('/public-key', async (request, response) => response.status(200).send(jwk.getPublicKey()));
 
 /**
  * Send a login link to a visitor.
