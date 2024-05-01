@@ -11,6 +11,10 @@ import jwk from './config/jwk.js';
 import Registration from './controllers/v1/registration.js';
 import Return from './controllers/v1/return.js';
 
+import db from './models/index.js';
+
+const {RequestUUID} = db;
+
 const v1router = express.Router();
 
 // `/health` is a simple health-check end-point to test whether the service is up.
@@ -526,6 +530,19 @@ const cleanReturnInput = (id, body) => ({
 
 // Allow the API consumer to submit a return against a registration.
 v1router.post('/registrations/:id/return', async (request, response) => {
+  // Grab the UUID from the payload.
+  const {uuid} = request.body;
+  // Check this is the first time we've received this application.
+  const isPreviousRequest = await RequestUUID.findOne({where: {uuid}});
+
+  if (isPreviousRequest) {
+    // If this request has already been received return `undefined`.
+    return response.status(200).send(undefined);
+  }
+
+  // Add the UUID from the request to the RequestUUID table.
+  await RequestUUID.create({uuid});
+
   // Try to parse the incoming ID to make sure it's really a number.
   const existingId = Number(request.params.id);
   if (Number.isNaN(existingId)) {
