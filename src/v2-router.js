@@ -4,6 +4,7 @@ import Registration from './controllers/v2/registration.js';
 import ScheduledController from './controllers/v2/scheduled.js';
 import Return from './controllers/v2/return.js';
 import config from './config/app.js';
+import jwk from './config/jwk.js';
 import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
 import Note from './controllers/v2/note.js';
 
@@ -767,7 +768,7 @@ v2Router.delete('/registrations/:id/returns/:returnId', async (request, response
  * Gets the application's public key to allow other applications to
  * verify our signed tokens.
  */
-v2Router.get('/public-key', async (request, response) => response.status(501).send({message: 'Not implemented.'}));
+v2Router.get('/public-key', async (request, response) => response.status(200).send(jwk.getPublicKey()));
 
 /**
  * Send a login link to a visitor.
