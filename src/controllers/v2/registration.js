@@ -3,7 +3,7 @@ import db from '../../models/index.js';
 import config from '../../config/app.js';
 import jsonConsoleLogger, {unErrorJson} from '../../json-console-logger.js';
 
-const {Registration, Return, NonTargetSpecies, Revocation, Note} = db;
+const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID} = db;
 
 /**
  * Takes an issue date, calculates an expiry date based on that and converts it
@@ -109,6 +109,17 @@ const RegistrationController = {
     }),
 
   create: async (reg) => {
+    // Check this is the first time we've received this application.
+    const isPreviousRequest = await RequestUUID.findOne({where: {uuid: reg.uuid}});
+
+    if (isPreviousRequest) {
+      // If this request has already been received return `undefined`.
+      return undefined;
+    }
+
+    // Add the UUID from the request to the RequestUUID table.
+    await RequestUUID.create({uuid: reg.uuid});
+
     let newReg;
     let remainingAttempts = 10;
     // Loop until we have a new empty registration or we run out of attempts,
