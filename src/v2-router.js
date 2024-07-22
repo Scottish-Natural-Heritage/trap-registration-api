@@ -72,7 +72,8 @@ const cleanInput = (body) => ({
       ? undefined
       : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
   uprn: body.uprn === undefined ? undefined : String(body.uprn),
-  expiryDate: calculateExpiryDate()
+  expiryDate: calculateExpiryDate(),
+  uuid: body.uuid
 });
 
 /**
@@ -283,8 +284,12 @@ v2Router.post('/registrations', async (request, response) => {
     // Try to create the new registration entry.
     const newRegistration = await Registration.create(cleanObject);
 
+    let newId;
+
     // Grab the new registration ID.
-    const newId = newRegistration.id;
+    if (newRegistration) {
+      newId = newRegistration.id;
+    }
 
     // On success return 201 with the location of the new entry in the response header.
     return response.status(201).location(new URL(newId, baseUrl)).send(newRegistration);
