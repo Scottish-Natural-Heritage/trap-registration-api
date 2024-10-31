@@ -108,6 +108,13 @@ const RegistrationController = {
       order: [['createdAt', 'DESC']]
     }),
 
+  /**
+   * Retrieve all registrations from the database with email.
+   *
+   * @returns {Sequelize.Model} All existing registrations with email
+   */
+  findAllEmails: async (emailAddress) => Registration.findAll({where: {emailAddress: emailAddress}}),
+
   create: async (reg) => {
     // Check this is the first time we've received this application.
     const isPreviousRequest = await RequestUUID.findOne({where: {uuid: reg.uuid}});
