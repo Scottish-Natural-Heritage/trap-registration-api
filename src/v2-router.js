@@ -1,5 +1,7 @@
 import express from 'express';
 import utils from 'naturescot-utils';
+import jwt from 'jsonwebtoken';
+import NotifyClient from 'notifications-node-client';
 import Registration from './controllers/v2/registration.js';
 import ScheduledController from './controllers/v2/scheduled.js';
 import Return from './controllers/v2/return.js';
@@ -7,10 +9,7 @@ import config from './config/app.js';
 import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
 import Note from './controllers/v2/note.js';
 
-import jwt from 'jsonwebtoken';
 import jwk from './config/jwk.js';
-
-import NotifyClient from 'notifications-node-client';
 
 const v2Router = express.Router();
 
@@ -236,16 +235,6 @@ const cleanRevokeInput = (existingId, body) => ({
   createdBy: body.createdBy === undefined ? undefined : body.createdBy.trim(),
   isRevoked: body.isRevoked
 });
-
-/**
- * Build a JWT to allow a visitor to log in to the supply a return flow.
- *
- * @param {string} jwtPrivateKey
- * @param {string} id
- * @returns {string} a signed JWT
- */
-const buildToken = (jwtPrivateKey, id) =>
-  jwt.sign({}, jwtPrivateKey, {subject: `${id}`, algorithm: 'ES256', expiresIn: '30m', noTimestamp: true});
 
 /**
  * Build a JWT to allow a visitor to log in to the renewal flow.

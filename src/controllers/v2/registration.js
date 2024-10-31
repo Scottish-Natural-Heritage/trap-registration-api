@@ -109,11 +109,11 @@ const RegistrationController = {
     }),
 
   /**
-   * Retrieve all registrations from the database with email.
+   * Retrieve all registrations from the database with specified email.
    *
-   * @returns {Sequelize.Model} All existing registrations with email
+   * @returns {Sequelize.Model} All existing registrations with specified email.
    */
-  findAllEmails: async (emailAddress) => Registration.findAll({where: {emailAddress: emailAddress}}),
+  findAllEmails: async (emailAddress) => Registration.findAll({where: {emailAddress}}),
 
   create: async (reg) => {
     // Check this is the first time we've received this application.
