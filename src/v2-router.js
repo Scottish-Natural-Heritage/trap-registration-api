@@ -6,7 +6,6 @@ import Return from './controllers/v2/return.js';
 import config from './config/app.js';
 import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
 import Note from './controllers/v2/note.js';
-import RegistrationController from './controllers/v2/registration.js';
 
 import jwt from 'jsonwebtoken';
 import jwk from './config/jwk.js';
@@ -249,6 +248,16 @@ const buildToken = (jwtPrivateKey, id) =>
   jwt.sign({}, jwtPrivateKey, {subject: `${id}`, algorithm: 'ES256', expiresIn: '30m', noTimestamp: true});
 
 /**
+ * Build a JWT to allow a visitor to log in to the renewal flow.
+ *
+ * @param {string} jwtPrivateKey
+ * @param {string} email
+ * @returns {string} a signed JWT
+ */
+const buildRenewalToken = (jwtPrivateKey, email) =>
+  jwt.sign({}, jwtPrivateKey, {subject: `${email}`, algorithm: 'ES256', expiresIn: '30m', noTimestamp: true});
+
+/**
  * Send an email to the visitor that contains a link which allows them to log in
  * to the rest of the meat bait return system.
  *
@@ -270,38 +279,12 @@ const sendRenewalEmail = async (notifyApiKey, emailAddress, loginLink) => {
   }
 };
 
-/**
- * Send an email to the visitor that contains a link which allows them to log in
- * to the rest of the meat bait return system.
- *
- * @param {string} notifyApiKey API key for sending emails
- * @param {string} emailAddress where to send the log in email
- * @param {string} loginLink link to log in via
- * @param {string} regNo trap registration number for notify's records
- */
-const sendLoginEmail = async (notifyApiKey, emailAddress, loginLink) => {
-  if (notifyApiKey) {
-    const notifyClient = new NotifyClient.NotifyClient(notifyApiKey);
-
-    await notifyClient.sendEmail('a5901745-e01c-4e42-a726-ece91b63e593', emailAddress, {
-      personalisation: {
-        loginLink
-      },
-      emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
-    });
-  }
-};
-
 // #region Health Check
 
 /**
  * Gets the health status message for the API.
  */
 v2Router.get('/health', async (request, response) => {
-  response.status(200).send({message: 'OK'});
-});
-
-v2Router.get('/test', async (request, response) => {
   response.status(200).send({message: 'OK'});
 });
 
@@ -845,19 +828,17 @@ v2Router.get('/registrations/:id/login', async (request, response) =>
   response.status(501).send({message: 'Not implemented.'})
 );
 
-// need new router for login.
-// For renewals
-v2Router.post('/registrations/renewal', async (request, response) => {
-  // Check that the visitor's given us a postcode.
+/**
+ * Send out a renewal email to user if email has been found in database.
+ */
+v2Router.post('/registrations/renewalEmailCheck', async (request, response) => {
+  // Check that the visitor's given us an email address.
   const {email} = request.query;
   const emailInvalid = email === undefined;
 
-  // Check if there's a registration allocated at the specified ID.
+  // Check if there's a registration allocated at the specified email address.
   const emailExists = await Registration.findAllEmails(email);
-  const emailNotFound = emailExists === undefined || emailExists === null;
-
-  // Check that the visitor's supplied postcode matches their stored one.
-  //const emailIncorrect = emailExists !== undefined && emailExists !== null;
+  const emailNotFound = emailExists === undefined || emailExists === null || emailExists.length === 0;
 
   // Check that the visitor's given us a base url.
   const {redirectBaseUrl} = request.query;
@@ -867,7 +848,7 @@ v2Router.post('/registrations/renewal', async (request, response) => {
   // information, build them a token for logging in with.
   let token;
   if (!emailNotFound && !emailInvalid) {
-    token = buildToken(jwk.getPrivateKey(), email);
+    token = buildRenewalToken(jwk.getPrivateKey(), email);
   }
 
   // If the visitor has given us enough information, build them a link that will
@@ -891,6 +872,7 @@ v2Router.post('/registrations/renewal', async (request, response) => {
   // If we're in development mode, send back a debug message, with the link for
   // the developer, to avoid sending unnecessary emails.
   return response.status(200).send({
+    emailExists,
     emailNotFound,
     emailInvalid,
     urlInvalid,
@@ -898,60 +880,6 @@ v2Router.post('/registrations/renewal', async (request, response) => {
     loginLink
   });
 });
-
-// For renewals login
-v2Router.post('/registrations/login', async (request, response) => {
-  // Check that the visitor's given us a postcode.
-  const {email} = request.query;
-  const emailInvalid = email === undefined;
-
-  // Check if there's a registration allocated at the specified ID.
-  const emailExists = await Registration.findAllEmails(email);
-  const emailNotFound = emailExists === undefined || emailExists === null;
-
-  // Check that the visitor's supplied postcode matches their stored one.
-  //const emailIncorrect = emailExists !== undefined && emailExists !== null;
-
-  // Check that the visitor's given us a base url.
-  const {redirectBaseUrl} = request.query;
-  const urlInvalid = redirectBaseUrl === undefined || redirectBaseUrl === null;
-
-  // As long as we're happy that the visitor's provided use with valid
-  // information, build them a token for logging in with.
-  let token;
-  if (!emailNotFound && !emailInvalid) {
-    token = buildToken(jwk.getPrivateKey(), email);
-  }
-
-  // If the visitor has given us enough information, build them a link that will
-  // allow them to click-to-log-in.
-  let loginLink;
-  if (!urlInvalid && token !== undefined) {
-    loginLink = `${redirectBaseUrl}${token}`;
-  }
-
-  // As long as we've managed to build a login link, send the visitor an email
-  // with that link included.
-  if (loginLink !== undefined) {
-    await sendLoginEmail(config.notifyApiKey, email, loginLink);
-  }
-
-  // If we're in production, no matter what, tell the API consumer that everything went well.
-  if (process.env.NODE_ENV === 'production') {
-    return response.status(200).send();
-  }
-
-  // If we're in development mode, send back a debug message, with the link for
-  // the developer, to avoid sending unnecessary emails.
-  return response.status(200).send({
-    emailNotFound,
-    emailInvalid,
-    urlInvalid,
-    token,
-    loginLink
-  });
-});
-
 // #endregion
 
 export {v2Router as default};
