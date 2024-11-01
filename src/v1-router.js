@@ -367,6 +367,7 @@ const postcodesMatch = (postcode1, postcode2) => {
   return cleanPostcode1 === cleanPostcode2;
 };
 
+// STILL BEING USED BY RETURNS
 // Allow the API consumer to provide enough personal information to allow us to
 // build and send a login link for the specified visitor.
 v1router.get('/registrations/:id/login', async (request, response) => {
