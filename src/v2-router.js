@@ -253,15 +253,16 @@ const buildRenewalToken = (jwtPrivateKey, email) =>
  * @param {string} notifyApiKey API key for sending emails
  * @param {string} emailAddress where to send the log in email
  * @param {string} loginLink link to log in via
- * @param {string} regNo trap registration number for notify's records
+ * @param {string} fullname users full name to appear on email.
  */
-const sendRenewalEmail = async (notifyApiKey, emailAddress, loginLink) => {
+const sendRenewalEmail = async (notifyApiKey, emailAddress, loginLink, fullname) => {
   if (notifyApiKey) {
     const notifyClient = new NotifyClient.NotifyClient(notifyApiKey);
 
     await notifyClient.sendEmail('173ce02f-b78f-44eb-ac72-2a58af3606a9', emailAddress, {
       personalisation: {
-        loginLink
+        loginLink,
+        Name: fullname
       },
       emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
     });
@@ -820,17 +821,23 @@ v2Router.get('/registrations/:id/login', async (request, response) =>
 /**
  * Send out a renewal email to user if email has been found in database.
  */
-v2Router.post('/registrations/renewalEmailCheck', async (request, response) => {
+v2Router.post('/registrations/renewal-email-check', async (request, response) => {
   // Check that the visitor's given us an email address.
-  const {email} = request.query;
+  const {email} = request.body.params;
   const emailInvalid = email === undefined;
 
+  let emailExists;
+  try {
+    emailExists = await Registration.findAllEmails(email);
+  } catch (error) {
+    console.error({error});
+  }
+
   // Check if there's a registration allocated at the specified email address.
-  const emailExists = await Registration.findAllEmails(email);
   const emailNotFound = emailExists === undefined || emailExists === null || emailExists.length === 0;
 
   // Check that the visitor's given us a base url.
-  const {redirectBaseUrl} = request.query;
+  const {redirectBaseUrl} = request.body.params;
   const urlInvalid = redirectBaseUrl === undefined || redirectBaseUrl === null;
 
   // As long as we're happy that the visitor's provided use with valid
@@ -847,10 +854,11 @@ v2Router.post('/registrations/renewalEmailCheck', async (request, response) => {
     loginLink = `${redirectBaseUrl}${token}`;
   }
 
+  const name = emailExists[0].fullName;
   // As long as we've managed to build a login link, send the visitor an email
   // with that link included.
   if (loginLink !== undefined) {
-    await sendRenewalEmail(config.notifyApiKey, email, loginLink);
+    await sendRenewalEmail(config.notifyApiKey, email, loginLink, name);
   }
 
   // If we're in production, no matter what, tell the API consumer that everything went well.
