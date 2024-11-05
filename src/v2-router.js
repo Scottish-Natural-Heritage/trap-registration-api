@@ -877,6 +877,34 @@ v2Router.post('/registrations/renewal-email-check', async (request, response) =>
     loginLink
   });
 });
+
+v2Router.get('/registrations/:id/renew', async (request, response) => {
+  // Try to parse the incoming ID to make sure it's really a number.
+  const existingId = Number(request.params.id);
+  if (Number.isNaN(existingId)) {
+    return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+  }
+
+  // Check if there's a registration allocated at the specified ID.
+  const existingReg = await Registration.findOne(existingId);
+  if (existingReg === undefined || existingReg === null) {
+    return response.status(404).send({message: `Registration ${existingId} not allocated.`});
+  }
+
+  // Clean up the user's input before we store it in the database.
+  const cleanObject = cleanInput(existingId, request.body);
+
+  try {
+    const newId = await Registration.createRenewal(cleanObject);
+    if (newId === undefined) {
+      return response.status(500).send({message: 'Return could not be created.'});
+    }
+
+    return response.status(201).location(new URL(newId, baseUrl)).send();
+  } catch (error) {
+    return response.status(500).send({error});
+  }
+});
 // #endregion
 
 export {v2Router as default};
