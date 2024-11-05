@@ -17,8 +17,7 @@ const RegistrationNumberModel = (sequelize, DataTypes) => {
       sequelize,
       modelName: 'RegistrationNumber',
       timestamps: true,
-      paranoid: true,
-      freezeTableName: true
+      paranoid: true
     }
   );
 

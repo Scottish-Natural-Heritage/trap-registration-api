@@ -22,10 +22,9 @@ const RegistrationNumberController = {
   /**
    * Create a new RegistrationNumber.
    *
-   * @returns {Number[]} Composite ID of the new RegistrationNumber
+   * @returns Composite ID of the new RegistrationNumber
    */
   create: async (incomingRegistrationNumber) => {
-    // Split the incoming json blob in to each object to be persisted.
     let newRegistrationNumber;
     // Start the database transaction.
     await db.sequelize.transaction(async (t) => {
@@ -37,7 +36,7 @@ const RegistrationNumberController = {
       return newRegistrationNumber;
     }
 
-    // When anything goes return undefined to the router so it can tell the client.
+    // When anything goes askance return `undefined` to the router so it can tell the client.
     return undefined;
   }
 };
