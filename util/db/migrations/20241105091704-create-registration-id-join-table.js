@@ -6,12 +6,12 @@ module.exports = {
       RegistrationNumber: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       RegistrationId: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
