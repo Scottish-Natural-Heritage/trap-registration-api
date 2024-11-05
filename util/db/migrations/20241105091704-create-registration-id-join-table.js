@@ -11,7 +11,11 @@ module.exports = {
       RegistrationId: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Registrations',
+          key: 'id'
+        }
       },
       createdAt: {
         allowNull: false,

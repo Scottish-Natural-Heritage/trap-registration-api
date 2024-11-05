@@ -7,6 +7,7 @@ import NonTargetSpecies from './non-target-species.js';
 import Revocation from './revocation.js';
 import Note from './note.js';
 import RequestUUID from './request-uuid.js';
+import RegistrationNumber from './registration-number.js';
 
 const sequelize = new Sequelize(dbConfig.database);
 
@@ -19,6 +20,7 @@ db.NonTargetSpecies = NonTargetSpecies(sequelize, Sequelize);
 db.Revocation = Revocation(sequelize, Sequelize);
 db.Note = Note(sequelize, Sequelize);
 db.RequestUUID = RequestUUID(sequelize, Sequelize);
+db.RegistrationNumber = RegistrationNumber(sequelize, Sequelize);
 
 db.Registration.hasMany(db.Return);
 db.Registration.hasOne(db.Revocation);
@@ -28,5 +30,7 @@ db.NonTargetSpecies.belongsTo(db.Return);
 db.Revocation.belongsTo(db.Registration);
 db.Registration.hasMany(db.Note);
 db.Note.belongsTo(db.Registration);
+db.Registration.hasOne(db.RegistrationNumber);
+db.RegistrationNumber.belongsTo(db.Registration);
 
 export {db as default};
