@@ -403,13 +403,15 @@ v2Router.get('/registrations/:id', async (request, response) => {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
-    if (!Array.isArray(registration)) {
-      registration = [registration];
+    if (Array.isArray(registration)) {
+      for (const reg of registration) {
+        reg.Returns.sort((a, b) => a.id - b.id);
+      }
+    } else {
+      registration.Returns.sort((a, b) => a.id - b.id);
     }
 
-    for (const reg of registration) {
-      reg.Returns.sort((a, b) => a.id - b.id);
-    }
+
 
     return response.status(200).send(registration);
   } catch (error) {
