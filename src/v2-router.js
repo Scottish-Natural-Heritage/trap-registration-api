@@ -376,19 +376,40 @@ v2Router.post('/registrations/:id/note', async (request, response) => {
  * READs a single registration.
  */
 v2Router.get('/registrations/:id', async (request, response) => {
+  const {idType} = request.query;
+  let isEmail = false;
+
+  if (idType && idType === 'email') {
+    isEmail = true;
+  }
+
   try {
-    const existingId = Number(request.params.id);
-    if (Number.isNaN(existingId)) {
-      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+    const existingId = request.params.id;
+    let registrationFunction;
+
+    if (isEmail) {
+      registrationFunction = Registration.findAllByEmail;
+    } else {
+      if (Number.isNaN(existingId)) {
+        return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
+      }
+
+      registrationFunction = Registration.findOne;
     }
 
-    const registration = await Registration.findOne(existingId);
+    const registration = await registrationFunction(existingId);
 
     if (registration === undefined || registration === null) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
-    registration.Returns.sort((a, b) => a.id - b.id);
+    if (Array.isArray(registration)) {
+      for (const reg of registration) {
+        reg.Returns.sort((a, b) => a.id - b.id);
+      }
+    } else {
+      registration.Returns.sort((a, b) => a.id - b.id);
+    }
 
     return response.status(200).send(registration);
   } catch (error) {

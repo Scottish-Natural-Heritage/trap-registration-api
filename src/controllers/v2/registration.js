@@ -96,6 +96,52 @@ const RegistrationController = {
       paranoid: false
     }),
 
+  findOneByEmail: async (email) =>
+    Registration.findOne({
+      where: {
+        emailAddress: email
+      },
+      include: [
+        {
+          model: Note
+        },
+        {model: Revocation, paranoid: false},
+        {
+          model: Return,
+          include: [
+            {
+              model: NonTargetSpecies
+            }
+          ],
+          paranoid: false
+        }
+      ],
+      paranoid: false
+    }),
+
+  findAllByEmail: async (email) =>
+    Registration.findAll({
+      where: {
+        emailAddress: email
+      },
+      include: [
+        {
+          model: Note
+        },
+        {model: Revocation, paranoid: false},
+        {
+          model: Return,
+          include: [
+            {
+              model: NonTargetSpecies
+            }
+          ],
+          paranoid: false
+        }
+      ],
+      paranoid: false
+    }),
+
   /**
    * Retrieve all registrations from the database.
    *
