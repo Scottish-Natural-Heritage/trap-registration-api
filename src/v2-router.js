@@ -397,7 +397,7 @@ v2Router.get('/registrations/:id', async (request, response) => {
       registrationFunction = Registration.findOne;
     }
 
-    let registration = await registrationFunction(existingId);
+    const registration = await registrationFunction(existingId);
 
     if (registration === undefined || registration === null) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
@@ -410,8 +410,6 @@ v2Router.get('/registrations/:id', async (request, response) => {
     } else {
       registration.Returns.sort((a, b) => a.id - b.id);
     }
-
-
 
     return response.status(200).send(registration);
   } catch (error) {
