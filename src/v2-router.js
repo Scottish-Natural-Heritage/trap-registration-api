@@ -76,7 +76,11 @@ const cleanInput = (body) => ({
       ? undefined
       : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
   uprn: body.uprn === undefined ? undefined : String(body.uprn),
-  expiryDate: calculateExpiryDate(),
+  // WE ARE TEMPORARILY ISSUING WITHOUT AN EXPIRY
+  // REVERT by uncommenting the next line
+  // expiryDate: calculateExpiryDate(),
+  // AND removing the next line
+  expiryDate: null,
   uuid: body.uuid
 });
 
