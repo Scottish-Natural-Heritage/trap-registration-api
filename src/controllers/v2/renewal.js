@@ -92,42 +92,42 @@ const RenewalController = {
     const existingReg = findOneregistrationResponse;
 
     const mappedExistingReg = {
-      convictions: existingReg.convictions,
-      usingGL01: existingReg.usingGL01,
-      usingGL02: existingReg.usingGL02,
-      usingGL03: existingReg.usingGL03,
-      complyWithTerms: existingReg.complyWithTerms,
-      meatBaits: existingReg.meatBaits,
-      fullName: existingReg.fullName,
-      addressLine1: existingReg.addressLine1,
-      addressLine2: existingReg.addressLine2,
-      addressTown: existingReg.addressTown,
-      addressCounty: existingReg.addressCounty,
-      addressPostcode: existingReg.addressPostcode,
-      phoneNumber: existingReg.phoneNumber,
-      emailAddress: existingReg.emailAddress,
-      uprn: existingReg.uprn
+      convictions: existingReg?.convictions,
+      usingGL01: existingReg?.usingGL01,
+      usingGL02: existingReg?.usingGL02,
+      usingGL03: existingReg?.usingGL03,
+      complyWithTerms: existingReg?.complyWithTerms,
+      meatBaits: existingReg?.meatBaits,
+      fullName: existingReg?.fullName,
+      addressLine1: existingReg?.addressLine1,
+      addressLine2: existingReg?.addressLine2,
+      addressTown: existingReg?.addressTown,
+      addressCounty: existingReg?.addressCounty,
+      addressPostcode: existingReg?.addressPostcode,
+      phoneNumber: existingReg?.phoneNumber,
+      emailAddress: existingReg?.emailAddress,
+      uprn: existingReg?.uprn
     };
 
     // Clean up the user's input before we store it in the database.
     const cleanObject = cleanInput(request.body);
 
     const mappedCleanObject = {
-      convictions: cleanObject.convictions,
-      usingGL01: cleanObject.usingGL01,
-      usingGL02: cleanObject.usingGL02,
-      usingGL03: cleanObject.usingGL03,
-      complyWithTerms: cleanObject.complyWithTerms,
-      meatBaits: cleanObject.meatBaits,
-      fullName: cleanObject.fullName,
-      addressLine1: cleanObject.addressLine1,
-      addressLine2: cleanObject.addressLine2,
-      addressTown: cleanObject.addressTown,
-      addressCounty: cleanObject.addressCounty,
-      addressPostcode: cleanObject.addressPostcode,
-      phoneNumber: cleanObject.phoneNumber,
-      emailAddress: cleanObject.emailAddress,
-      uprn: cleanObject.uprn
+      convictions: cleanObject?.convictions,
+      usingGL01: cleanObject?.usingGL01,
+      usingGL02: cleanObject?.usingGL02,
+      usingGL03: cleanObject?.usingGL03,
+      complyWithTerms: cleanObject?.complyWithTerms,
+      meatBaits: cleanObject?.meatBaits,
+      fullName: cleanObject?.fullName,
+      addressLine1: cleanObject?.addressLine1,
+      addressLine2: cleanObject?.addressLine2,
+      addressTown: cleanObject?.addressTown,
+      addressCounty: cleanObject?.addressCounty,
+      addressPostcode: cleanObject?.addressPostcode,
+      phoneNumber: cleanObject?.phoneNumber,
+      emailAddress: cleanObject?.emailAddress,
+      uprn: cleanObject?.uprn
     };
 
     const changes = {};
