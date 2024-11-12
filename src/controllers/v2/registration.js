@@ -13,11 +13,6 @@ const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID} = 
 const sendSuccessEmail = async (reg) => {
   if (config.notifyApiKey) {
     try {
-      // Every registration has a 5 year expiry, tied to the issue date of that
-      // year's General Licenses. General Licenses are always issued on January 1st,
-      // so registrations last for four whole years, plus the rest of the issued
-      // year.
-      const yearExpires = new Date().getFullYear() + 4;
       const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
 
       await notifyClient.sendEmail('7b7a0810-a15d-4c72-8fcf-c1e7494641b3', reg.emailAddress, {
@@ -33,7 +28,7 @@ const sendSuccessEmail = async (reg) => {
           noComply: reg.complyWithTerms ? 'no' : 'yes',
           meatBait: reg.meatBaits ? 'yes' : 'no',
           noMeatBait: reg.meatBaits ? 'no' : 'yes',
-          expiryDate: `31/12/${yearExpires}`
+          expiryDate: reg.expiryDate ?? 'TBC'
         },
         reference: reg.regNo,
         emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
