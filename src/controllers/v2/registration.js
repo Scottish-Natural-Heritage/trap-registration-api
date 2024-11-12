@@ -6,27 +6,6 @@ import jsonConsoleLogger, {unErrorJson} from '../../json-console-logger.js';
 const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID} = db;
 
 /**
- * Takes an issue date, calculates an expiry date based on that and converts it
- * in to a formatted string.
- *
- * @param {Date} issueDate when the registration is issued
- * @returns {String} a formatted date string
- */
-const buildExpiryDateString = (issueDate) => {
-  // Every registration has a 5 year expiry, tied to the issue date of that
-  // year's General Licenses. General Licenses are always issued on January 1st,
-  // so registrations last for four whole years, plus the rest of the issued
-  // year.
-  const expiryYear = issueDate.getFullYear() + 4;
-
-  const d = 31;
-  const m = 12;
-  const y = String(expiryYear).padStart(4, '0');
-
-  return `${d}/${m}/${y}`;
-};
-
-/**
  * Send emails to the applicant to let them know it was successful.
  *
  * @param {any} reg an enhanced JSON version of the model
@@ -210,9 +189,6 @@ const RegistrationController = {
 
     // Generate and save  the human-readable version of the reg no.
     newReg.regNo = `NS-TRP-${String(newReg.id).padStart(5, '0')}`;
-
-    // Make the expiry date a user friendly string.
-    newReg.dataValues.expiryDate = buildExpiryDateString(new Date());
 
     // Send the applicant their confirmation email.
     await sendSuccessEmail(newReg);
