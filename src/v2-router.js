@@ -80,7 +80,7 @@ const cleanInput = (body) => ({
   // REVERT by uncommenting the next line
   // expiryDate: calculateExpiryDate(),
   // AND removing the next line
-  expiryDate: null,
+  expiryDate: new Date() > new Date('2024/11/14') ? null : calculateExpiryDate(),
   uuid: body.uuid
 });
 
