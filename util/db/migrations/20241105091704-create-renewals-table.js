@@ -1,21 +1,24 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) =>
-    queryInterface.createTable('RegistrationNumbers', {
-      RegistrationNumber: {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('Renewals', {
+      id: {
         allowNull: false,
         primaryKey: true,
+        autoIncrement: true,
         type: Sequelize.INTEGER
       },
       RegistrationId: {
         allowNull: false,
-        primaryKey: true,
         type: Sequelize.INTEGER,
         references: {
           model: 'Registrations',
           key: 'id'
         }
+      },
+      expiryDate: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
@@ -28,6 +31,9 @@ module.exports = {
       deletedAt: {
         type: Sequelize.DATE
       }
-    }),
-  down: (queryInterface) => queryInterface.dropTable('RegistrationNumbers')
+    });
+  },
+  down: async (queryInterface) => {
+    await queryInterface.dropTable('Renewals');
+  }
 };
