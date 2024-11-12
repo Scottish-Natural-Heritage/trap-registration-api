@@ -3,7 +3,7 @@ import utils from 'naturescot-utils';
 import jwt from 'jsonwebtoken';
 import NotifyClient from 'notifications-node-client';
 import Registration from './controllers/v2/registration.js';
-import RegistrationNumber from './controllers/v2/registration-number.js';
+import RenewalController from './controllers/v2/renewal.js';
 import ScheduledController from './controllers/v2/scheduled.js';
 import Return from './controllers/v2/return.js';
 import config from './config/app.js';
@@ -880,39 +880,9 @@ v2Router.post('/registrations/renewal-email-check', async (request, response) =>
 });
 
 v2Router.post('/registrations/:id/renew', async (request, response) => {
-  // Try to parse the incoming ID to make sure it's really a number.
-  const registrationNumber = Number(request.params.id);
-  if (Number.isNaN(registrationNumber)) {
-    return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
-  }
+  const {status, message} = await RenewalController.create(request);
 
-  // Check if there's a registration allocated at the specified ID.
-  const existingReg = await Registration.findOne(registrationNumber);
-  if (existingReg === undefined || existingReg === null) {
-    return response.status(404).send({message: `Registration ${registrationNumber} not allocated.`});
-  }
-
-  // Clean up the user's input before we store it in the database.
-  const cleanObject = cleanInput(request.body);
-
-  try {
-    const renewedRegistration = await Registration.create(cleanObject);
-    if (renewedRegistration === undefined) {
-      return response.status(500).send({message: 'Renewal could not be created.'});
-    }
-
-    const regNumber = {
-      RegistrationNumber: registrationNumber,
-      RegistrationId: renewedRegistration.id
-    };
-
-    // Next we need to link the renewal to the existing registration number.
-    const renewalIds = await RegistrationNumber.create(regNumber);
-
-    return response.status(201).send(`Registration ${renewalIds.RegistrationNumber} renewed.`);
-  } catch (error) {
-    return response.status(500).send({error});
-  }
+  return response.status(status).send({message});
 });
 
 // #endregion
