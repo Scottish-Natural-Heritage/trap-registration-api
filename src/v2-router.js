@@ -880,10 +880,10 @@ v2Router.post('/registrations/renewal-email-check', async (request, response) =>
     loginLink = `${redirectBaseUrl}${token}`;
   }
 
-  const name = emailExists[0].fullName;
   // As long as we've managed to build a login link, send the visitor an email
   // with that link included.
   if (loginLink !== undefined) {
+    const name = emailExists[0].fullName;
     await sendRenewalEmail(config.notifyApiKey, email, loginLink, name);
   }
 
