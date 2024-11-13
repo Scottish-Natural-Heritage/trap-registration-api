@@ -1,5 +1,6 @@
 import utils from 'naturescot-utils';
 import db from '../../models/index.js';
+import {sendSuccessEmail} from '../../notify-emails.js';
 import RegistrationController from './registration.js';
 
 const {Renewal, RegistrationHistory, Registration} = db;
@@ -161,6 +162,23 @@ const RenewalController = {
         return {status: 500, id: registrationNumber};
       }
     });
+
+    const renewedReg = await RegistrationController.findOne(registrationNumber);
+
+    const notifyDetails = {
+      regNo: `NS-TRP-${String(registrationNumber).padStart(5, '0')}`,
+      usingGL01: renewedReg?.usingGL01,
+      usingGL02: renewedReg?.usingGL02,
+      convictions: renewedReg?.convictions,
+      complyWithTerms: renewedReg?.complyWithTerms,
+      meatBaits: renewedReg?.meatBaits,
+      emailAddress: renewedReg?.emailAddress,
+      expiryDate: null
+    };
+
+    // Send the email aff
+    // Send the applicant their renewal confirmation email.
+    await sendSuccessEmail(notifyDetails);
 
     return {status: 201, id: registrationNumber};
   }
