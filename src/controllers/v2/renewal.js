@@ -80,16 +80,16 @@ const RenewalController = {
     // Try to parse the incoming ID to make sure it's really a number.
     const registrationNumber = Number.parseInt(request.params.id, 10);
     if (Number.isNaN(registrationNumber)) {
-      return {status: 404, message: `Registration ${request.params.id} not valid.`};
+      return {status: 404, id: registrationNumber};
     }
 
     // Check if there's a registration allocated at the specified ID.
-    const findOneregistrationResponse = await RegistrationController.findOne(registrationNumber);
-    if (findOneregistrationResponse === undefined || findOneregistrationResponse === null) {
-      return {status: 404, message: `Registration ${registrationNumber} not allocated.`};
+    const findOneRegistrationResponse = await RegistrationController.findOne(registrationNumber);
+    if (findOneRegistrationResponse === undefined || findOneRegistrationResponse === null) {
+      return {status: 404, id: registrationNumber};
     }
 
-    const existingReg = findOneregistrationResponse;
+    const existingReg = findOneRegistrationResponse;
 
     const mappedExistingReg = {
       convictions: existingReg?.convictions,
@@ -141,30 +141,28 @@ const RenewalController = {
 
     await db.sequelize.transaction(async (t) => {
       try {
-        if (Object.keys(changes).length > 0) {
-          await RegistrationHistory.create(
-            {
-              ...mappedExistingReg,
-              RegistrationId: registrationNumber,
-              createdByLicensingOfficer: existingReg.createdByLicensingOfficer,
-              // Need to confirm expected behaviour here!
-              expiryDate: existingReg.expiryDate
-            },
-            {transaction: t}
-          );
+        await RegistrationHistory.create(
+          {
+            ...mappedExistingReg,
+            RegistrationId: registrationNumber,
+            createdByLicensingOfficer: existingReg.createdByLicensingOfficer,
+            // Need to confirm expected behaviour here!
+            expiryDate: existingReg.expiryDate
+          },
+          {transaction: t}
+        );
 
-          await Registration.update(changes, {where: {id: registrationNumber}, transaction: t});
-        }
+        await Registration.update({...changes, expiryDate: null}, {where: {id: registrationNumber}, transaction: t});
 
         // For now, renewals expiry date will be null 12/11/2024
-        await Renewal.create({RegistrationId: registrationNumber, expiryDate: null}, {transaction: t});
+        await Renewal.create({RegistrationId: registrationNumber}, {transaction: t});
       } catch (error) {
         console.log(error);
-        return {status: 500, message: `Error occured: ${error}`};
+        return {status: 500, id: registrationNumber};
       }
     });
 
-    return {status: 201, message: `Registration ${registrationNumber} renewed.`};
+    return {status: 201, id: registrationNumber};
   }
 };
 
