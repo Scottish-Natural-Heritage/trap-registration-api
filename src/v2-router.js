@@ -880,9 +880,9 @@ v2Router.post('/registrations/renewal-email-check', async (request, response) =>
 });
 
 v2Router.post('/registrations/:id/renew', async (request, response) => {
-  const {status, message} = await RenewalController.create(request);
+  const {status, id} = await RenewalController.create(request);
 
-  return response.status(status).send({message});
+  return response.status(status).send({id});
 });
 
 // #endregion
