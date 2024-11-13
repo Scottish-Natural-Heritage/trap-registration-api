@@ -3,6 +3,7 @@ import utils from 'naturescot-utils';
 import jwt from 'jsonwebtoken';
 import NotifyClient from 'notifications-node-client';
 import Registration from './controllers/v2/registration.js';
+import RenewalController from './controllers/v2/renewal.js';
 import ScheduledController from './controllers/v2/scheduled.js';
 import Return from './controllers/v2/return.js';
 import config from './config/app.js';
@@ -902,6 +903,13 @@ v2Router.post('/registrations/renewal-email-check', async (request, response) =>
     loginLink
   });
 });
+
+v2Router.post('/registrations/:id/renew', async (request, response) => {
+  const {status, id} = await RenewalController.create(request);
+
+  return response.status(status).send({id});
+});
+
 // #endregion
 
 export {v2Router as default};

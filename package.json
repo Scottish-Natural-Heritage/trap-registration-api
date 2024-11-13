@@ -9,6 +9,7 @@
     "lint": "xo",
     "premigrations": "npx sequelize-cli db:migrate --env preMigrations --migrations-path util/db/pre-migrations >/dev/null",
     "migrations": "npx sequelize-cli db:migrate  --env database >/dev/null",
+    "migrate:undo": "sequelize-cli db:migrate:undo --env database >/dev/null",
     "prestart": "npm run migrations",
     "start": "node --no-warnings src/server.js",
     "nm:run": "newman run tests/v1-trap-registration-api.postman_collection.json && newman run tests/v2-trap-registration-api.postman_collection.json",
