@@ -1,44 +1,7 @@
-import NotifyClient from 'notifications-node-client';
 import db from '../../models/index.js';
-import config from '../../config/app.js';
-import jsonConsoleLogger, {unErrorJson} from '../../json-console-logger.js';
+import {sendSuccessEmail} from '../../notify-emails.js';
 
 const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID} = db;
-
-/**
- * Send emails to the applicant to let them know it was successful.
- *
- * @param {any} reg an enhanced JSON version of the model
- */
-const sendSuccessEmail = async (reg) => {
-  if (config.notifyApiKey) {
-    try {
-      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
-
-      await notifyClient.sendEmail('7b7a0810-a15d-4c72-8fcf-c1e7494641b3', reg.emailAddress, {
-        personalisation: {
-          regNo: reg.regNo,
-          convictions: reg.convictions ? 'yes' : 'no',
-          noConvictions: reg.convictions ? 'no' : 'yes',
-          general1: reg.usingGL01 ? 'yes' : 'no',
-          noGeneral1: reg.usingGL01 ? 'no' : 'yes',
-          general2: reg.usingGL02 ? 'yes' : 'no',
-          noGeneral2: reg.usingGL02 ? 'no' : 'yes',
-          comply: reg.complyWithTerms ? 'yes' : 'no',
-          noComply: reg.complyWithTerms ? 'no' : 'yes',
-          meatBait: reg.meatBaits ? 'yes' : 'no',
-          noMeatBait: reg.meatBaits ? 'no' : 'yes',
-          expiryDate: reg.expiryDate ?? 'TBC'
-        },
-        reference: reg.regNo,
-        emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
-      });
-    } catch (error) {
-      jsonConsoleLogger.error(unErrorJson(error));
-      throw error;
-    }
-  }
-};
 
 /**
  * An object to perform 'persistence' operations on our registration objects.
