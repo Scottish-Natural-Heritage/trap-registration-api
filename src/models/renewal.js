@@ -6,10 +6,6 @@ const RenewalModel = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true
-      },
-      expiryDate: {
-        type: DataTypes.STRING,
-        allowNull: true
       }
     },
     {
