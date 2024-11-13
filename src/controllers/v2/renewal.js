@@ -176,7 +176,6 @@ const RenewalController = {
       expiryDate: null
     };
 
-    // Send the email aff
     // Send the applicant their renewal confirmation email.
     await sendSuccessEmail(notifyDetails);
 
