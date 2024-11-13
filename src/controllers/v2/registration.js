@@ -102,18 +102,16 @@ const RegistrationController = {
         {
           model: Note
         },
-        {model: Revocation, paranoid: false},
+        {model: Revocation},
         {
           model: Return,
           include: [
             {
               model: NonTargetSpecies
             }
-          ],
-          paranoid: false
+          ]
         }
-      ],
-      paranoid: false
+      ]
     }),
 
   /**
