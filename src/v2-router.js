@@ -910,6 +910,25 @@ v2Router.post('/registrations/:id/renew', async (request, response) => {
   return response.status(status).send({id});
 });
 
+/**
+ * Send out a renewal email to user if email has been found in database.
+ */
+v2Router.post('/expired-licence-no-renewals-reminder', async (request, response) => {
+  const todaysDate = new Date();
+  try {
+    const expiredRegistrations = await Registration.findAllExpiredNoRenewals(todaysDate);
+
+    // Try to send out reminder emails.
+    const emailsSent = await ScheduledController.sendExpiredNoRenewalsReminder(expiredRegistrations);
+
+    return response.status(200).send(`Sent ${emailsSent} recently expired licence renewal reminder`);
+
+    //return response.status(200).send({message: `expired registrations have been found`});
+  } catch (error) {
+    console.error({error});
+  }
+});
+
 // #endregion
 
 export {v2Router as default};
