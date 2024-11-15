@@ -4,8 +4,7 @@ const RenewalModel = (sequelize, DataTypes) => {
     {
       RegistrationId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        primaryKey: true
+        allowNull: false
       }
     },
     {
