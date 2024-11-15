@@ -14,6 +14,34 @@ import {
 
 const {Registration, Return, Renewal} = database;
 
+/**
+ * Split a date object into day, month and year and format for output.
+ * The month is written out in full.
+ *
+ * @param {Date} date A Date object.
+ * @returns {string} Returns a string containing the day, month and year.
+ */
+const formatDateForEmail = (date) => {
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = months[date.getMonth()];
+  const year = date.getFullYear().toString();
+  return `${day} ${month} ${year}`;
+};
+
 const setReturnReminderEmailDetails = (registration) => ({
   id: registration.id,
   lhName: registration.fullName
@@ -22,8 +50,9 @@ const setReturnReminderEmailDetails = (registration) => ({
 const setRenewalReminderEmailDetails = (registration) => ({
   id: registration.id,
   lhName: registration.fullName,
-  expiry: registration.expiryDate,
-  hasMeatBaits: registration.meatbaits
+  expiry: formatDateForEmail(registration.expiryDate),
+  year: registration.expiryDate.getFullYear(),
+  hasMeatBaits: registration.meatBaits === true
 });
 
 const setPreviousYearReturnReminderEmailDetails = (registration) => ({
@@ -91,6 +120,29 @@ const ScheduledController = {
   async findAll() {
     return Registration.findAll({
       include: [{model: Return}]
+    });
+  },
+
+  /**
+   * Retrieve all registrations from the database that are expired.
+   *
+   * @returns {Sequelize.Model} All registrations that are expired.
+   */
+  async findAllExpiredNoRenewals(todaysDate) {
+    return Registration.findAll({
+      include: [
+        {
+          model: Renewal,
+          required: false
+        },
+        {model: Return, required: false}
+      ],
+      where: {
+        expiryDate: {
+          [Op.lt]: todaysDate
+        },
+        '$Renewals.id$': {[Op.is]: null}
+      }
     });
   },
 
@@ -174,6 +226,7 @@ const ScheduledController = {
   },
 
   async sendExpiredNoRenewalsReminder(registrations) {
+    console.log('registrations from sendExpriedNoRenewalsReminder', registrations);
     // A count of the number of emails sent.
     let sentCount = 0;
 
@@ -182,6 +235,7 @@ const ScheduledController = {
     for (const registration of registrations) {
       const emailDetails = setRenewalReminderEmailDetails(registration);
 
+      console.log('email details', emailDetails);
       promises.push(
         sendRenewalReminderEmail(
           emailDetails,
