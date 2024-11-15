@@ -1,7 +1,8 @@
 import db from '../../models/index.js';
+import {Op} from 'sequelize';
 import {sendSuccessEmail} from '../../notify-emails.js';
 
-const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID} = db;
+const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID, Renewal} = db;
 
 /**
  * An object to perform 'persistence' operations on our registration objects.
@@ -87,6 +88,28 @@ const RegistrationController = {
       include: [{model: Revocation}],
       paranoid: false,
       order: [['createdAt', 'DESC']]
+    }),
+
+  /**
+   * Retrieve all registrations from the database that are expired.
+   *
+   * @returns {Sequelize.Model} All registrations that are expired.
+   */
+  findAllExpiredNoRenewals: async (todaysDate) =>
+    Registration.findAll({
+      include: [
+        {
+          model: Renewal,
+          required: false
+        },
+        {model: Return}
+      ],
+      where: {
+        expiryDate: {
+          [Op.lt]: todaysDate
+        },
+        '$Renewals.id$': {[Op.is]: null}
+      }
     }),
 
   /**
