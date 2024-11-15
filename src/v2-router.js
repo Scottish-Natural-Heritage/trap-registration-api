@@ -916,14 +916,14 @@ v2Router.post('/registrations/:id/renew', async (request, response) => {
 v2Router.post('/expired-licence-no-renewals-reminder', async (request, response) => {
   const todaysDate = new Date();
   try {
-    const expiredRegistrations = await Registration.findAllExpiredNoRenewals(todaysDate);
+    const expiredRegistrations = await ScheduledController.findAllExpiredNoRenewals(todaysDate);
+
+    console.log('Expired Registrations:', expiredRegistrations);
 
     // Try to send out reminder emails.
     const emailsSent = await ScheduledController.sendExpiredNoRenewalsReminder(expiredRegistrations);
 
-    return response.status(200).send(`Sent ${emailsSent} recently expired licence renewal reminder`);
-
-    //return response.status(200).send({message: `expired registrations have been found`});
+    return response.status(200).send(`Sent renewal reminders for ${emailsSent} recently expired licences.`);
   } catch (error) {
     console.error({error});
   }
