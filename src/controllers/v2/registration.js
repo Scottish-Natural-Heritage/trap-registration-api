@@ -91,28 +91,6 @@ const RegistrationController = {
     }),
 
   /**
-   * Retrieve all registrations from the database that are expired.
-   *
-   * @returns {Sequelize.Model} All registrations that are expired.
-   */
-  findAllExpiredNoRenewals: async (todaysDate) =>
-    Registration.findAll({
-      include: [
-        {
-          model: Renewal,
-          required: false
-        },
-        {model: Return}
-      ],
-      where: {
-        expiryDate: {
-          [Op.lt]: todaysDate
-        },
-        '$Renewals.id$': {[Op.is]: null}
-      }
-    }),
-
-  /**
    * Retrieve all registrations from the database with specified email.
    *
    * @returns {Sequelize.Model} All existing registrations with specified email.
