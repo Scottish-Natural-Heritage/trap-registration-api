@@ -47,12 +47,13 @@ const setReturnReminderEmailDetails = (registration) => ({
   lhName: registration.fullName
 });
 
-const setRenewalReminderEmailDetails = (registration) => ({
+const setRenewalReminderEmailDetails = (registration, missingYearsString, returnsDue) => ({
   id: registration.id,
   lhName: registration.fullName,
   expiry: formatDateForEmail(registration.expiryDate),
-  year: registration.expiryDate.getFullYear(),
-  hasMeatBaits: registration.meatBaits === true
+  year: missingYearsString,
+  hasMeatBaits: registration.meatBaits,
+  returnsDue
 });
 
 const setPreviousYearReturnReminderEmailDetails = (registration) => ({
@@ -60,6 +61,55 @@ const setPreviousYearReturnReminderEmailDetails = (registration) => ({
   lhName: registration.fullName,
   PreviousYear: new Date().getFullYear() - 1
 });
+
+/**
+ * Get the years that the user is missing returns for.
+ *
+ *
+ * @param {any} registration Registration object.
+ * @returns {any} The missing years as a string and a boolean value if returns are due.
+ */
+const getMissingReturnYears = (registration) => {
+  // This is used in the notify email for the list of returns required to be submitted by the user.
+  // Set this to an empty string for, set to list of year[s] if a meat bait trap and return[s] is required.
+  let missingYearsString = '';
+
+  // Also for use in the notify template
+  let returnsDue = false;
+
+  // Check if user has meat baits and if returns are missing.
+  if (registration.meatBaits) {
+    const createdAtYear = new Date(registration.createdAt).getFullYear();
+    const expiryYear = new Date(registration.expiryDate).getFullYear();
+
+    // Year returns are done only started to get asked in 2022
+    const startYearOfReturns = 2022;
+    // Creates a range of years from year licence was created to the year it expired.
+    const licenceActiveYears = Array.from({length: expiryYear - createdAtYear + 1}, (_value, i) => createdAtYear + i);
+
+    const validForReturns = licenceActiveYears.includes(startYearOfReturns) || createdAtYear >= startYearOfReturns;
+
+    if (validForReturns) {
+      const submittedYears = new Set(registration.Returns.map((r) => Number(r.year)));
+
+      const validReturnYears = Array.from(
+        {length: expiryYear - startYearOfReturns + 1},
+        (_, i) => startYearOfReturns + i
+      );
+
+      const missingYears = validReturnYears.filter((year) => !submittedYears.has(year));
+
+      returnsDue = missingYears.length > 0;
+
+      missingYearsString = returnsDue ? missingYears.join(', ') : '';
+    }
+  }
+
+  return {
+    missingYearsString,
+    returnsDue
+  };
+};
 
 /**
  * Send reminder email to applicant informing them their returns
@@ -225,17 +275,16 @@ const ScheduledController = {
     return sentCount;
   },
 
-  async sendExpiredNoRenewalsReminder(registrations) {
-    console.log('registrations from sendExpriedNoRenewalsReminder', registrations);
+  async sendExpiredNoRenewalsReminder(expiredRegistrations) {
     // A count of the number of emails sent.
     let sentCount = 0;
 
     const promises = [];
 
-    for (const registration of registrations) {
-      const emailDetails = setRenewalReminderEmailDetails(registration);
+    for (const registration of expiredRegistrations) {
+      const {missingYearsString, returnsDue} = getMissingReturnYears(registration);
+      const emailDetails = setRenewalReminderEmailDetails(registration, missingYearsString, returnsDue);
 
-      console.log('email details', emailDetails);
       promises.push(
         sendRenewalReminderEmail(
           emailDetails,
