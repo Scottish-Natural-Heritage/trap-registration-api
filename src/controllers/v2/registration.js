@@ -1,8 +1,7 @@
 import db from '../../models/index.js';
-import {Op} from 'sequelize';
 import {sendSuccessEmail} from '../../notify-emails.js';
 
-const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID, Renewal} = db;
+const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID} = db;
 
 /**
  * An object to perform 'persistence' operations on our registration objects.
