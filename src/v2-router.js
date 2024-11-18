@@ -918,9 +918,7 @@ v2Router.post('/expired-licence-no-renewals-reminder', async (request, response)
   try {
     const expiredRegistrations = await ScheduledController.findAllExpiredNoRenewals(todaysDate);
 
-    console.log('Expired Registrations:', expiredRegistrations);
-
-    // Try to send out reminder emails.
+    // Try to send out reminder emails for renewals.
     const emailsSent = await ScheduledController.sendExpiredNoRenewalsReminder(expiredRegistrations);
 
     return response.status(200).send(`Sent renewal reminders for ${emailsSent} recently expired licences.`);
