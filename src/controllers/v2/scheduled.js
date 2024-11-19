@@ -4,7 +4,9 @@ import {
   RETURN_REMINDER_NOTIFY_TEMPLATE_ID,
   PREVIOUS_YEAR_RETURN_NOTIFY_TEMPLATE_ID,
   NEVER_SUBMITTED_RETURN_NOTIFY_TEMPLATE_ID,
-  EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID
+  EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID,
+  TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID,
+  EXPIRED_RECENTLY_NO_RENEWALS_NOTIFY_TEMPLATE_ID
 } from '../../notify-template-ids.js';
 import {formatRegId, formatDateForEmail, addDaysSetTime} from '../../helper-functions.js';
 import {
@@ -233,7 +235,13 @@ const ScheduledController = {
         years: missingYearsString
       };
 
-      promises.push(sendTwoWeekExpiryReminderEmail(registration.emailAddress, emailDetails));
+      promises.push(
+        sendTwoWeekExpiryReminderEmail(
+          registration.emailAddress,
+          emailDetails,
+          TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID
+        )
+      );
       sentCount++;
     }
 
@@ -252,7 +260,13 @@ const ScheduledController = {
       const {missingYearsString, returnsDue} = getMissingReturnYears(registration);
       const emailDetails = setRenewalReminderEmailDetails(registration, missingYearsString, returnsDue);
 
-      promises.push(sendRenewalReminderEmail(emailDetails, registration.emailAddress));
+      promises.push(
+        sendRenewalReminderEmail(
+          emailDetails,
+          registration.emailAddress,
+          EXPIRED_RECENTLY_NO_RENEWALS_NOTIFY_TEMPLATE_ID
+        )
+      );
       sentCount++;
     }
 

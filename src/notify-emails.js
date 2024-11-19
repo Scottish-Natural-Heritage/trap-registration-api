@@ -3,9 +3,7 @@ import config from './config/app.js';
 import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
 import {
   TRAP_REGISTRATION_CONFIRMATION_NOTIFY_TEMPLATE_ID,
-  LICENSING_REPLY_TO_NOTIFY_EMAIL_ID,
-  TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID,
-  EXPIRED_RECENTLY_NO_RENEWALS_NOTIFY_TEMPLATE_ID
+  LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
 } from './notify-template-ids.js';
 
 /**
@@ -49,14 +47,14 @@ export const sendSuccessEmail = async (reg) => {
  * @param {string} emailAddress Registration holder's email address.
  * @param {any} emailDetails Object containing personalisation data for notify
  */
-export const sendTwoWeekExpiryReminderEmail = async (emailAddress, emailDetails) => {
+export const sendTwoWeekExpiryReminderEmail = async (emailAddress, emailDetails, notifyTemplate) => {
   if (config.notifyApiKey) {
     try {
       const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
 
       const {lhName, regNo, expiryDate, isMeatBait, returnsDue, years} = emailDetails;
 
-      await notifyClient.sendEmail(TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID, emailAddress, {
+      await notifyClient.sendEmail(notifyTemplate, emailAddress, {
         personalisation: {
           lhName,
           regNo,
@@ -81,13 +79,13 @@ export const sendTwoWeekExpiryReminderEmail = async (emailAddress, emailDetails)
  * @param {string} emailDetails The details to use in personalisation of email.
  * @param {any} emailAddress The email address of the recipient.
  */
-export const sendRenewalReminderEmail = async (emailDetails, emailAddress) => {
+export const sendRenewalReminderEmail = async (emailDetails, emailAddress, notifyTemplate) => {
   if (config.notifyApiKey) {
     try {
       const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
 
       // Send the email via notify.
-      await notifyClient.sendEmail(EXPIRED_RECENTLY_NO_RENEWALS_NOTIFY_TEMPLATE_ID, emailAddress, {
+      await notifyClient.sendEmail(notifyTemplate, emailAddress, {
         personalisation: emailDetails,
         emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
       });
