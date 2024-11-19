@@ -4,7 +4,8 @@ import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
 import {
   TRAP_REGISTRATION_CONFIRMATION_NOTIFY_TEMPLATE_ID,
   LICENSING_REPLY_TO_NOTIFY_EMAIL_ID,
-  TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID
+  TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID,
+  EXPIRED_RECENTLY_NO_RENEWALS_NOTIFY_TEMPLATE_ID
 } from './notify-template-ids.js';
 
 /**
@@ -45,7 +46,8 @@ export const sendSuccessEmail = async (reg) => {
 /**
  * Send emails to the applicant to let them know it was successful.
  *
- * @param {any} reg an enhanced JSON version of the model
+ * @param {string} emailAddress Registration holder's email address.
+ * @param {any} emailDetails Object containing personalisation data for notify
  */
 export const sendTwoWeekExpiryReminderEmail = async (emailAddress, emailDetails) => {
   if (config.notifyApiKey) {
@@ -64,6 +66,54 @@ export const sendTwoWeekExpiryReminderEmail = async (emailAddress, emailDetails)
           years
         },
         reference: regNo,
+        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
+      });
+    } catch (error) {
+      jsonConsoleLogger.error(unErrorJson(error));
+      throw error;
+    }
+  }
+};
+
+/**
+ * Send reminder email to applicant informing them that they can renew their application
+ *
+ * @param {string} emailDetails The details to use in personalisation of email.
+ * @param {any} emailAddress The email address of the recipient.
+ */
+export const sendRenewalReminderEmail = async (emailDetails, emailAddress) => {
+  if (config.notifyApiKey) {
+    try {
+      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
+
+      // Send the email via notify.
+      await notifyClient.sendEmail(EXPIRED_RECENTLY_NO_RENEWALS_NOTIFY_TEMPLATE_ID, emailAddress, {
+        personalisation: emailDetails,
+        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
+      });
+    } catch (error) {
+      jsonConsoleLogger.error(unErrorJson(error));
+      throw error;
+    }
+  }
+};
+
+/**
+ * Send reminder email to applicant informing them their returns
+ * are due.
+ *
+ * @param {string} emailDetails The details to use in personalisation of email.
+ * @param {any} emailAddress The email address of the recipient.
+ * @param {string} notifyTemplate The Notify template to use for the email.
+ */
+export const sendReturnReminderEmail = async (emailDetails, emailAddress, notifyTemplate) => {
+  if (config.notifyApiKey) {
+    try {
+      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
+
+      // Send the email via notify.
+      await notifyClient.sendEmail(notifyTemplate, emailAddress, {
+        personalisation: emailDetails,
         emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
       });
     } catch (error) {
