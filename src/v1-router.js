@@ -310,7 +310,7 @@ const sendLoginEmail = async (notifyApiKey, emailAddress, loginLink, regNo) => {
   if (notifyApiKey) {
     const notifyClient = new NotifyClient.NotifyClient(notifyApiKey);
 
-    await notifyClient.sendEmail('a5901745-e01c-4e42-a726-ece91b63e593', emailAddress, {
+    await notifyClient.sendEmail('740e3362-5e73-41dc-82f8-fbee160a4f8a', emailAddress, {
       personalisation: {
         loginLink
       },
