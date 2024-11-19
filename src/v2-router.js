@@ -814,6 +814,25 @@ v2Router.post('/expired-licence-no-returns-reminder', async (request, response) 
 });
 
 /**
+ * Send out a reminder email on recently expired licences with no returns submitted
+ * that returns are due.
+ */
+v2Router.post('/expired-licences-two-week-reminder', async (request, response) => {
+  try {
+    // Registrations due to expire in two weeks time.
+    const registrations = await ScheduledController.findAllDueToExpireInTwoWeeks();
+
+    // Try to send out reminder emails.
+    const emailsSent = await ScheduledController.sendTwoWeekExpiryReminder(registrations);
+
+    return response.status(200).send(`Sent renewal reminders for ${emailsSent} recently expired licences.`);
+  } catch (error) {
+    jsonConsoleLogger.error(unErrorJson(error));
+    return response.status(500).send({error});
+  }
+});
+
+/**
  * UPDATEs a single return in a single registration.
  */
 v2Router.put('/registrations/:id/returns/:returnId', async (request, response) =>
