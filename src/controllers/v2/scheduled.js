@@ -175,7 +175,8 @@ const ScheduledController = {
    *
    * @returns {Sequelize.Model} All registrations that are expired.
    */
-  async findAllExpiredNoRenewals(todaysDate) {
+  async findAllExpiredNoRenewals() {
+    const todaysDate = new Date();
     // Function to Add days to current date
     function addDaysSetTime(date, days, hours, mins, seconds) {
       const newDate = new Date(date);

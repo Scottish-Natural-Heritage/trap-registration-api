@@ -914,9 +914,8 @@ v2Router.post('/registrations/:id/renew', async (request, response) => {
  * Send out a renewal email to user if email has been found in database.
  */
 v2Router.post('/expired-licence-no-renewals-reminder', async (request, response) => {
-  const todaysDate = new Date();
   try {
-    const expiredRegistrations = await ScheduledController.findAllExpiredNoRenewals(todaysDate);
+    const expiredRegistrations = await ScheduledController.findAllExpiredNoRenewals();
 
     // Try to send out reminder emails for renewals.
     const emailsSent = await ScheduledController.sendExpiredNoRenewalsReminder(expiredRegistrations);
