@@ -92,10 +92,7 @@ const getMissingReturnYears = (registration) => {
     if (validForReturns) {
       const submittedYears = new Set(registration.Returns.map((r) => Number(r.year)));
 
-      const validReturnYears = Array.from(
-        {length: expiryYear - startYearOfReturns + 1},
-        (_, i) => startYearOfReturns + i
-      );
+      const validReturnYears = Array.from({length: expiryYear - createdAtYear + 1}, (_, i) => createdAtYear + i);
 
       const missingYears = validReturnYears.filter((year) => !submittedYears.has(year));
 
