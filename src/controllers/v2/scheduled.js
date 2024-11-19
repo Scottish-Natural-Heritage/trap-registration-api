@@ -203,8 +203,7 @@ const ScheduledController = {
           [Op.between]: [startOfDay, endOfDay]
         },
         '$Renewals.id$': {[Op.is]: null}
-      },
-      logging: console.log
+      }
     });
   },
 
