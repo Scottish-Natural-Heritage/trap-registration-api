@@ -108,8 +108,7 @@ const ScheduledController = {
       where: {
         '$Renewals.id$': {[Op.is]: null},
         expiryDate: {[Op.between]: [fourteenDaysFromNowStart, fourteenDaysFromNowEnd], [Op.gt]: new Date()}
-      },
-      logging: console.log
+      }
     });
   },
   /**
@@ -224,7 +223,7 @@ const ScheduledController = {
     const promises = [];
 
     for (const registration of registrations) {
-      const {missingYearsString, returnsDue} = getMissingReturnYears(registration);
+      const {years, returnsDue} = getMissingReturnYears(registration);
 
       const emailDetails = {
         lhName: registration.fullName,
@@ -232,7 +231,7 @@ const ScheduledController = {
         expiryDate: formatDateForEmail(registration.expiryDate),
         isMeatBait: registration.meatBaits,
         returnsDue,
-        years: missingYearsString
+        years
       };
 
       promises.push(
@@ -257,8 +256,8 @@ const ScheduledController = {
     const promises = [];
 
     for (const registration of expiredRegistrations) {
-      const {missingYearsString, returnsDue} = getMissingReturnYears(registration);
-      const emailDetails = setRenewalReminderEmailDetails(registration, missingYearsString, returnsDue);
+      const {years, returnsDue} = getMissingReturnYears(registration);
+      const emailDetails = setRenewalReminderEmailDetails(registration, years, returnsDue);
 
       promises.push(
         sendRenewalReminderEmail(
