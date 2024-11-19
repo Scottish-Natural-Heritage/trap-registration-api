@@ -21,9 +21,14 @@ const initScheduledJobs = () => {
 
     // Tasks here.
 
-    if (currentDate.getDate() === 1) {
-      const promises = [];
+    const promises = [];
 
+    // Each day check for expired licences that do not have a renewal done and send out reminder.
+    promises.push(
+      axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/expired-licence-no-renewals-reminder`)
+    );
+
+    if (currentDate.getDate() === 1) {
       // Check for expired licences of meat bait users that did not submit a return, on the 1st of every month.
       promises.push(
         axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/expired-licence-no-returns-reminder`)
@@ -52,12 +57,12 @@ const initScheduledJobs = () => {
           axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/valid-licence-returns-due-reminder`)
         );
       }
+    }
 
-      try {
-        await Promise.all(promises);
-      } catch (error) {
-        jsonConsoleLogger.error(unErrorJson(error));
-      }
+    try {
+      await Promise.all(promises);
+    } catch (error) {
+      jsonConsoleLogger.error(unErrorJson(error));
     }
 
     console.log('Ending cron job(s).');

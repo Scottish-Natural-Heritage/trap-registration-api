@@ -76,7 +76,8 @@ const RegistrationModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING
       },
       expiryDate: {
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        allowNull: true
       },
       uprn: {
         type: DataTypes.STRING
