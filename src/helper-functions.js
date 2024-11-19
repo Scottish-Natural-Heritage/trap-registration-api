@@ -27,11 +27,11 @@ export const formatDateForEmail = (date) => {
   return `${day} ${month} ${year}`;
 };
 
-export const formatRegId = (id) => {
+export function formatRegId(id) {
   return `NS-TRP-${String(id).padStart(5, '0')}`;
-};
+}
 
-export function addDaysAndSetTime(date, days, hours, mins, seconds) {
+export function addDaysSetTime(date, days, hours, mins, seconds) {
   const newDate = new Date(date);
   newDate.setDate(date.getDate() + days);
   newDate.setHours(hours, mins, seconds);
