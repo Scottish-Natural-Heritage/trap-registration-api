@@ -179,6 +179,17 @@ const ScheduledController = {
    * @returns {Sequelize.Model} All registrations that are expired.
    */
   async findAllExpiredNoRenewals(todaysDate) {
+    // Function to Add days to current date
+    function addDaysSetTime(date, days, hours, mins, seconds) {
+      const newDate = new Date(date);
+      newDate.setDate(date.getDate() + days);
+      newDate.setHours(hours, mins, seconds);
+      return newDate;
+    }
+
+    const startOfDay = addDaysSetTime(todaysDate, -1, 0, 0, 0);
+    const endOfDay = addDaysSetTime(todaysDate, -1, 23, 59, 59);
+
     return Registration.findAll({
       include: [
         {
@@ -189,10 +200,11 @@ const ScheduledController = {
       ],
       where: {
         expiryDate: {
-          [Op.lt]: todaysDate
+          [Op.between]: [startOfDay, endOfDay]
         },
         '$Renewals.id$': {[Op.is]: null}
-      }
+      },
+      logging: console.log
     });
   },
 
