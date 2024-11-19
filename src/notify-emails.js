@@ -3,7 +3,8 @@ import config from './config/app.js';
 import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
 import {
   TRAP_REGISTRATION_CONFIRMATION_NOTIFY_TEMPLATE_ID,
-  LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
+  LICENSING_REPLY_TO_NOTIFY_EMAIL_ID,
+  TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID
 } from './notify-template-ids.js';
 
 /**
@@ -32,6 +33,37 @@ export const sendSuccessEmail = async (reg) => {
           expiryDate: reg.expiryDate ?? 'TBC'
         },
         reference: reg.regNo,
+        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
+      });
+    } catch (error) {
+      jsonConsoleLogger.error(unErrorJson(error));
+      throw error;
+    }
+  }
+};
+
+/**
+ * Send emails to the applicant to let them know it was successful.
+ *
+ * @param {any} reg an enhanced JSON version of the model
+ */
+export const sendTwoWeekExpiryReminderEmail = async (emailAddress, emailDetails) => {
+  if (config.notifyApiKey) {
+    try {
+      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
+
+      const {lhName, regNo, expiryDate, isMeatBait, returnsDue, years} = emailDetails;
+
+      await notifyClient.sendEmail(TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID, emailAddress, {
+        personalisation: {
+          lhName,
+          regNo,
+          expiryDate,
+          isMeatBait,
+          returnsDue,
+          years
+        },
+        reference: regNo,
         emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
       });
     } catch (error) {
