@@ -23,9 +23,11 @@ const initScheduledJobs = () => {
 
     const promises = [];
 
-    // Each day check for expired licences that do not have a renewal done and send out reminder.
     promises.push(
-      axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/expired-licence-no-renewals-reminder`)
+      // Each day check for expired licences that do not have a renewal done and send out reminder.
+      axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/expired-licence-no-renewals-reminder`),
+      // Each day check for licences that are due to expire in two weeks, that do not have a renewal done and send out reminder.
+      axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/expired-licences-two-week-reminder`)
     );
 
     if (currentDate.getDate() === 1) {
