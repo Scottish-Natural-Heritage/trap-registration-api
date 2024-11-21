@@ -13,7 +13,7 @@ const PREVIOUS_YEAR_RETURN_NOTIFY_TEMPLATE_ID = '5223cf17-75e1-4ee6-b0b1-93fd4d4
  * The ID of the Notify template to be used when a valid licence with no returns ever
  * reminder email is sent.
  */
-const NEVER_SUBMITTED_RETURN_NOTIFY_TEMPLATE_ID = '9318c092-aaea-4df2-ad04-e909cce8a683';
+const NEVER_SUBMITTED_RETURN_NOTIFY_TEMPLATE_ID = 'cd216cfb-bde9-4e91-b906-f2230fcb160c';
 
 /**
  * The ID of the Notify template to be used when the recently expired licence with no
