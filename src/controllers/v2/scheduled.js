@@ -106,7 +106,6 @@ const ScheduledController = {
         {model: Renewal, required: false}
       ],
       where: {
-        '$Renewals.id$': {[Op.is]: null},
         expiryDate: {[Op.between]: [fourteenDaysFromNowStart, fourteenDaysFromNowEnd], [Op.gt]: new Date()}
       }
     });
