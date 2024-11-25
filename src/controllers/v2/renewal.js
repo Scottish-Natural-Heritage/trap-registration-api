@@ -87,7 +87,7 @@ const RenewalController = {
    */
   create: async (request) => {
     // Try to parse the incoming ID to make sure it's really a number.
-    const registrationNumber = 79_553; // Number.parseInt(request.params.id, 10);
+    const registrationNumber = Number.parseInt(request.params.id, 10);
 
     if (Number.isNaN(registrationNumber)) {
       return {status: 404, id: registrationNumber};
