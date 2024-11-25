@@ -34,6 +34,13 @@ const LICENSING_REPLY_TO_NOTIFY_EMAIL_ID = '4b49467e-2a35-4713-9d92-809c55bf1cdd
 const TRAP_REGISTRATION_CONFIRMATION_NOTIFY_TEMPLATE_ID = '247825a7-cb7b-4da0-9da5-92b421beab28';
 
 /**
+ * The ID of the notify template used to remind the trap registration holder of the trap expiry due in two weeks.
+ * Will be active in Nov 2024.
+ */
+
+const TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID = '9ee505d4-688f-4e2e-bac3-63a5963cd730';
+
+/**
  * The ID of the Notify template to be used when the recently expired licence with no
  * renewals reminder email is sent.
  */
@@ -46,5 +53,6 @@ export {
   EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID,
   LICENSING_REPLY_TO_NOTIFY_EMAIL_ID,
   TRAP_REGISTRATION_CONFIRMATION_NOTIFY_TEMPLATE_ID,
+  TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID,
   EXPIRED_RECENTLY_NO_RENEWALS_NOTIFY_TEMPLATE_ID
 };
