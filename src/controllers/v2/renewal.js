@@ -72,6 +72,14 @@ const RenewalController = {
    */
   findAll: async () => Renewal.findAll(),
 
+  findAllForRegistration: async (registrationId) => {
+    if (Number.isNaN(registrationId)) {
+      return {status: 404, id: registrationNumber};
+    }
+
+    return Renewal.findAll({where: {RegistrationId: registrationId}});
+  },
+
   /**
    * Create a new Renewal.
    *
@@ -79,7 +87,8 @@ const RenewalController = {
    */
   create: async (request) => {
     // Try to parse the incoming ID to make sure it's really a number.
-    const registrationNumber = Number.parseInt(request.params.id, 10);
+    const registrationNumber = 79553; //Number.parseInt(request.params.id, 10);
+
     if (Number.isNaN(registrationNumber)) {
       return {status: 404, id: registrationNumber};
     }

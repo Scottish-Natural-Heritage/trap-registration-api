@@ -910,6 +910,18 @@ v2Router.post('/registrations/:id/renew', async (request, response) => {
   return response.status(status).send({id});
 });
 
+v2Router.get('/registrations/:id/renewals', async (request, response) => {
+  const existingId = Number(request.params.id);
+
+  try {
+    const renewals = await RenewalController.findAllForRegistration(existingId);
+    return response.status(200).send(renewals);
+  } catch (error) {
+    jsonConsoleLogger.error(unErrorJson(error));
+    return response.status(500).send({error});
+  }
+});
+
 /**
  * Send out a renewal email to user if email has been found in database.
  */
