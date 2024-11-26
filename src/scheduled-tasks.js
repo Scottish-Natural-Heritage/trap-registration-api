@@ -13,7 +13,7 @@ import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
  * Start up node-cron.
  */
 const initScheduledJobs = () => {
-  const scheduledJobFunction = cron.schedule('0 6 * * *', async () => {
+  const scheduledJobFunction = cron.schedule('0 11 * * *', async () => {
     console.log('Triggering cron job(s).');
 
     // Get the date.
