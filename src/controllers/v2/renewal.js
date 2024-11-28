@@ -53,7 +53,7 @@ const cleanInput = (body) => ({
       : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
   uprn: body.uprn === undefined ? undefined : String(body.uprn),
   expiryDate: calculateExpiryDate(),
-  uuid: body.uuid
+  uuid: body.uuid,
 });
 
 const RenewalController = {
@@ -77,7 +77,9 @@ const RenewalController = {
       return {status: 404, id: registrationId};
     }
 
-    return Renewal.findAll({where: {RegistrationId: registrationId}});
+    const registration = await Registration.findByPk(registrationId);
+
+    return Registration.findAll({where: { trapId: registration.trapId, registrationType: 'Renewal'}})
   },
 
   /**
@@ -116,7 +118,7 @@ const RenewalController = {
       addressPostcode: existingReg?.addressPostcode,
       phoneNumber: existingReg?.phoneNumber,
       emailAddress: existingReg?.emailAddress,
-      uprn: existingReg?.uprn
+      uprn: existingReg?.uprn,
     };
 
     // Clean up the user's input before we store it in the database.
@@ -137,11 +139,11 @@ const RenewalController = {
       addressPostcode: cleanObject?.addressPostcode,
       phoneNumber: cleanObject?.phoneNumber,
       emailAddress: cleanObject?.emailAddress,
-      uprn: cleanObject?.uprn
+      uprn: cleanObject?.uprn,
     };
-
+    
     const changes = {};
-
+    
     // Check if there are any changes from the original
     for (const key in mappedExistingReg) {
       if (mappedExistingReg[key] !== mappedCleanObject[key]) {
@@ -149,46 +151,37 @@ const RenewalController = {
       }
     }
 
+    let renewalRegistration;
+
     await db.sequelize.transaction(async (t) => {
       try {
-        await RegistrationHistory.create(
-          {
-            ...mappedExistingReg,
-            RegistrationId: registrationNumber,
-            createdByLicensingOfficer: existingReg.createdByLicensingOfficer,
-            // Need to confirm expected behaviour here!
-            expiryDate: existingReg.expiryDate
-          },
-          {transaction: t}
-        );
 
-        await Registration.update({...changes, expiryDate: null}, {where: {id: registrationNumber}, transaction: t});
+        const initialRegistration = await Registration.findByPk(registrationNumber);
 
-        // For now, renewals expiry date will be null 12/11/2024
-        await Renewal.create({RegistrationId: registrationNumber}, {transaction: t});
+        await Registration.update({...changes, expiryDate: null}, {where: {trapId: initialRegistration.trapId}, transaction: t});
+        renewalRegistration = await Registration.create({...mappedCleanObject, trapId: initialRegistration.trapId, registrationType: 'Renewal'}, {transaction: t});
+
       } catch (error) {
         console.log(error);
         return {status: 500, id: registrationNumber};
       }
     });
 
-    const renewedReg = await RegistrationController.findOne(registrationNumber);
-
     const notifyDetails = {
-      regNo: `NS-TRP-${String(registrationNumber).padStart(5, '0')}`,
-      usingGL01: renewedReg?.usingGL01,
-      usingGL02: renewedReg?.usingGL02,
-      convictions: renewedReg?.convictions,
-      complyWithTerms: renewedReg?.complyWithTerms,
-      meatBaits: renewedReg?.meatBaits,
-      emailAddress: renewedReg?.emailAddress,
+      regNo: `NS-TRP-${String(renewalRegistration.trapId).padStart(5, '0')}`,
+      usingGL01: renewalRegistration?.usingGL01,
+      usingGL02: renewalRegistration?.usingGL02,
+      convictions: renewalRegistration?.convictions,
+      complyWithTerms: renewalRegistration?.complyWithTerms,
+      meatBaits: renewalRegistration?.meatBaits,
+      emailAddress: renewalRegistration?.emailAddress,
       expiryDate: null
     };
 
     // Send the applicant their renewal confirmation email.
     await sendSuccessEmail(notifyDetails);
 
-    return {status: 201, id: registrationNumber};
+    return {status: 201, id: renewalRegistration.id};
   }
 };
 

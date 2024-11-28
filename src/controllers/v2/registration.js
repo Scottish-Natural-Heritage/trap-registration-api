@@ -3,6 +3,9 @@ import {sendSuccessEmail} from '../../notify-emails.js';
 
 const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID} = db;
 
+const REGISTRATION_RENEWAL = 'Renewal';
+const REGISTRATION_INITIAL = 'Initial'
+
 /**
  * An object to perform 'persistence' operations on our registration objects.
  */
@@ -96,7 +99,9 @@ const RegistrationController = {
    */
   findAllEmails: async (emailAddress) => Registration.findAll({where: {emailAddress}}),
 
-  create: async (reg) => {
+  create: async (reg, linkedTrapId) => {
+    console.log("🚀 ~ create: ~ linkedTrapId:", linkedTrapId)
+    console.log("🚀 ~ create: ~ reg:", reg)
     // Check this is the first time we've received this application.
     const isPreviousRequest = await RequestUUID.findOne({where: {uuid: reg.uuid}});
 
@@ -121,10 +126,18 @@ const RegistrationController = {
         // Begin the database transaction.
         await db.sequelize.transaction(async (t) => {
           // First check if the ID has already been used by another registration.
-          newReg = await Registration.findByPk(regId, {transaction: t});
+          // newReg = await Registration.findByPk(regId, {transaction: t});
+          newReg = await Registration.findOne({where: { trapId: regId }})
           // If the ID is not in use we can use it.
           if (newReg === null) {
-            reg.id = regId;
+            if(linkedTrapId) {
+              reg.trapId = linkedTrapId;
+              reg.registrationType = REGISTRATION_RENEWAL;
+            } else {
+              reg.trapId = regId;
+              reg.registrationType = REGISTRATION_INITIAL;
+            }
+
             newReg = await Registration.create(reg, {transaction: t});
           } else {
             // If the ID is in use set newReg to undefined and try again.

@@ -4,6 +4,12 @@ const RegistrationModel = (sequelize, DataTypes) => {
   const Registration = sequelize.define(
     'Registration',
     {
+      trapId: {
+        type: DataTypes.INTEGER
+      },
+      registrationType: {
+        type: DataTypes.STRING
+      },
       convictions: {
         type: DataTypes.BOOLEAN
       },
