@@ -1,6 +1,6 @@
 import db from '../../models/index.js';
 
-const {Return, NonTargetSpecies} = db;
+const {Return, NonTargetSpecies, Registration} = db;
 
 const ReturnController = {
   /**
@@ -9,7 +9,7 @@ const ReturnController = {
    * @param {Number} id a Return's ID
    * @returns a Return
    */
-  findOne: async (id) => Return.findByPk(id, {include: NonTargetSpecies}),
+  findOne: async (id) => Return.findByPk(id, {include: [{model: NonTargetSpecies}, {model: Registration}]}),
 
   /**
    * Retrieve all returns from the database.
@@ -28,7 +28,7 @@ const ReturnController = {
       where: {
         RegistrationId: id
       },
-      include: NonTargetSpecies
+      include: [{model: NonTargetSpecies}, {model: Registration}]
     }),
 
   findRegReturn: async (id) =>
@@ -36,7 +36,7 @@ const ReturnController = {
       where: {
         RegistrationId: id
       },
-      include: NonTargetSpecies
+      include: [{model: NonTargetSpecies}, {model: Registration}]
     }),
 
   /**
