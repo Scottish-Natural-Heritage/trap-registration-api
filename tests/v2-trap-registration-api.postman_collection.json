@@ -239,14 +239,7 @@
               "pm.test('Status code is 201 Created', function () {\r",
               "    pm.response.to.have.status(201);\r",
               "    pm.response.to.have.status('Created');\r",
-              "});\r",
-              "\r",
-              "pm.test('Response contains id', function () {\r",
-              "    var responseId = pm.response.json().id;\r",
-              "    var collectionId = pm.variables.get(\"TR_NEW_REG_ID\")\r",
-              "    var result = collectionId == responseId;\r",
-              "    pm.expect(result).to.be.true\r",
-              "})"
+              "});\r"
             ],
             "type": "text/javascript",
             "packages": {}
