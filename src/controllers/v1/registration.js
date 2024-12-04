@@ -21,7 +21,7 @@ const tryCreate = async () => {
   try {
     // Generate a random 5 digit number and attempt to create a new record with
     // that ID.
-    const newReg = await Registration.create({id: Math.floor(Math.random() * 99_999)});
+    const newReg = await Registration.create({trapId: Math.floor(Math.random() * 99_999)});
 
     // X.create only ever returns if it's successful, so we can just return our
     // new model.

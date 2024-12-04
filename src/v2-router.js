@@ -82,7 +82,9 @@ const cleanInput = (body) => ({
   // expiryDate: calculateExpiryDate(),
   // AND removing the next line
   expiryDate: new Date() > new Date('2024/11/14') ? null : calculateExpiryDate(),
-  uuid: body.uuid
+  uuid: body.uuid,
+  linkedTrapId: body.linkedTrapId,
+  registrationType: body.registrationType
 });
 
 /**
@@ -324,7 +326,7 @@ v2Router.post('/registrations', async (request, response) => {
     const cleanObject = cleanInput(request.body);
 
     // Try to create the new registration entry.
-    const newRegistration = await Registration.create(cleanObject);
+    const newRegistration = await Registration.create(cleanObject, cleanObject?.linkedTrapId);
 
     let newId;
 
@@ -904,10 +906,16 @@ v2Router.post('/registrations/renewal-email-check', async (request, response) =>
   });
 });
 
-v2Router.post('/registrations/:id/renew', async (request, response) => {
-  const {status, id} = await RenewalController.create(request);
+v2Router.get('/registrations/:id/renewals', async (request, response) => {
+  const existingId = Number(request.params.id);
 
-  return response.status(status).send({id});
+  try {
+    const renewals = await RenewalController.findAllForRegistration(existingId);
+    return response.status(200).send(renewals);
+  } catch (error) {
+    jsonConsoleLogger.error(unErrorJson(error));
+    return response.status(500).send({error});
+  }
 });
 
 /**
