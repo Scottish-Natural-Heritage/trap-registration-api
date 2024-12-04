@@ -7,8 +7,6 @@ import NonTargetSpecies from './non-target-species.js';
 import Revocation from './revocation.js';
 import Note from './note.js';
 import RequestUUID from './request-uuid.js';
-import Renewal from './renewal.js';
-import RegistrationHistory from './registration-history.js';
 
 const sequelize = new Sequelize(dbConfig.database);
 
@@ -21,8 +19,6 @@ db.NonTargetSpecies = NonTargetSpecies(sequelize, Sequelize);
 db.Revocation = Revocation(sequelize, Sequelize);
 db.Note = Note(sequelize, Sequelize);
 db.RequestUUID = RequestUUID(sequelize, Sequelize);
-db.Renewal = Renewal(sequelize, Sequelize);
-db.RegistrationHistory = RegistrationHistory(sequelize, Sequelize);
 
 db.Registration.hasMany(db.Return);
 db.Registration.hasOne(db.Revocation);
@@ -32,10 +28,5 @@ db.NonTargetSpecies.belongsTo(db.Return);
 db.Revocation.belongsTo(db.Registration);
 db.Registration.hasMany(db.Note);
 db.Note.belongsTo(db.Registration);
-db.Registration.hasMany(db.Renewal);
-db.Renewal.belongsTo(db.Registration);
-
-db.Registration.hasMany(db.RegistrationHistory);
-db.RegistrationHistory.belongsTo(db.Registration);
 
 export {db as default};
