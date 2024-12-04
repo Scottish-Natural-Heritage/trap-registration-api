@@ -1,46 +1,21 @@
-import NotifyClient from 'notifications-node-client';
 import {Op} from 'sequelize';
 import database from '../../models/index.js';
-import config from '../../config/app.js';
-import jsonConsoleLogger, {unErrorJson} from '../../json-console-logger.js';
 import {
   RETURN_REMINDER_NOTIFY_TEMPLATE_ID,
   PREVIOUS_YEAR_RETURN_NOTIFY_TEMPLATE_ID,
   NEVER_SUBMITTED_RETURN_NOTIFY_TEMPLATE_ID,
   EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID,
-  LICENSING_REPLY_TO_NOTIFY_EMAIL_ID,
+  TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID,
   EXPIRED_RECENTLY_NO_RENEWALS_NOTIFY_TEMPLATE_ID
 } from '../../notify-template-ids.js';
+import {formatRegId, formatDateForEmail, addDaysSetTime} from '../../helper-functions.js';
+import {
+  sendTwoWeekExpiryReminderEmail,
+  sendRenewalReminderEmail,
+  sendReturnReminderEmail
+} from '../../notify-emails.js';
 
 const {Registration, Return, Renewal} = database;
-
-/**
- * Split a date object into day, month and year and format for output.
- * The month is written out in full.
- *
- * @param {Date} date A Date object.
- * @returns {string} Returns a string containing the day, month and year.
- */
-const formatDateForEmail = (date) => {
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ];
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = months[date.getMonth()];
-  const year = date.getFullYear().toString();
-  return `${day} ${month} ${year}`;
-};
 
 const setReturnReminderEmailDetails = (registration) => ({
   id: registration.id,
@@ -72,7 +47,7 @@ const setPreviousYearReturnReminderEmailDetails = (registration) => ({
 const getMissingReturnYears = (registration) => {
   // This is used in the notify email for the list of returns required to be submitted by the user.
   // Set this to an empty string for, set to list of year[s] if a meat bait trap and return[s] is required.
-  let missingYearsString = '';
+  let years = '';
 
   // Also for use in the notify template
   let returnsDue = false;
@@ -98,63 +73,14 @@ const getMissingReturnYears = (registration) => {
 
       returnsDue = missingYears.length > 0;
 
-      missingYearsString = returnsDue ? missingYears.join(', ') : '';
+      years = returnsDue ? missingYears.join(', ') : '';
     }
   }
 
   return {
-    missingYearsString,
+    years,
     returnsDue
   };
-};
-
-/**
- * Send reminder email to applicant informing them their returns
- * are due.
- *
- * @param {string} emailDetails The details to use in personalisation of email.
- * @param {any} emailAddress The email address of the recipient.
- * @param {string} notifyTemplate The Notify template to use for the email.
- */
-const sendReturnReminderEmail = async (emailDetails, emailAddress, notifyTemplate) => {
-  if (config.notifyApiKey) {
-    try {
-      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
-
-      // Send the email via notify.
-      await notifyClient.sendEmail(notifyTemplate, emailAddress, {
-        personalisation: emailDetails,
-        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
-      });
-    } catch (error) {
-      jsonConsoleLogger.error(unErrorJson(error));
-      throw error;
-    }
-  }
-};
-
-/**
- * Send reminder email to applicant informing them that they can renew their application
- *
- * @param {string} emailDetails The details to use in personalisation of email.
- * @param {any} emailAddress The email address of the recipient.
- * @param {string} notifyTemplate The Notify template to use for the email.
- */
-const sendRenewalReminderEmail = async (emailDetails, emailAddress, notifyTemplate) => {
-  if (config.notifyApiKey) {
-    try {
-      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
-
-      // Send the email via notify.
-      await notifyClient.sendEmail(notifyTemplate, emailAddress, {
-        personalisation: emailDetails,
-        emailReplyToId: LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
-      });
-    } catch (error) {
-      jsonConsoleLogger.error(unErrorJson(error));
-      throw error;
-    }
-  }
 };
 
 const ScheduledController = {
@@ -169,7 +95,21 @@ const ScheduledController = {
       include: [{model: Return}]
     });
   },
+  async findAllDueToExpireInTwoWeeks() {
+    const todaysDate = new Date();
+    const fourteenDaysFromNowStart = addDaysSetTime(todaysDate, 14, 0, 0, 0);
+    const fourteenDaysFromNowEnd = addDaysSetTime(todaysDate, 14, 23, 59, 59);
 
+    return Registration.findAll({
+      include: [
+        {model: Return, required: false},
+        {model: Renewal, required: false}
+      ],
+      where: {
+        expiryDate: {[Op.between]: [fourteenDaysFromNowStart, fourteenDaysFromNowEnd], [Op.gt]: new Date()}
+      }
+    });
+  },
   /**
    * Retrieve all registrations from the database that are expired.
    *
@@ -177,14 +117,6 @@ const ScheduledController = {
    */
   async findAllExpiredNoRenewals() {
     const todaysDate = new Date();
-    // Function to Add days to current date
-    function addDaysSetTime(date, days, hours, mins, seconds) {
-      const newDate = new Date(date);
-      newDate.setDate(date.getDate() + days);
-      newDate.setHours(hours, mins, seconds);
-      return newDate;
-    }
-
     const startOfDay = addDaysSetTime(todaysDate, -1, 0, 0, 0);
     const endOfDay = addDaysSetTime(todaysDate, -1, 23, 59, 59);
 
@@ -284,6 +216,38 @@ const ScheduledController = {
     return sentCount;
   },
 
+  async sendTwoWeekExpiryReminder(registrations) {
+    // A count of the number of emails sent.
+    let sentCount = 0;
+    const promises = [];
+
+    for (const registration of registrations) {
+      const {years, returnsDue} = getMissingReturnYears(registration);
+
+      const emailDetails = {
+        lhName: registration.fullName,
+        regNo: formatRegId(registration.id),
+        expiryDate: formatDateForEmail(registration.expiryDate),
+        isMeatBait: registration.meatBaits,
+        returnsDue,
+        years
+      };
+
+      promises.push(
+        sendTwoWeekExpiryReminderEmail(
+          registration.emailAddress,
+          emailDetails,
+          TWO_WEEK_EXPIRY_RENEWAL_REMINDER_NOTIFY_TEMPLATE_ID
+        )
+      );
+      sentCount++;
+    }
+
+    await Promise.all(promises);
+
+    return sentCount;
+  },
+
   async sendExpiredNoRenewalsReminder(expiredRegistrations) {
     // A count of the number of emails sent.
     let sentCount = 0;
@@ -291,8 +255,8 @@ const ScheduledController = {
     const promises = [];
 
     for (const registration of expiredRegistrations) {
-      const {missingYearsString, returnsDue} = getMissingReturnYears(registration);
-      const emailDetails = setRenewalReminderEmailDetails(registration, missingYearsString, returnsDue);
+      const {years, returnsDue} = getMissingReturnYears(registration);
+      const emailDetails = setRenewalReminderEmailDetails(registration, years, returnsDue);
 
       promises.push(
         sendRenewalReminderEmail(
