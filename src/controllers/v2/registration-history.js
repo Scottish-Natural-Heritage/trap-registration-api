@@ -1,13 +1,12 @@
 import db from '../../models/index.js';
 
-const {RegistrationHistory, Return} = db;
+const {RegistrationHistory} = db;
 
 const RegistrationHistoryController = {
   findOne: async (id) => RegistrationHistory.findByPk(id),
 
-  findAllForRegistration: async (registrationId) => {
-    return await RegistrationHistory.findAll({where: {RegistrationId: registrationId}});
-  },
+  findAllForRegistration: async (registrationId) =>
+    RegistrationHistory.findAll({where: {RegistrationId: registrationId}}),
 
   findAll: async () => RegistrationHistory.findAll()
 };

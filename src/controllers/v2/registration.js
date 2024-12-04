@@ -4,7 +4,7 @@ import {sendSuccessEmail} from '../../notify-emails.js';
 const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID} = db;
 
 const REGISTRATION_RENEWAL = 'Renewal';
-const REGISTRATION_INITIAL = 'Initial'
+const REGISTRATION_INITIAL = 'Initial';
 
 /**
  * An object to perform 'persistence' operations on our registration objects.
@@ -124,10 +124,10 @@ const RegistrationController = {
         // Begin the database transaction.
         await db.sequelize.transaction(async (t) => {
           // First check if the ID has already been used by another registration.
-          newReg = await Registration.findOne({where: { trapId: regId }})
+          newReg = await Registration.findOne({where: {trapId: regId}});
           // If the ID is not in use we can use it.
           if (newReg === null) {
-            if(linkedTrapId) {
+            if (linkedTrapId) {
               reg.trapId = linkedTrapId;
               reg.registrationType = REGISTRATION_RENEWAL;
             } else {

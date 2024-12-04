@@ -1,31 +1,25 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    return Promise.all([
+  up: async (queryInterface, Sequelize) =>
+    Promise.all([
       queryInterface.addColumn(
-        'Registrations', // table name
-        'trapId', // new field name
+        'Registrations', // Table name
+        'trapId', // New field name
         {
           type: Sequelize.INTEGER,
-          allowNull: true,
-        },
+          allowNull: true
+        }
       ),
-      queryInterface.addColumn(
-        'Registrations',
-        'registrationType',
-        {
-          type: Sequelize.STRING,
-          allowNull: true,
-        },
-      ),
-    ]);
-  },
+      queryInterface.addColumn('Registrations', 'registrationType', {
+        type: Sequelize.STRING,
+        allowNull: true
+      })
+    ]),
 
-  down: async (queryInterface, Sequelize) => {
-    return Promise.all([
+  down: async (queryInterface, _Sequelize) =>
+    Promise.all([
       queryInterface.removeColumn('Registrations', 'trapId'),
-      queryInterface.removeColumn('Registrations', 'registrationType'),
-    ]);
-  }
+      queryInterface.removeColumn('Registrations', 'registrationType')
+    ])
 };

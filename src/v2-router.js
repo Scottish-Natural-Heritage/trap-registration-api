@@ -9,7 +9,7 @@ import Return from './controllers/v2/return.js';
 import config from './config/app.js';
 import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
 import Note from './controllers/v2/note.js';
-import RegistrationHistory from './controllers/v2/registration-history.js'
+import RegistrationHistory from './controllers/v2/registration-history.js';
 
 import jwk from './config/jwk.js';
 
@@ -943,32 +943,33 @@ v2Router.get('/registrations/:id/history', async (request, response) => {
   const registrationId = Number(request.params.id);
 
   try {
-    const history = await RegistrationHistory.findAllForRegistration(registrationId)
+    const history = await RegistrationHistory.findAllForRegistration(registrationId);
 
-    return response.status(200).send(history)
+    return response.status(200).send(history);
   } catch (error) {
     jsonConsoleLogger.error(unErrorJson(error));
     return response.status(500).send({error});
   }
-})
+});
 
 v2Router.get('/history/:revisionId', async (request, response) => {
-  const registrationId = Number(request.params.id);
-  const revisionId = request.params.revisionId;
+  const {revisionId} = request.params;
 
   try {
-    const history = await RegistrationHistory.findOne(revisionId)
-    const returns = await Return.findRegReturns(history.RegistrationId)
+    const history = await RegistrationHistory.findOne(revisionId);
+    const returns = await Return.findRegReturns(history.RegistrationId);
 
     // Filter returns to match history entry
-    const filteredReturns = returns.filter(returnItem => new Date(returnItem.createdAt).getFullYear() === new Date(history.expiryDate).getFullYear())
+    const filteredReturns = returns.filter(
+      (returnItem) => new Date(returnItem.createdAt).getFullYear() === new Date(history.expiryDate).getFullYear()
+    );
 
-    return response.status(200).send({history, returns: filteredReturns})
+    return response.status(200).send({history, returns: filteredReturns});
   } catch (error) {
     jsonConsoleLogger.error(unErrorJson(error));
     return response.status(500).send({error});
   }
-})
+});
 
 // #endregion
 

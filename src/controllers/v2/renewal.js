@@ -3,7 +3,7 @@ import db from '../../models/index.js';
 import {sendSuccessEmail} from '../../notify-emails.js';
 import RegistrationController from './registration.js';
 
-const {Renewal, RegistrationHistory, Registration} = db;
+const {Renewal, Registration} = db;
 
 /**
  * Every registration has a 5 year expiry, tied to the issue date of that
@@ -53,7 +53,7 @@ const cleanInput = (body) => ({
       : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
   uprn: body.uprn === undefined ? undefined : String(body.uprn),
   expiryDate: calculateExpiryDate(),
-  uuid: body.uuid,
+  uuid: body.uuid
 });
 
 const RenewalController = {
@@ -79,7 +79,7 @@ const RenewalController = {
 
     const registration = await Registration.findByPk(registrationId);
 
-    return Registration.findAll({where: { trapId: registration.trapId, registrationType: 'Renewal'}})
+    return Registration.findAll({where: {trapId: registration.trapId, registrationType: 'Renewal'}});
   },
 
   /**
@@ -118,7 +118,7 @@ const RenewalController = {
       addressPostcode: existingReg?.addressPostcode,
       phoneNumber: existingReg?.phoneNumber,
       emailAddress: existingReg?.emailAddress,
-      uprn: existingReg?.uprn,
+      uprn: existingReg?.uprn
     };
 
     // Clean up the user's input before we store it in the database.
@@ -139,11 +139,11 @@ const RenewalController = {
       addressPostcode: cleanObject?.addressPostcode,
       phoneNumber: cleanObject?.phoneNumber,
       emailAddress: cleanObject?.emailAddress,
-      uprn: cleanObject?.uprn,
+      uprn: cleanObject?.uprn
     };
-    
+
     const changes = {};
-    
+
     // Check if there are any changes from the original
     for (const key in mappedExistingReg) {
       if (mappedExistingReg[key] !== mappedCleanObject[key]) {
@@ -155,12 +155,16 @@ const RenewalController = {
 
     await db.sequelize.transaction(async (t) => {
       try {
-
         const initialRegistration = await Registration.findByPk(registrationNumber);
 
-        await Registration.update({...changes, expiryDate: null}, {where: {trapId: initialRegistration.trapId}, transaction: t});
-        renewalRegistration = await Registration.create({...mappedCleanObject, trapId: initialRegistration.trapId, registrationType: 'Renewal'}, {transaction: t});
-
+        await Registration.update(
+          {...changes, expiryDate: null},
+          {where: {trapId: initialRegistration.trapId}, transaction: t}
+        );
+        renewalRegistration = await Registration.create(
+          {...mappedCleanObject, trapId: initialRegistration.trapId, registrationType: 'Renewal'},
+          {transaction: t}
+        );
       } catch (error) {
         console.log(error);
         return {status: 500, id: registrationNumber};
