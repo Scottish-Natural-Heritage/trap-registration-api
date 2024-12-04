@@ -230,6 +230,60 @@
       "response": []
     },
     {
+      "name": "Create a renewed Registration as a Visitor",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201 Created', function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "    pm.response.to.have.status('Created');\r",
+              "});\r",
+              "\r",
+              "pm.test('Response contains id', function () {\r",
+              "    var responseId = pm.response.json().id;\r",
+              "    var collectionId = pm.variables.get(\"TR_NEW_REG_ID\")\r",
+              "    var result = collectionId == responseId;\r",
+              "    pm.expect(result).to.be.true\r",
+              "})"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [""],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\",\r\n  \"uprn\": 123456789,\r\n  \"uuid\": \"{{$randomUUID}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/renew",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}", "renew"]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Create new Registration  as a Licensing Officer",
       "event": [
         {
@@ -645,60 +699,6 @@
           "host": ["localhost"],
           "port": "3001",
           "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}", "returns"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create a renewed Registration as a Visitor",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 201 Created', function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "    pm.response.to.have.status('Created');\r",
-              "});\r",
-              "\r",
-              "pm.test('Response contains id', function () {\r",
-              "    var responseId = pm.response.json().id;\r",
-              "    var collectionId = pm.variables.get(\"TR_NEW_REG_ID\")\r",
-              "    var result = collectionId == responseId;\r",
-              "    pm.expect(result).to.be.true\r",
-              "})"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        },
-        {
-          "listen": "prerequest",
-          "script": {
-            "exec": [""],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\",\r\n  \"uprn\": 123456789,\r\n  \"uuid\": \"{{$randomUUID}}\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/renew",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}", "renew"]
         }
       },
       "response": []
