@@ -18,12 +18,12 @@ import {
 const {Registration, Return, Renewal} = database;
 
 const setReturnReminderEmailDetails = (registration) => ({
-  id: registration.id,
+  id: registration.trapId,
   lhName: registration.fullName
 });
 
 const setRenewalReminderEmailDetails = (registration, missingYearsString, returnsDue) => ({
-  id: registration.id,
+  id: registration.trapId,
   lhName: registration.fullName,
   expiry: formatDateForEmail(registration.expiryDate),
   year: missingYearsString,
@@ -32,7 +32,7 @@ const setRenewalReminderEmailDetails = (registration, missingYearsString, return
 });
 
 const setPreviousYearReturnReminderEmailDetails = (registration) => ({
-  id: registration.id,
+  id: registration.trapId,
   lhName: registration.fullName,
   PreviousYear: new Date().getFullYear() - 1
 });
@@ -226,7 +226,7 @@ const ScheduledController = {
 
       const emailDetails = {
         lhName: registration.fullName,
-        regNo: formatRegId(registration.id),
+        regNo: formatRegId(registration.trapId),
         expiryDate: formatDateForEmail(registration.expiryDate),
         isMeatBait: registration.meatBaits,
         returnsDue,

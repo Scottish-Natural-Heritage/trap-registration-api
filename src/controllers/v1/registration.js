@@ -156,7 +156,7 @@ const RegistrationController = {
       const updatedReg = {...reg};
 
       // Generate and save  the human-readable version of the reg no.
-      updatedReg.regNo = `NS-TRP-${String(id).padStart(5, '0')}`;
+      updatedReg.regNo = `NS-TRP-${String(result.trapId).padStart(5, '0')}`;
 
       // Generate and save the registration's expiry date.
       updatedReg.expiryDate = buildExpiryDateString(new Date());

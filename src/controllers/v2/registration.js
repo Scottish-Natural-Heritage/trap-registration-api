@@ -154,7 +154,7 @@ const RegistrationController = {
     }
 
     // Generate and save  the human-readable version of the reg no.
-    newReg.regNo = `NS-TRP-${String(newReg.id).padStart(5, '0')}`;
+    newReg.regNo = `NS-TRP-${String(newReg.trapId).padStart(5, '0')}`;
 
     // Send the applicant their confirmation email.
     await sendSuccessEmail(newReg);
