@@ -1,3 +1,4 @@
+import {Op} from 'sequelize';
 import db from '../../models/index.js';
 import {sendSuccessEmail} from '../../notify-emails.js';
 
@@ -218,6 +219,21 @@ const RegistrationController = {
       // If something during the transaction return false.
       return false;
     }
+  },
+  checkIfRegistrationAlreadyRenewed: async (trapId, date) => {
+    await Registration.count({
+      where: {
+        trapId,
+        registrationType: 'Renewal',
+        [Op.or]: [{expiryDate: {[Op.gt]: date}}, {expiryDate: {[Op.is]: null}}]
+      }
+    }).then((count) => {
+      if (count !== 0) {
+        return true;
+      }
+
+      return false;
+    });
   }
 };
 
