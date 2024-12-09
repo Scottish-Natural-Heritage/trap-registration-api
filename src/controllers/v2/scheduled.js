@@ -14,8 +14,9 @@ import {
   sendRenewalReminderEmail,
   sendReturnReminderEmail
 } from '../../notify-emails.js';
+import RegistrationController from './registration.js';
 
-const {Registration, Return, Renewal} = database;
+const {Registration, Return} = database;
 
 const setReturnReminderEmailDetails = (registration) => ({
   id: registration.trapId,
@@ -101,10 +102,7 @@ const ScheduledController = {
     const fourteenDaysFromNowEnd = addDaysSetTime(todaysDate, 14, 23, 59, 59);
 
     return Registration.findAll({
-      include: [
-        {model: Return, required: false},
-        {model: Renewal, required: false}
-      ],
+      include: [{model: Return, required: false}],
       where: {
         expiryDate: {[Op.between]: [fourteenDaysFromNowStart, fourteenDaysFromNowEnd], [Op.gt]: new Date()}
       }
@@ -121,18 +119,11 @@ const ScheduledController = {
     const endOfDay = addDaysSetTime(todaysDate, -1, 23, 59, 59);
 
     return Registration.findAll({
-      include: [
-        {
-          model: Renewal,
-          required: false
-        },
-        {model: Return, required: false}
-      ],
+      include: [{model: Return, required: false}],
       where: {
         expiryDate: {
           [Op.between]: [startOfDay, endOfDay]
-        },
-        '$Renewals.id$': {[Op.is]: null}
+        }
       }
     });
   },
@@ -221,7 +212,21 @@ const ScheduledController = {
     let sentCount = 0;
     const promises = [];
 
+    const todaysDate = new Date();
+    const fourteenDaysFromNowStart = addDaysSetTime(todaysDate, 14, 0, 0, 0);
+
     for (const registration of registrations) {
+      // Check if this registration has already been renewed.
+      // eslint-disable-next-line no-await-in-loop
+      const hasAlreadyBeenRenewed = await RegistrationController.checkIfRegistrationAlreadyRenewed(
+        registration.trapId,
+        fourteenDaysFromNowStart
+      );
+
+      if (hasAlreadyBeenRenewed) {
+        continue;
+      }
+
       const {years, returnsDue} = getMissingReturnYears(registration);
 
       const emailDetails = {
@@ -254,7 +259,21 @@ const ScheduledController = {
 
     const promises = [];
 
+    const todaysDate = new Date();
+    const startOfDay = addDaysSetTime(todaysDate, -1, 0, 0, 0);
+
     for (const registration of expiredRegistrations) {
+      // Check if this registration has already been renewed.
+      // eslint-disable-next-line no-await-in-loop
+      const hasAlreadyBeenRenewed = await RegistrationController.checkIfRegistrationAlreadyRenewed(
+        registration.trapId,
+        startOfDay
+      );
+
+      if (hasAlreadyBeenRenewed) {
+        continue;
+      }
+
       const {years, returnsDue} = getMissingReturnYears(registration);
       const emailDetails = setRenewalReminderEmailDetails(registration, years, returnsDue);
 
