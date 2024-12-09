@@ -9,7 +9,6 @@ import Return from './controllers/v2/return.js';
 import config from './config/app.js';
 import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
 import Note from './controllers/v2/note.js';
-import RegistrationHistory from './controllers/v2/registration-history.js';
 
 import jwk from './config/jwk.js';
 
@@ -83,7 +82,9 @@ const cleanInput = (body) => ({
   // expiryDate: calculateExpiryDate(),
   // AND removing the next line
   expiryDate: new Date() > new Date('2024/11/14') ? null : calculateExpiryDate(),
-  uuid: body.uuid
+  uuid: body.uuid,
+  linkedTrapId: body.linkedTrapId,
+  registrationType: body.registrationType
 });
 
 /**
@@ -325,7 +326,7 @@ v2Router.post('/registrations', async (request, response) => {
     const cleanObject = cleanInput(request.body);
 
     // Try to create the new registration entry.
-    const newRegistration = await Registration.create(cleanObject);
+    const newRegistration = await Registration.create(cleanObject, cleanObject?.linkedTrapId);
 
     let newId;
 
@@ -905,12 +906,6 @@ v2Router.post('/registrations/renewal-email-check', async (request, response) =>
   });
 });
 
-v2Router.post('/registrations/:id/renew', async (request, response) => {
-  const {status, id} = await RenewalController.create(request);
-
-  return response.status(status).send({id});
-});
-
 v2Router.get('/registrations/:id/renewals', async (request, response) => {
   const existingId = Number(request.params.id);
 
@@ -936,38 +931,6 @@ v2Router.post('/expired-licence-no-renewals-reminder', async (request, response)
     return response.status(200).send(`Sent renewal reminders for ${emailsSent} recently expired licences.`);
   } catch (error) {
     console.error({error});
-  }
-});
-
-v2Router.get('/registrations/:id/history', async (request, response) => {
-  const registrationId = Number(request.params.id);
-
-  try {
-    const history = await RegistrationHistory.findAllForRegistration(registrationId);
-
-    return response.status(200).send(history);
-  } catch (error) {
-    jsonConsoleLogger.error(unErrorJson(error));
-    return response.status(500).send({error});
-  }
-});
-
-v2Router.get('/history/:revisionId', async (request, response) => {
-  const {revisionId} = request.params;
-
-  try {
-    const history = await RegistrationHistory.findOne(revisionId);
-    const returns = await Return.findRegReturns(history.RegistrationId);
-
-    // Filter returns to match history entry
-    const filteredReturns = returns.filter(
-      (returnItem) => new Date(returnItem.createdAt).getFullYear() === new Date(history.expiryDate).getFullYear()
-    );
-
-    return response.status(200).send({history, returns: filteredReturns});
-  } catch (error) {
-    jsonConsoleLogger.error(unErrorJson(error));
-    return response.status(500).send({error});
   }
 });
 

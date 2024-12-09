@@ -3,9 +3,6 @@ import {sendSuccessEmail} from '../../notify-emails.js';
 
 const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID} = db;
 
-const REGISTRATION_RENEWAL = 'Renewal';
-const REGISTRATION_INITIAL = 'Initial';
-
 /**
  * An object to perform 'persistence' operations on our registration objects.
  */
@@ -103,49 +100,46 @@ const RegistrationController = {
     // Check this is the first time we've received this application.
     const isPreviousRequest = await RequestUUID.findOne({where: {uuid: reg.uuid}});
 
+    let newReg;
+
     if (isPreviousRequest) {
       // If this request has already been received return `undefined`.
       return undefined;
     }
 
-    // Add the UUID from the request to the RequestUUID table.
-    await RequestUUID.create({uuid: reg.uuid});
+    await db.sequelize.transaction(async (t) => {
+      // Add the UUID from the request to the RequestUUID table.
+      await RequestUUID.create({uuid: reg.uuid}, {transaction: t});
 
-    let newReg;
-    let remainingAttempts = 10;
-    // Loop until we have a new empty registration or we run out of attempts,
-    // whichever happens first. We want to wait until we know if an ID is in
-    // use here so disable the no-await-in-loop rule.
-    /* eslint-disable no-await-in-loop */
-    while (newReg === undefined && remainingAttempts > 0) {
-      try {
-        // Generate a random ID for the registration.
-        const regId = Math.floor(Math.random() * 99_999);
-        // Begin the database transaction.
-        await db.sequelize.transaction(async (t) => {
-          // First check if the ID has already been used by another registration.
-          newReg = await Registration.findOne({where: {trapId: regId}});
-          // If the ID is not in use we can use it.
-          if (newReg === null) {
-            if (linkedTrapId) {
-              reg.trapId = linkedTrapId;
-              reg.registrationType = REGISTRATION_RENEWAL;
-            } else {
-              reg.trapId = regId;
-              reg.registrationType = REGISTRATION_INITIAL;
-            }
+      // If this is a renewal, then a linkedTrapId will be provided.
+      if (linkedTrapId) {
+        newReg = await Registration.create({...reg, trapId: linkedTrapId}, {transaction: t});
+      } else {
+        // If it is a new registration, then generate the trap id and check if it clashes.
+        let remainingAttempts = 10;
+        // Loop until we have a new empty registration or we run out of attempts,
+        // whichever happens first. We want to wait until we know if an ID is in
+        // use here so disable the no-await-in-loop rule.
+        /* eslint-disable no-await-in-loop */
+        while (newReg === undefined && remainingAttempts > 0) {
+          try {
+            // Generate a random ID for the registration.
+            const regId = Math.floor(Math.random() * 99_999);
+            // Begin the database transaction.
+            // First check if the ID has already been used by another registration.
+            const existingReg = await Registration.findOne({where: {trapId: regId}, transaction: t});
+            // If the ID is not in use we can use it, else if the ID is in use, set newReg to null and try again.
 
-            newReg = await Registration.create(reg, {transaction: t});
-          } else {
-            // If the ID is in use set newReg to undefined and try again.
+            newReg =
+              existingReg === null ? await Registration.create({...reg, trapId: regId}, {transaction: t}) : undefined;
+
+            remainingAttempts--;
+          } catch {
             newReg = undefined;
           }
-        });
-        remainingAttempts--;
-      } catch {
-        newReg = undefined;
+        }
       }
-    }
+    });
     /* eslint-enable no-await-in-loop */
 
     // If we run out of attempts let the calling code know by raising an error.
