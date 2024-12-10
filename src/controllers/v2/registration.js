@@ -124,7 +124,7 @@ const RegistrationController = {
           if (isTrapId) {
             existingReg = await Registration.findOne({where: {trapId: regId}, transaction: t});
           } else {
-            existingReg = Registration.findOne({where: {id: regId}, transaction: t});
+            existingReg = await Registration.findOne({where: {id: regId}, transaction: t});
           }
 
           uniqueId = existingReg === null ? regId : undefined;
