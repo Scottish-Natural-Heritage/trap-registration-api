@@ -338,6 +338,8 @@ v2Router.post('/registrations', async (request, response) => {
     // On success return 201 with the location of the new entry in the response header.
     return response.status(201).location(new URL(newId, baseUrl)).send(newRegistration);
   } catch (error) {
+    console.log(error);
+
     return response.status(500).send({error});
   }
 });
