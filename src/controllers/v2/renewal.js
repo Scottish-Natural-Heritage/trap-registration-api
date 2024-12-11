@@ -15,7 +15,8 @@ const RenewalController = {
       where: {
         trapId: registration.trapId,
         id: {[Op.ne]: registration.id}
-      }
+      },
+      order: [['expiryDate', 'DESC']]
     });
   }
 };
