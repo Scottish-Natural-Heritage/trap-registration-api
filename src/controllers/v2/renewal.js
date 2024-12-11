@@ -9,7 +9,7 @@ const RenewalController = {
       return {status: 404, id: registrationId};
     }
 
-    const registration = await Registration.findByPk(registrationId);
+    const registration = await Registration.findByPk(registrationId, {paranoid: false});
 
     return Registration.findAll({
       where: {
