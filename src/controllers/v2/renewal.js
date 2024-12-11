@@ -1,7 +1,7 @@
 import {Op} from 'sequelize';
 import db from '../../models/index.js';
 
-const {Registration} = db;
+const {Registration, Revocation} = db;
 
 const RenewalController = {
   findAllForRegistration: async (registrationId) => {
@@ -16,6 +16,11 @@ const RenewalController = {
         trapId: registration.trapId,
         id: {[Op.ne]: registration.id}
       },
+      include: [
+        {
+          model: Revocation
+        }
+      ],
       order: [['expiryDate', 'DESC']],
       paranoid: false
     });
