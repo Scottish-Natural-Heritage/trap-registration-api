@@ -65,18 +65,17 @@ const cleanInput = (body) => ({
   // The strings are trimmed for leading and trailing whitespace and then
   // copied across if they're in the POST body or are set to undefined if
   // they're missing.
-  fullName: body.fullName === undefined ? undefined : body.fullName.trim(),
-  addressLine1: body.addressLine1 === undefined ? undefined : body.addressLine1.trim(),
-  addressLine2: body.addressLine2 === undefined ? undefined : body.addressLine2.trim(),
-  addressTown: body.addressTown === undefined ? undefined : body.addressTown.trim(),
-  addressCounty: body.addressCounty === undefined ? undefined : body.addressCounty.trim(),
-  addressPostcode: body.addressPostcode === undefined ? undefined : body.addressPostcode.trim(),
-  phoneNumber: body.phoneNumber === undefined ? undefined : body.phoneNumber.trim(),
-  emailAddress:
-    body.emailAddress === undefined
-      ? undefined
-      : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
-  uprn: body.uprn === undefined ? undefined : String(body.uprn),
+  fullName: body.fullName ? body.fullName.trim() : undefined,
+  addressLine1: body.addressLine1 ? body.addressLine1.trim() : undefined,
+  addressLine2: body.addressLine2 ? body.addressLine2.trim() : undefined,
+  addressTown: body.addressTown ? body.addressTown.trim() : undefined,
+  addressCounty: body.addressCounty ? body.addressCounty.trim() : undefined,
+  addressPostcode: body.addressPostcode ? body.addressPostcode.trim() : undefined,
+  phoneNumber: body.phoneNumber ? body.phoneNumber.trim() : undefined,
+  emailAddress: body.emailAddress
+    ? utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase())
+    : undefined,
+  uprn: body.uprn ? String(body.uprn) : undefined,
   // WE ARE TEMPORARILY ISSUING WITHOUT AN EXPIRY
   // REVERT by uncommenting the next line
   // expiryDate: calculateExpiryDate(),
