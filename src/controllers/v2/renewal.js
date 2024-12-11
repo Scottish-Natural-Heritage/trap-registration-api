@@ -1,3 +1,4 @@
+import {Op} from 'sequelize';
 import db from '../../models/index.js';
 
 const {Registration} = db;
@@ -10,7 +11,12 @@ const RenewalController = {
 
     const registration = await Registration.findByPk(registrationId);
 
-    return Registration.findAll({where: {trapId: registration.trapId, registrationType: 'Renewal'}});
+    return Registration.findAll({
+      where: {
+        trapId: registration.trapId,
+        id: {[Op.ne]: registration.id}
+      }
+    });
   }
 };
 
