@@ -16,7 +16,8 @@ const RenewalController = {
         trapId: registration.trapId,
         id: {[Op.ne]: registration.id}
       },
-      order: [['expiryDate', 'DESC']]
+      order: [['expiryDate', 'DESC']],
+      paranoid: false
     });
   }
 };
