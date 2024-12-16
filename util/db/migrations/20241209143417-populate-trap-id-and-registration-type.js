@@ -3,6 +3,7 @@
 module.exports = {
   up: async (queryInterface) =>
     queryInterface.sequelize.transaction(async (t) => {
+      // Adding a comment
       const tableName = process.env.NODE_ENV === 'production' ? 'licensing.traps."Registrations"' : '"Registrations"';
 
       await queryInterface.sequelize.query(
