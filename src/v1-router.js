@@ -310,7 +310,7 @@ const sendLoginEmail = async (notifyApiKey, emailAddress, loginLink, regNo) => {
   if (notifyApiKey) {
     const notifyClient = new NotifyClient.NotifyClient(notifyApiKey);
 
-    await notifyClient.sendEmail('740e3362-5e73-41dc-82f8-fbee160a4f8a', emailAddress, {
+    await notifyClient.sendEmail('a5901745-e01c-4e42-a726-ece91b63e593', emailAddress, {
       personalisation: {
         loginLink
       },
@@ -367,7 +367,6 @@ const postcodesMatch = (postcode1, postcode2) => {
   return cleanPostcode1 === cleanPostcode2;
 };
 
-// STILL BEING USED BY RETURNS
 // Allow the API consumer to provide enough personal information to allow us to
 // build and send a login link for the specified visitor.
 v1router.get('/registrations/:id/login', async (request, response) => {
