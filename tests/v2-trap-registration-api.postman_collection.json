@@ -1,991 +1,1087 @@
 {
-  "info": {
-    "_postman_id": "dbdb5d1a-160d-4c81-bbd4-501a9fc3dc3e",
-    "name": "v2-trap-registration-api",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "5746803"
-  },
-  "item": [
-    {
-      "name": "Health Check",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              "\r",
-              "pm.test('Message is \"OK\"', function () {\r",
-              "    var jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.message).to.eql('OK');\r",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/health",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "health"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create new Registration as a Visitor",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 201 Created', function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "    pm.response.to.have.status('Created');\r",
-              "});\r",
-              "\r",
-              "pm.test('Location is present', function () {\r",
-              "    pm.response.to.have.header('Location');\r",
-              "    \r",
-              "    \r",
-              "    pm.expect(pm.response.headers.get('Location')).to.include(\r",
-              "        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
-              "    );\r",
-              "});\r",
-              "\r",
-              "pm.collectionVariables.set(\"TR_NEW_REG_ID\", pm.response.headers.get('Location').split('/').pop());\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\",\r\n  \"uprn\": 123456789,\r\n  \"uuid\": \"{{$randomUUID}}\",\r\n  \"linkedTrapId\": null,\r\n  \"registrationType\": \"Initial\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get a Visitor's Registration",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              "\r",
-              "pm.test('JSON response has properties', function () {\r",
-              "    var jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData).to.have.property('id');\r",
-              "    pm.expect(jsonData).to.have.property('convictions');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL01');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL02');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL03');\r",
-              "    pm.expect(jsonData).to.have.property('complyWithTerms');\r",
-              "    pm.expect(jsonData).to.have.property('meatBaits');\r",
-              "    pm.expect(jsonData).to.have.property('fullName');\r",
-              "    pm.expect(jsonData).to.have.property('addressLine1');\r",
-              "    pm.expect(jsonData).to.have.property('addressLine2');\r",
-              "    pm.expect(jsonData).to.have.property('addressTown');\r",
-              "    pm.expect(jsonData).to.have.property('addressCounty');\r",
-              "    pm.expect(jsonData).to.have.property('addressPostcode');\r",
-              "    pm.expect(jsonData).to.have.property('phoneNumber');\r",
-              "    pm.expect(jsonData).to.have.property('emailAddress');\r",
-              "    pm.expect(jsonData).to.have.property('createdAt');\r",
-              "    pm.expect(jsonData).to.have.property('updatedAt');\r",
-              "    pm.expect(jsonData).to.have.property('deletedAt');\r",
-              "    pm.expect(jsonData).to.have.property('Returns');\r",
-              "    pm.expect(jsonData.Returns.length).to.equal(0);\r",
-              "    pm.expect(jsonData).to.have.property('createdByLicensingOfficer');\r",
-              "    pm.expect(jsonData.createdByLicensingOfficer).to.be.null;\r",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create new registration note",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 201 Created', function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "    pm.response.to.have.status('Created');\r",
-              "});\r",
-              "\r",
-              "pm.test('Location is present', function () {\r",
-              "    pm.response.to.have.header('Location');\r",
-              "    \r",
-              "    \r",
-              "    pm.expect(pm.response.headers.get('Location')).to.include(\r",
-              "        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
-              "    );\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"note\": \"This is a test\",\r\n  \"createdBy\": \"989745\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/note",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}", "note"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get a Visitor's Registration with Note",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              "\r",
-              "pm.test('JSON response has properties', function () {\r",
-              "    var jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData).to.have.property('Notes');\r",
-              "    pm.expect(jsonData.Notes.length).to.equal(1);\r",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create a renewed Registration as a Visitor",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 201 Created', function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "    pm.response.to.have.status('Created');\r",
-              "});\r"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        },
-        {
-          "listen": "prerequest",
-          "script": {
-            "exec": [""],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\",\r\n  \"uprn\": 123456789,\r\n  \"uuid\": \"{{$randomUUID}}\",\r\n  \"linkedTrapId\": 1234,\r\n  \"registrationType\": \"Renewal\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create new Registration  as a Licensing Officer",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 201 Created', function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "    pm.response.to.have.status('Created');\r",
-              "});\r",
-              "\r",
-              "pm.test('Location is present', function () {\r",
-              "    pm.response.to.have.header('Location');\r",
-              "    \r",
-              "    \r",
-              "    pm.expect(pm.response.headers.get('Location')).to.include(\r",
-              "        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
-              "    );\r",
-              "});\r",
-              "\r",
-              "pm.collectionVariables.set(\"TR_NEW_REG_ID\", pm.response.headers.get('Location').split('/').pop());\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\",\r\n  \"uprn\": 123456789,\r\n  \"uuid\": \"{{$randomUUID}}\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get a Licensing Officer's Registration",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              "\r",
-              "pm.test('JSON response has properties', function () {\r",
-              "    var jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData).to.have.property('id');\r",
-              "    pm.expect(jsonData).to.have.property('convictions');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL01');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL02');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL03');\r",
-              "    pm.expect(jsonData).to.have.property('complyWithTerms');\r",
-              "    pm.expect(jsonData).to.have.property('meatBaits');\r",
-              "    pm.expect(jsonData).to.have.property('fullName');\r",
-              "    pm.expect(jsonData).to.have.property('addressLine1');\r",
-              "    pm.expect(jsonData).to.have.property('addressLine2');\r",
-              "    pm.expect(jsonData).to.have.property('addressTown');\r",
-              "    pm.expect(jsonData).to.have.property('addressCounty');\r",
-              "    pm.expect(jsonData).to.have.property('addressPostcode');\r",
-              "    pm.expect(jsonData).to.have.property('phoneNumber');\r",
-              "    pm.expect(jsonData).to.have.property('emailAddress');\r",
-              "    pm.expect(jsonData).to.have.property('createdAt');\r",
-              "    pm.expect(jsonData).to.have.property('updatedAt');\r",
-              "    pm.expect(jsonData).to.have.property('deletedAt');\r",
-              "    pm.expect(jsonData).to.have.property('Returns');\r",
-              "    pm.expect(jsonData.Returns.length).to.equal(0);\r",
-              "    pm.expect(jsonData).to.have.property('createdByLicensingOfficer');\r",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Edit Registration",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              "\r",
-              "pm.test('Response contains edited field', function () {\r",
-              "    var reqJsonData = JSON.parse(pm.request.body.raw);\r",
-              "    var resJsonData = pm.response.json();\r",
-              "\r",
-              "    pm.expect(reqJsonData.fullName).to.eql(resJsonData.fullName);\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "PATCH",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"fullName\": \"Test Edit Works With Partial Object\"\r\n}\r\n",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create new Return as a Visitor",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 201 Created', function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "    pm.response.to.have.status('Created');\r",
-              "});\r",
-              "\r",
-              "pm.test('Location is present', function () {\r",
-              "    pm.response.to.have.header('Location');\r",
-              "    \r",
-              "    \r",
-              "    pm.expect(pm.response.headers.get('Location')).to.include(\r",
-              "        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
-              "    );\r",
-              "});\r",
-              "\r",
-              "pm.collectionVariables.set(\"TR_NEW_RET_ID\", pm.response.headers.get('Location').split('/').pop());\r",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n   \"noMeatBaitsUsed\": false,\r\n   \"nonTargetSpeciesToReport\": true,\r\n   \"year\": \"2013\",\r\n   \"numberLarsenMate\": 13,\r\n   \"numberLarsenPod\": 0,\r\n   \"nonTargetSpeciesCaught\": [\r\n      {\r\n         \"gridReference\": \"NH63054372\",\r\n         \"speciesCaught\": \"Buzzard\",\r\n         \"numberCaught\": 11,\r\n         \"trapType\": \"Larson pod\",\r\n         \"comment\": \"\"\r\n      },\r\n      {\r\n         \"gridReference\": \"NH63044379\",\r\n         \"speciesCaught\": \"barn owl\",\r\n         \"numberCaught\": 13,\r\n         \"trapType\": \"Larson mate\",\r\n         \"comment\": \"realesed all of them unharmed\"\r\n      }\r\n   ]\r\n}\r\n",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}", "returns"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get a Visitors Registration with Returns",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              "\r",
-              "pm.test('JSON response has properties', function () {\r",
-              "    var jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData).to.have.property('id');\r",
-              "    pm.expect(jsonData).to.have.property('convictions');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL01');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL02');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL03');\r",
-              "    pm.expect(jsonData).to.have.property('complyWithTerms');\r",
-              "    pm.expect(jsonData).to.have.property('meatBaits');\r",
-              "    pm.expect(jsonData).to.have.property('fullName');\r",
-              "    pm.expect(jsonData).to.have.property('addressLine1');\r",
-              "    pm.expect(jsonData).to.have.property('addressLine2');\r",
-              "    pm.expect(jsonData).to.have.property('addressTown');\r",
-              "    pm.expect(jsonData).to.have.property('addressCounty');\r",
-              "    pm.expect(jsonData).to.have.property('addressPostcode');\r",
-              "    pm.expect(jsonData).to.have.property('phoneNumber');\r",
-              "    pm.expect(jsonData).to.have.property('emailAddress');\r",
-              "    pm.expect(jsonData).to.have.property('createdAt');\r",
-              "    pm.expect(jsonData).to.have.property('updatedAt');\r",
-              "    pm.expect(jsonData).to.have.property('deletedAt');\r",
-              "    pm.expect(jsonData).to.have.property('Returns');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('id');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('RegistrationId');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('nonTargetSpeciesToReport');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('createdAt');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('updatedAt');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('deletedAt');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('NonTargetSpecies');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('id');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('ReturnId');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('gridReference');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('speciesCaught');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('numberCaught');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('trapType');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('comment');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('createdAt');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('updatedAt');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('deletedAt');\r",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create new Return for empty return as a Visitor",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 201 Created', function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "    pm.response.to.have.status('Created');\r",
-              "});\r",
-              "\r",
-              "pm.test('Location is present', function () {\r",
-              "    pm.response.to.have.header('Location');\r",
-              "    \r",
-              "    \r",
-              "    pm.expect(pm.response.headers.get('Location')).to.include(\r",
-              "        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
-              "    );\r",
-              "});\r",
-              "\r",
-              "pm.collectionVariables.set(\"TR_NEW_RET_ID\", pm.response.headers.get('Location').split('/').pop());\r",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"noMeatBaitsUsed\": true,\r\n  \"nonTargetSpeciesToReport\": false,\r\n  \"year\": \"2013\",\r\n  \"nonTargetSpeciesCaught\": []\r\n}\r\n",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}", "returns"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create new Return for no non-target-species as Visitor",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 201 Created', function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "    pm.response.to.have.status('Created');\r",
-              "});\r",
-              "\r",
-              "pm.test('Location is present', function () {\r",
-              "    pm.response.to.have.header('Location');\r",
-              "    \r",
-              "    \r",
-              "    pm.expect(pm.response.headers.get('Location')).to.include(\r",
-              "        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
-              "    );\r",
-              "});\r",
-              "\r",
-              "pm.collectionVariables.set(\"TR_NEW_RET_ID\", pm.response.headers.get('Location').split('/').pop());\r",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"noMeatBaitsUsed\": false,\r\n  \"nonTargetSpeciesToReport\": false,\r\n  \"year\": \"2013\",\r\n  \"numberLarsenMate\": 13,\r\n  \"numberLarsePod\": 3,\r\n  \"nonTargetSpeciesCaught\": []\r\n}\r\n",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}", "returns"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create new Return as a Licensing officer",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 201 Created', function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "    pm.response.to.have.status('Created');\r",
-              "});\r",
-              "\r",
-              "pm.test('Location is present', function () {\r",
-              "    pm.response.to.have.header('Location');\r",
-              "    \r",
-              "    \r",
-              "    pm.expect(pm.response.headers.get('Location')).to.include(\r",
-              "        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
-              "    );\r",
-              "});\r",
-              "\r",
-              "pm.collectionVariables.set(\"TR_NEW_RET_ID\", pm.response.headers.get('Location').split('/').pop());\r",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n   \"noMeatBaitsUsed\": false,\r\n   \"nonTargetSpeciesToReport\": true,\r\n   \"year\": \"2013\",\r\n   \"numberLarsenMate\": 13,\r\n   \"numberLarsenPod\": 0,\r\n   \"createdByLicensingOfficer\": \"939123\",\r\n   \"nonTargetSpeciesCaught\": [\r\n      {\r\n         \"gridReference\": \"NH63054372\",\r\n         \"speciesCaught\": \"Buzzard\",\r\n         \"numberCaught\": 11,\r\n         \"trapType\": \"Larson pod\",\r\n         \"comment\": \"\"\r\n      },\r\n      {\r\n         \"gridReference\": \"NH63044379\",\r\n         \"speciesCaught\": \"barn owl\",\r\n         \"numberCaught\": 13,\r\n         \"trapType\": \"Larson mate\",\r\n         \"comment\": \"realesed all of them unharmed\"\r\n      }\r\n   ]\r\n}\r\n",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}", "returns"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get a Licensing Officer's Registration with returns",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              "\r",
-              "pm.test('JSON response has properties', function () {\r",
-              "    var jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData).to.have.property('id');\r",
-              "    pm.expect(jsonData).to.have.property('convictions');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL01');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL02');\r",
-              "    pm.expect(jsonData).to.have.property('usingGL03');\r",
-              "    pm.expect(jsonData).to.have.property('complyWithTerms');\r",
-              "    pm.expect(jsonData).to.have.property('meatBaits');\r",
-              "    pm.expect(jsonData).to.have.property('fullName');\r",
-              "    pm.expect(jsonData).to.have.property('addressLine1');\r",
-              "    pm.expect(jsonData).to.have.property('addressLine2');\r",
-              "    pm.expect(jsonData).to.have.property('addressTown');\r",
-              "    pm.expect(jsonData).to.have.property('addressCounty');\r",
-              "    pm.expect(jsonData).to.have.property('addressPostcode');\r",
-              "    pm.expect(jsonData).to.have.property('phoneNumber');\r",
-              "    pm.expect(jsonData).to.have.property('emailAddress');\r",
-              "    pm.expect(jsonData).to.have.property('createdAt');\r",
-              "    pm.expect(jsonData).to.have.property('updatedAt');\r",
-              "    pm.expect(jsonData).to.have.property('deletedAt');\r",
-              "    pm.expect(jsonData).to.have.property('Returns');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('id');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('RegistrationId');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('nonTargetSpeciesToReport');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('createdAt');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('updatedAt');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('deletedAt');\r",
-              "    pm.expect(jsonData.Returns[0]).to.have.property('NonTargetSpecies');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('id');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('ReturnId');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('gridReference');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('speciesCaught');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('numberCaught');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('trapType');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('comment');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('createdAt');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('updatedAt');\r",
-              "    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('deletedAt');\r",
-              "    pm.expect(jsonData.Returns[2]).to.have.property('createdByLicensingOfficer');\r",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get All Registrations",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              "\r",
-              "pm.test('JSON response length is greater than 1', function () {\r",
-              "    var jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.length).to.be.above(1);\r",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get All Returns",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              "\r",
-              "pm.test('JSON response length is greater than 1', function () {\r",
-              "    var jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.length).to.be.above(1);\r",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/returns",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "returns"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get All registration returns",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              "\r",
-              "pm.test('JSON response length is greater than 1', function () {\r",
-              "    var jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.length).to.be.above(1);\r",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}", "returns"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get registration return",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              "\r",
-              "pm.test('JSON response has properties', function () {\r",
-              "    var jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData).to.have.property('id');\r",
-              "    pm.expect(jsonData).to.have.property('RegistrationId');\r",
-              "    pm.expect(jsonData).to.have.property('nonTargetSpeciesToReport');\r",
-              "    pm.expect(jsonData).to.have.property('createdAt');\r",
-              "    pm.expect(jsonData).to.have.property('updatedAt');\r",
-              "    pm.expect(jsonData).to.have.property('deletedAt');\r",
-              "    pm.expect(jsonData).to.have.property('NonTargetSpecies');\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns/{{TR_NEW_RET_ID}}",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}", "returns", "{{TR_NEW_RET_ID}}"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Revoke Registration",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"reason\": \"Nature Scot Reason\",\r\n    \"createdBy\": \"989745\",\r\n    \"isRevoked\": true\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get revoked registration",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "    pm.response.to.have.status('OK');\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3001",
-          "path": ["trap-registration-api", "v2", "registrations", "{{TR_NEW_REG_ID}}"]
-        }
-      },
-      "response": []
-    }
-  ],
-  "variable": [
-    {
-      "key": "TR_NEW_REG_ID",
-      "value": "28914"
-    },
-    {
-      "key": "TR_NEW_RET_ID",
-      "value": "93529"
-    }
-  ]
+	"info": {
+		"_postman_id": "dbdb5d1a-160d-4c81-bbd4-501a9fc3dc3e",
+		"name": "v2-trap-registration-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5746803"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('Message is \"OK\"', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql('OK');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new Registration as a Visitor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201 Created', function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.have.status('Created');\r",
+							"});\r",
+							"\r",
+							"pm.test('Location is present', function () {\r",
+							"    pm.response.to.have.header('Location');\r",
+							"    \r",
+							"    \r",
+							"    pm.expect(pm.response.headers.get('Location')).to.include(\r",
+							"        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
+							"    );\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"TR_NEW_REG_ID\", pm.response.headers.get('Location').split('/').pop());\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\",\r\n  \"uprn\": 123456789,\r\n  \"uuid\": \"f378d69c-64ac-4970-9de3-0fb105a54d56\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a Visitor's Registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('JSON response has properties', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('convictions');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL01');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL02');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL03');\r",
+							"    pm.expect(jsonData).to.have.property('complyWithTerms');\r",
+							"    pm.expect(jsonData).to.have.property('meatBaits');\r",
+							"    pm.expect(jsonData).to.have.property('fullName');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine1');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine2');\r",
+							"    pm.expect(jsonData).to.have.property('addressTown');\r",
+							"    pm.expect(jsonData).to.have.property('addressCounty');\r",
+							"    pm.expect(jsonData).to.have.property('addressPostcode');\r",
+							"    pm.expect(jsonData).to.have.property('phoneNumber');\r",
+							"    pm.expect(jsonData).to.have.property('emailAddress');\r",
+							"    pm.expect(jsonData).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData).to.have.property('Returns');\r",
+							"    pm.expect(jsonData.Returns.length).to.equal(0);\r",
+							"    pm.expect(jsonData).to.have.property('createdByLicensingOfficer');\r",
+							"    pm.expect(jsonData.createdByLicensingOfficer).to.be.null;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new registration note",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201 Created', function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.have.status('Created');\r",
+							"});\r",
+							"\r",
+							"pm.test('Location is present', function () {\r",
+							"    pm.response.to.have.header('Location');\r",
+							"    \r",
+							"    \r",
+							"    pm.expect(pm.response.headers.get('Location')).to.include(\r",
+							"        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
+							"    );\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"note\": \"This is a test\",\r\n  \"createdBy\": \"989745\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/note",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"note"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a Visitor's Registration with Note",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('JSON response has properties', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('Notes');\r",
+							"    pm.expect(jsonData.Notes.length).to.equal(1);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new Registration  as a Licensing Officer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201 Created', function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.have.status('Created');\r",
+							"});\r",
+							"\r",
+							"pm.test('Location is present', function () {\r",
+							"    pm.response.to.have.header('Location');\r",
+							"    \r",
+							"    \r",
+							"    pm.expect(pm.response.headers.get('Location')).to.include(\r",
+							"        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
+							"    );\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"TR_NEW_REG_ID\", pm.response.headers.get('Location').split('/').pop());\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"convictions\": false,\r\n  \"usingGL01\": false,\r\n  \"usingGL02\": true,\r\n  \"complyWithTerms\": true,\r\n  \"meatBaits\": false,\r\n  \"fullName\": \"Nature Scot\",\r\n  \"addressLine1\": \"Great Glen House\",\r\n  \"addressLine2\": \"\",\r\n  \"addressTown\": \"Inverness\",\r\n  \"addressCounty\": \"\",\r\n  \"addressPostcode\": \"IV3 8NW\",\r\n  \"phoneNumber\": \"01463 725 000\",\r\n  \"emailAddress\": \"licensing@nature.scot\",\r\n  \"uprn\": 123456789,\r\n  \"uuid\": \"399d8e34-157f-4e8f-a433-325917673997\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a Licensing Officer's Registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('JSON response has properties', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('convictions');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL01');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL02');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL03');\r",
+							"    pm.expect(jsonData).to.have.property('complyWithTerms');\r",
+							"    pm.expect(jsonData).to.have.property('meatBaits');\r",
+							"    pm.expect(jsonData).to.have.property('fullName');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine1');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine2');\r",
+							"    pm.expect(jsonData).to.have.property('addressTown');\r",
+							"    pm.expect(jsonData).to.have.property('addressCounty');\r",
+							"    pm.expect(jsonData).to.have.property('addressPostcode');\r",
+							"    pm.expect(jsonData).to.have.property('phoneNumber');\r",
+							"    pm.expect(jsonData).to.have.property('emailAddress');\r",
+							"    pm.expect(jsonData).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData).to.have.property('Returns');\r",
+							"    pm.expect(jsonData.Returns.length).to.equal(0);\r",
+							"    pm.expect(jsonData).to.have.property('createdByLicensingOfficer');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit Registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('Response contains edited field', function () {\r",
+							"    var reqJsonData = JSON.parse(pm.request.body.raw);\r",
+							"    var resJsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(reqJsonData.fullName).to.eql(resJsonData.fullName);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"fullName\": \"Test Edit Works With Partial Object\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new Return as a Visitor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201 Created', function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.have.status('Created');\r",
+							"});\r",
+							"\r",
+							"pm.test('Location is present', function () {\r",
+							"    pm.response.to.have.header('Location');\r",
+							"    \r",
+							"    \r",
+							"    pm.expect(pm.response.headers.get('Location')).to.include(\r",
+							"        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
+							"    );\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"TR_NEW_RET_ID\", pm.response.headers.get('Location').split('/').pop());\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"noMeatBaitsUsed\": false,\r\n   \"nonTargetSpeciesToReport\": true,\r\n   \"year\": \"2013\",\r\n   \"numberLarsenMate\": 13,\r\n   \"numberLarsenPod\": 0,\r\n   \"nonTargetSpeciesCaught\": [\r\n      {\r\n         \"gridReference\": \"NH63054372\",\r\n         \"speciesCaught\": \"Buzzard\",\r\n         \"numberCaught\": 11,\r\n         \"trapType\": \"Larson pod\",\r\n         \"comment\": \"\"\r\n      },\r\n      {\r\n         \"gridReference\": \"NH63044379\",\r\n         \"speciesCaught\": \"barn owl\",\r\n         \"numberCaught\": 13,\r\n         \"trapType\": \"Larson mate\",\r\n         \"comment\": \"realesed all of them unharmed\"\r\n      }\r\n   ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"returns"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a Visitors Registration with Returns",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('JSON response has properties', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('convictions');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL01');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL02');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL03');\r",
+							"    pm.expect(jsonData).to.have.property('complyWithTerms');\r",
+							"    pm.expect(jsonData).to.have.property('meatBaits');\r",
+							"    pm.expect(jsonData).to.have.property('fullName');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine1');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine2');\r",
+							"    pm.expect(jsonData).to.have.property('addressTown');\r",
+							"    pm.expect(jsonData).to.have.property('addressCounty');\r",
+							"    pm.expect(jsonData).to.have.property('addressPostcode');\r",
+							"    pm.expect(jsonData).to.have.property('phoneNumber');\r",
+							"    pm.expect(jsonData).to.have.property('emailAddress');\r",
+							"    pm.expect(jsonData).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData).to.have.property('Returns');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('id');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('RegistrationId');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('nonTargetSpeciesToReport');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('NonTargetSpecies');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('id');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('ReturnId');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('gridReference');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('speciesCaught');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('numberCaught');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('trapType');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('comment');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('deletedAt');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new Return for empty return as a Visitor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201 Created', function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.have.status('Created');\r",
+							"});\r",
+							"\r",
+							"pm.test('Location is present', function () {\r",
+							"    pm.response.to.have.header('Location');\r",
+							"    \r",
+							"    \r",
+							"    pm.expect(pm.response.headers.get('Location')).to.include(\r",
+							"        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
+							"    );\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"TR_NEW_RET_ID\", pm.response.headers.get('Location').split('/').pop());\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"noMeatBaitsUsed\": true,\r\n  \"nonTargetSpeciesToReport\": false,\r\n  \"year\": \"2013\",\r\n  \"nonTargetSpeciesCaught\": []\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"returns"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new Return for no non-target-species as Visitor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201 Created', function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.have.status('Created');\r",
+							"});\r",
+							"\r",
+							"pm.test('Location is present', function () {\r",
+							"    pm.response.to.have.header('Location');\r",
+							"    \r",
+							"    \r",
+							"    pm.expect(pm.response.headers.get('Location')).to.include(\r",
+							"        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
+							"    );\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"TR_NEW_RET_ID\", pm.response.headers.get('Location').split('/').pop());\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"noMeatBaitsUsed\": false,\r\n  \"nonTargetSpeciesToReport\": false,\r\n  \"year\": \"2013\",\r\n  \"numberLarsenMate\": 13,\r\n  \"numberLarsePod\": 3,\r\n  \"nonTargetSpeciesCaught\": []\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"returns"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new Return as a Licensing officer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201 Created', function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.have.status('Created');\r",
+							"});\r",
+							"\r",
+							"pm.test('Location is present', function () {\r",
+							"    pm.response.to.have.header('Location');\r",
+							"    \r",
+							"    \r",
+							"    pm.expect(pm.response.headers.get('Location')).to.include(\r",
+							"        `http://localhost:3001/trap-registration-api/v2/registrations/`\r",
+							"    );\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"TR_NEW_RET_ID\", pm.response.headers.get('Location').split('/').pop());\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"noMeatBaitsUsed\": false,\r\n   \"nonTargetSpeciesToReport\": true,\r\n   \"year\": \"2013\",\r\n   \"numberLarsenMate\": 13,\r\n   \"numberLarsenPod\": 0,\r\n   \"createdByLicensingOfficer\": \"939123\",\r\n   \"nonTargetSpeciesCaught\": [\r\n      {\r\n         \"gridReference\": \"NH63054372\",\r\n         \"speciesCaught\": \"Buzzard\",\r\n         \"numberCaught\": 11,\r\n         \"trapType\": \"Larson pod\",\r\n         \"comment\": \"\"\r\n      },\r\n      {\r\n         \"gridReference\": \"NH63044379\",\r\n         \"speciesCaught\": \"barn owl\",\r\n         \"numberCaught\": 13,\r\n         \"trapType\": \"Larson mate\",\r\n         \"comment\": \"realesed all of them unharmed\"\r\n      }\r\n   ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"returns"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a Licensing Officer's Registration with returns",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('JSON response has properties', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('convictions');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL01');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL02');\r",
+							"    pm.expect(jsonData).to.have.property('usingGL03');\r",
+							"    pm.expect(jsonData).to.have.property('complyWithTerms');\r",
+							"    pm.expect(jsonData).to.have.property('meatBaits');\r",
+							"    pm.expect(jsonData).to.have.property('fullName');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine1');\r",
+							"    pm.expect(jsonData).to.have.property('addressLine2');\r",
+							"    pm.expect(jsonData).to.have.property('addressTown');\r",
+							"    pm.expect(jsonData).to.have.property('addressCounty');\r",
+							"    pm.expect(jsonData).to.have.property('addressPostcode');\r",
+							"    pm.expect(jsonData).to.have.property('phoneNumber');\r",
+							"    pm.expect(jsonData).to.have.property('emailAddress');\r",
+							"    pm.expect(jsonData).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData).to.have.property('Returns');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('id');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('RegistrationId');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('nonTargetSpeciesToReport');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData.Returns[0]).to.have.property('NonTargetSpecies');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('id');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('ReturnId');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('gridReference');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('speciesCaught');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('numberCaught');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('trapType');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('comment');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData.Returns[0].NonTargetSpecies[0]).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData.Returns[2]).to.have.property('createdByLicensingOfficer');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Registrations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('JSON response length is greater than 1', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.length).to.be.above(1);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Returns",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('JSON response length is greater than 1', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.length).to.be.above(1);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/returns",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"returns"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All registration returns",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('JSON response length is greater than 1', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.length).to.be.above(1);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"returns"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get registration return",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							"\r",
+							"pm.test('JSON response has properties', function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('RegistrationId');\r",
+							"    pm.expect(jsonData).to.have.property('nonTargetSpeciesToReport');\r",
+							"    pm.expect(jsonData).to.have.property('createdAt');\r",
+							"    pm.expect(jsonData).to.have.property('updatedAt');\r",
+							"    pm.expect(jsonData).to.have.property('deletedAt');\r",
+							"    pm.expect(jsonData).to.have.property('NonTargetSpecies');\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}/returns/{{TR_NEW_RET_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}",
+						"returns",
+						"{{TR_NEW_RET_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Revoke Registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"reason\": \"Nature Scot Reason\",\r\n    \"createdBy\": \"989745\",\r\n    \"isRevoked\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get revoked registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200 OK', function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status('OK');\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3001/trap-registration-api/v2/registrations/{{TR_NEW_REG_ID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"trap-registration-api",
+						"v2",
+						"registrations",
+						"{{TR_NEW_REG_ID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "TR_NEW_REG_ID",
+			"value": "28914"
+		},
+		{
+			"key": "TR_NEW_RET_ID",
+			"value": "93529"
+		}
+	]
 }

@@ -1,8 +1,70 @@
-import {Op} from 'sequelize';
+import NotifyClient from 'notifications-node-client';
 import db from '../../models/index.js';
-import {sendSuccessEmail} from '../../notify-emails.js';
+import config from '../../config/app.js';
+import jsonConsoleLogger, {unErrorJson} from '../../json-console-logger.js';
 
 const {Registration, Return, NonTargetSpecies, Revocation, Note, RequestUUID} = db;
+
+/**
+ * Takes an issue date, calculates an expiry date based on that and converts it
+ * in to a formatted string.
+ *
+ * @param {Date} issueDate when the registration is issued
+ * @returns {String} a formatted date string
+ */
+const buildExpiryDateString = (issueDate) => {
+  // Every registration has a 5 year expiry, tied to the issue date of that
+  // year's General Licenses. General Licenses are always issued on January 1st,
+  // so registrations last for four whole years, plus the rest of the issued
+  // year.
+  const expiryYear = issueDate.getFullYear() + 4;
+
+  const d = 31;
+  const m = 12;
+  const y = String(expiryYear).padStart(4, '0');
+
+  return `${d}/${m}/${y}`;
+};
+
+/**
+ * Send emails to the applicant to let them know it was successful.
+ *
+ * @param {any} reg an enhanced JSON version of the model
+ */
+const sendSuccessEmail = async (reg) => {
+  if (config.notifyApiKey) {
+    try {
+      // Every registration has a 5 year expiry, tied to the issue date of that
+      // year's General Licenses. General Licenses are always issued on January 1st,
+      // so registrations last for four whole years, plus the rest of the issued
+      // year.
+      const yearExpires = new Date().getFullYear() + 4;
+      const notifyClient = new NotifyClient.NotifyClient(config.notifyApiKey);
+
+      await notifyClient.sendEmail('7b7a0810-a15d-4c72-8fcf-c1e7494641b3', reg.emailAddress, {
+        personalisation: {
+          regNo: reg.regNo,
+          convictions: reg.convictions ? 'yes' : 'no',
+          noConvictions: reg.convictions ? 'no' : 'yes',
+          general1: reg.usingGL01 ? 'yes' : 'no',
+          noGeneral1: reg.usingGL01 ? 'no' : 'yes',
+          general2: reg.usingGL02 ? 'yes' : 'no',
+          noGeneral2: reg.usingGL02 ? 'no' : 'yes',
+          comply: reg.complyWithTerms ? 'yes' : 'no',
+          noComply: reg.complyWithTerms ? 'no' : 'yes',
+          meatBait: reg.meatBaits ? 'yes' : 'no',
+          noMeatBait: reg.meatBaits ? 'no' : 'yes',
+          expiryDate: `31/12/${yearExpires}`
+        },
+        reference: reg.regNo,
+        emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
+      });
+    } catch (error) {
+      jsonConsoleLogger.error(unErrorJson(error));
+      throw error;
+    }
+  }
+};
 
 /**
  * An object to perform 'persistence' operations on our registration objects.
@@ -34,50 +96,6 @@ const RegistrationController = {
       paranoid: false
     }),
 
-  findOneByEmail: async (email) =>
-    Registration.findOne({
-      where: {
-        emailAddress: email
-      },
-      include: [
-        {
-          model: Note
-        },
-        {model: Revocation, paranoid: false},
-        {
-          model: Return,
-          include: [
-            {
-              model: NonTargetSpecies
-            }
-          ],
-          paranoid: false
-        }
-      ],
-      paranoid: false
-    }),
-
-  findAllByEmail: async (email) =>
-    Registration.findAll({
-      where: {
-        emailAddress: email
-      },
-      include: [
-        {
-          model: Note
-        },
-        {model: Revocation},
-        {
-          model: Return,
-          include: [
-            {
-              model: NonTargetSpecies
-            }
-          ]
-        }
-      ]
-    }),
-
   /**
    * Retrieve all registrations from the database.
    *
@@ -90,75 +108,46 @@ const RegistrationController = {
       order: [['createdAt', 'DESC']]
     }),
 
-  /**
-   * Retrieve all registrations from the database with specified email.
-   *
-   * @returns {Sequelize.Model} All existing registrations with specified email.
-   */
-  findAllEmails: async (emailAddress) => Registration.findAll({where: {emailAddress}}),
-
-  create: async (reg, linkedTrapId) => {
+  create: async (reg) => {
     // Check this is the first time we've received this application.
     const isPreviousRequest = await RequestUUID.findOne({where: {uuid: reg.uuid}});
-
-    // Trap id
-    let newReg;
-
-    const createUniqueId = async (isTrapId, t) => {
-      let uniqueId;
-
-      // Generate the reg id or trap id and check if it clashes.
-      let remainingAttempts = 10;
-      // Loop until we have a valid reg id / trap id or we run out of attempts,
-      // whichever happens first. We want to wait until we know if an ID is in
-      // use here so disable the no-await-in-loop rule.
-      /* eslint-disable no-await-in-loop */
-      while (uniqueId === undefined && remainingAttempts > 0) {
-        try {
-          // Generate a random ID for the registration.
-          const regId = Math.floor(Math.random() * 99_999);
-
-          let existingReg;
-
-          // eslint-disable-next-line unicorn/prefer-ternary
-          if (isTrapId) {
-            existingReg = await Registration.findOne({where: {trapId: regId}, transaction: t});
-          } else {
-            existingReg = await Registration.findOne({where: {id: regId}, transaction: t});
-          }
-
-          uniqueId = existingReg === null ? regId : undefined;
-
-          remainingAttempts--;
-        } catch {
-          newReg = undefined;
-        }
-      }
-
-      return uniqueId;
-    };
 
     if (isPreviousRequest) {
       // If this request has already been received return `undefined`.
       return undefined;
     }
 
-    await db.sequelize.transaction(async (t) => {
-      // Add the UUID from the request to the RequestUUID table.
-      await RequestUUID.create({uuid: reg.uuid}, {transaction: t});
+    // Add the UUID from the request to the RequestUUID table.
+    await RequestUUID.create({uuid: reg.uuid});
 
-      // If this is a renewal, then a linkedTrapId will be provided.
-      if (linkedTrapId) {
-        const newId = await createUniqueId(false, t);
-
-        newReg = await Registration.create({...reg, id: newId, trapId: linkedTrapId}, {transaction: t});
-      } else {
-        const newId = await createUniqueId(false, t);
-        const trapId = await createUniqueId(true, t);
-
-        newReg = await Registration.create({...reg, id: newId, trapId}, {transaction: t});
+    let newReg;
+    let remainingAttempts = 10;
+    // Loop until we have a new empty registration or we run out of attempts,
+    // whichever happens first. We want to wait until we know if an ID is in
+    // use here so disable the no-await-in-loop rule.
+    /* eslint-disable no-await-in-loop */
+    while (newReg === undefined && remainingAttempts > 0) {
+      try {
+        // Generate a random ID for the registration.
+        const regId = Math.floor(Math.random() * 99_999);
+        // Begin the database transaction.
+        await db.sequelize.transaction(async (t) => {
+          // First check if the ID has already been used by another registration.
+          newReg = await Registration.findByPk(regId, {transaction: t});
+          // If the ID is not in use we can use it.
+          if (newReg === null) {
+            reg.id = regId;
+            newReg = await Registration.create(reg, {transaction: t});
+          } else {
+            // If the ID is in use set newReg to undefined and try again.
+            newReg = undefined;
+          }
+        });
+        remainingAttempts--;
+      } catch {
+        newReg = undefined;
       }
-    });
+    }
     /* eslint-enable no-await-in-loop */
 
     // If we run out of attempts let the calling code know by raising an error.
@@ -167,7 +156,10 @@ const RegistrationController = {
     }
 
     // Generate and save  the human-readable version of the reg no.
-    newReg.regNo = `NS-TRP-${String(newReg.trapId).padStart(5, '0')}`;
+    newReg.regNo = `NS-TRP-${String(newReg.id).padStart(5, '0')}`;
+
+    // Make the expiry date a user friendly string.
+    newReg.dataValues.expiryDate = buildExpiryDateString(new Date());
 
     // Send the applicant their confirmation email.
     await sendSuccessEmail(newReg);
@@ -237,21 +229,6 @@ const RegistrationController = {
       // If something during the transaction return false.
       return false;
     }
-  },
-  checkIfRegistrationAlreadyRenewed: async (trapId, date) => {
-    await Registration.count({
-      where: {
-        trapId,
-        registrationType: 'Renewal',
-        [Op.or]: [{expiryDate: {[Op.gt]: date}}, {expiryDate: {[Op.is]: null}}]
-      }
-    }).then((count) => {
-      if (count !== 0) {
-        return true;
-      }
-
-      return false;
-    });
   }
 };
 

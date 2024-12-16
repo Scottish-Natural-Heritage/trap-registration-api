@@ -4,12 +4,6 @@ const RegistrationModel = (sequelize, DataTypes) => {
   const Registration = sequelize.define(
     'Registration',
     {
-      trapId: {
-        type: DataTypes.INTEGER
-      },
-      registrationType: {
-        type: DataTypes.STRING
-      },
       convictions: {
         type: DataTypes.BOOLEAN
       },
@@ -82,8 +76,7 @@ const RegistrationModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING
       },
       expiryDate: {
-        type: DataTypes.DATE,
-        allowNull: true
+        type: DataTypes.DATE
       },
       uprn: {
         type: DataTypes.STRING

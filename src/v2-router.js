@@ -1,16 +1,11 @@
 import express from 'express';
 import utils from 'naturescot-utils';
-import jwt from 'jsonwebtoken';
-import NotifyClient from 'notifications-node-client';
 import Registration from './controllers/v2/registration.js';
-import RenewalController from './controllers/v2/renewal.js';
 import ScheduledController from './controllers/v2/scheduled.js';
 import Return from './controllers/v2/return.js';
 import config from './config/app.js';
 import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
 import Note from './controllers/v2/note.js';
-
-import jwk from './config/jwk.js';
 
 const v2Router = express.Router();
 
@@ -65,25 +60,20 @@ const cleanInput = (body) => ({
   // The strings are trimmed for leading and trailing whitespace and then
   // copied across if they're in the POST body or are set to undefined if
   // they're missing.
-  fullName: body.fullName ? body.fullName.trim() : undefined,
-  addressLine1: body.addressLine1 ? body.addressLine1.trim() : undefined,
-  addressLine2: body.addressLine2 ? body.addressLine2.trim() : undefined,
-  addressTown: body.addressTown ? body.addressTown.trim() : undefined,
-  addressCounty: body.addressCounty ? body.addressCounty.trim() : undefined,
-  addressPostcode: body.addressPostcode ? body.addressPostcode.trim() : undefined,
-  phoneNumber: body.phoneNumber ? body.phoneNumber.trim() : undefined,
-  emailAddress: body.emailAddress
-    ? utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase())
-    : undefined,
-  uprn: body.uprn ? String(body.uprn) : undefined,
-  // WE ARE TEMPORARILY ISSUING WITHOUT AN EXPIRY
-  // REVERT by uncommenting the next line
-  // expiryDate: calculateExpiryDate(),
-  // AND removing the next line
-  expiryDate: new Date() > new Date('2024/11/14') ? null : calculateExpiryDate(),
-  uuid: body.uuid,
-  linkedTrapId: body.linkedTrapId,
-  registrationType: body.registrationType
+  fullName: body.fullName === undefined ? undefined : body.fullName.trim(),
+  addressLine1: body.addressLine1 === undefined ? undefined : body.addressLine1.trim(),
+  addressLine2: body.addressLine2 === undefined ? undefined : body.addressLine2.trim(),
+  addressTown: body.addressTown === undefined ? undefined : body.addressTown.trim(),
+  addressCounty: body.addressCounty === undefined ? undefined : body.addressCounty.trim(),
+  addressPostcode: body.addressPostcode === undefined ? undefined : body.addressPostcode.trim(),
+  phoneNumber: body.phoneNumber === undefined ? undefined : body.phoneNumber.trim(),
+  emailAddress:
+    body.emailAddress === undefined
+      ? undefined
+      : utils.formatters.stripAndRemoveObscureWhitespace(body.emailAddress.toLowerCase()),
+  uprn: body.uprn === undefined ? undefined : String(body.uprn),
+  expiryDate: calculateExpiryDate(),
+  uuid: body.uuid
 });
 
 /**
@@ -242,39 +232,6 @@ const cleanRevokeInput = (existingId, body) => ({
   isRevoked: body.isRevoked
 });
 
-/**
- * Build a JWT to allow a visitor to log in to the renewal flow.
- *
- * @param {string} jwtPrivateKey
- * @param {string} email
- * @returns {string} a signed JWT
- */
-const buildRenewalToken = (jwtPrivateKey, email) =>
-  jwt.sign({}, jwtPrivateKey, {subject: `${email}`, algorithm: 'ES256', expiresIn: '30m', noTimestamp: true});
-
-/**
- * Send an email to the visitor that contains a link which allows them to log in
- * to the rest of the meat bait return system.
- *
- * @param {string} notifyApiKey API key for sending emails
- * @param {string} emailAddress where to send the log in email
- * @param {string} loginLink link to log in via
- * @param {string} fullname users full name to appear on email.
- */
-const sendRenewalEmail = async (notifyApiKey, emailAddress, loginLink, fullname) => {
-  if (notifyApiKey) {
-    const notifyClient = new NotifyClient.NotifyClient(notifyApiKey);
-
-    await notifyClient.sendEmail('173ce02f-b78f-44eb-ac72-2a58af3606a9', emailAddress, {
-      personalisation: {
-        loginLink,
-        Name: fullname
-      },
-      emailReplyToId: '4b49467e-2a35-4713-9d92-809c55bf1cdd'
-    });
-  }
-};
-
 // #region Health Check
 
 /**
@@ -325,7 +282,7 @@ v2Router.post('/registrations', async (request, response) => {
     const cleanObject = cleanInput(request.body);
 
     // Try to create the new registration entry.
-    const newRegistration = await Registration.create(cleanObject, cleanObject?.linkedTrapId);
+    const newRegistration = await Registration.create(cleanObject);
 
     let newId;
 
@@ -337,8 +294,6 @@ v2Router.post('/registrations', async (request, response) => {
     // On success return 201 with the location of the new entry in the response header.
     return response.status(201).location(new URL(newId, baseUrl)).send(newRegistration);
   } catch (error) {
-    console.log(error);
-
     return response.status(500).send({error});
   }
 });
@@ -384,40 +339,19 @@ v2Router.post('/registrations/:id/note', async (request, response) => {
  * READs a single registration.
  */
 v2Router.get('/registrations/:id', async (request, response) => {
-  const {idType} = request.query;
-  let isEmail = false;
-
-  if (idType && idType === 'email') {
-    isEmail = true;
-  }
-
   try {
-    const existingId = request.params.id;
-    let registrationFunction;
-
-    if (isEmail) {
-      registrationFunction = Registration.findAllByEmail;
-    } else {
-      if (Number.isNaN(existingId)) {
-        return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
-      }
-
-      registrationFunction = Registration.findOne;
+    const existingId = Number(request.params.id);
+    if (Number.isNaN(existingId)) {
+      return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
-    const registration = await registrationFunction(existingId);
+    const registration = await Registration.findOne(existingId);
 
     if (registration === undefined || registration === null) {
       return response.status(404).send({message: `Registration ${request.params.id} not valid.`});
     }
 
-    if (Array.isArray(registration)) {
-      for (const reg of registration) {
-        reg.Returns.sort((a, b) => a.id - b.id);
-      }
-    } else {
-      registration.Returns.sort((a, b) => a.id - b.id);
-    }
+    registration.Returns.sort((a, b) => a.id - b.id);
 
     return response.status(200).send(registration);
   } catch (error) {
@@ -843,116 +777,9 @@ v2Router.get('/public-key', async (request, response) => response.status(501).se
 /**
  * Send a login link to a visitor.
  */
-v2Router.get('/registrations/:id/login', async (request, response) =>
+v2Router.post('/registrations/:id/login', async (request, response) =>
   response.status(501).send({message: 'Not implemented.'})
 );
-
-/**
- * Send out a renewal email to user if email has been found in database.
- */
-v2Router.post('/registrations/renewal-email-check', async (request, response) => {
-  // Check that the visitor's given us an email address.
-  const {email} = request.body.params;
-  const emailInvalid = email === undefined;
-
-  let emailExists;
-  try {
-    emailExists = await Registration.findAllEmails(email);
-  } catch (error) {
-    console.error({error});
-  }
-
-  // Check if there's a registration allocated at the specified email address.
-  const emailNotFound = emailExists === undefined || emailExists === null || emailExists.length === 0;
-
-  // Check that the visitor's given us a base url.
-  const {redirectBaseUrl} = request.body.params;
-  const urlInvalid = redirectBaseUrl === undefined || redirectBaseUrl === null;
-
-  // As long as we're happy that the visitor's provided use with valid
-  // information, build them a token for logging in with.
-  let token;
-  if (!emailNotFound && !emailInvalid) {
-    token = buildRenewalToken(jwk.getPrivateKey(), email);
-  }
-
-  // If the visitor has given us enough information, build them a link that will
-  // allow them to click-to-log-in.
-  let loginLink;
-  if (!urlInvalid && token !== undefined) {
-    loginLink = `${redirectBaseUrl}${token}`;
-  }
-
-  // As long as we've managed to build a login link, send the visitor an email
-  // with that link included.
-  if (loginLink !== undefined) {
-    const name = emailExists[0].fullName;
-    await sendRenewalEmail(config.notifyApiKey, email, loginLink, name);
-  }
-
-  // If we're in production, no matter what, tell the API consumer that everything went well.
-  if (process.env.NODE_ENV === 'production') {
-    return response.status(200).send();
-  }
-
-  // If we're in development mode, send back a debug message, with the link for
-  // the developer, to avoid sending unnecessary emails.
-  return response.status(200).send({
-    emailExists,
-    emailNotFound,
-    emailInvalid,
-    urlInvalid,
-    token,
-    loginLink
-  });
-});
-
-v2Router.get('/registrations/:id/renewals', async (request, response) => {
-  const existingId = Number(request.params.id);
-
-  try {
-    const renewals = await RenewalController.findAllForRegistration(existingId);
-    return response.status(200).send(renewals);
-  } catch (error) {
-    jsonConsoleLogger.error(unErrorJson(error));
-    return response.status(500).send({error});
-  }
-});
-
-/**
- * Finds all registrations due to expire today and sends out a notify email.
- */
-v2Router.post('/expired-licence-no-renewals-reminder', async (request, response) => {
-  try {
-    const expiredRegistrations = await ScheduledController.findAllExpiredNoRenewals();
-
-    // Try to send out reminder emails for renewals.
-    const emailsSent = await ScheduledController.sendExpiredNoRenewalsReminder(expiredRegistrations);
-
-    return response.status(200).send(`Sent renewal reminders for ${emailsSent} recently expired licences.`);
-  } catch (error) {
-    console.error({error});
-  }
-});
-
-/**
- * Send out a reminder email on recently expired licences with no returns submitted
- * that returns are due.
- */
-v2Router.post('/expired-licences-two-week-reminder', async (request, response) => {
-  try {
-    // Registrations due to expire in two weeks time.
-    const registrations = await ScheduledController.findAllDueToExpireInTwoWeeks();
-
-    // Try to send out reminder emails.
-    const emailsSent = await ScheduledController.sendTwoWeekExpiryReminder(registrations);
-
-    return response.status(200).send(`Sent renewal reminders for ${emailsSent} recently expired licences.`);
-  } catch (error) {
-    jsonConsoleLogger.error(unErrorJson(error));
-    return response.status(500).send({error});
-  }
-});
 
 // #endregion
 
