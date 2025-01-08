@@ -12,13 +12,13 @@ if (process.env.NODE_ENV === 'production') {
         }
       });
 
-      await queryInterface.sequelize.query('revoke sfo from licensing;', {
+      await queryInterface.sequelize.query('revoke traps from licensing;', {
         type: Sequelize.QueryTypes.RAW
       });
     },
 
     down: async (queryInterface, Sequelize) => {
-      await queryInterface.sequelize.query('grant sfo to licensing;', {
+      await queryInterface.sequelize.query('grant traps to licensing;', {
         type: Sequelize.QueryTypes.RAW
       });
 
