@@ -17,6 +17,10 @@ if (process.env.NODE_ENV === 'production') {
         type: Sequelize.QueryTypes.RAW
       });
 
+      await queryInterface.sequelize.query('grant traps to licensing;', {
+        type: Sequelize.QueryTypes.RAW
+      });
+
       await queryInterface.sequelize.query(
         'alter default privileges for role licensing, traps in schema traps grant select on tables to rotraps;',
         {
@@ -31,6 +35,10 @@ if (process.env.NODE_ENV === 'production') {
           type: Sequelize.QueryTypes.RAW
         }
       );
+
+      await queryInterface.sequelize.query('revoke traps from licensing;', {
+        type: Sequelize.QueryTypes.RAW
+      });
 
       await queryInterface.sequelize.query('revoke select on schema traps from rotraps;', {
         type: Sequelize.QueryTypes.RAW
