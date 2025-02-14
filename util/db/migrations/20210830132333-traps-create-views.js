@@ -1,6 +1,6 @@
 'use strict';
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV !== 'all') {
   module.exports = {
     up: async (queryInterface, Sequelize) => {
       await queryInterface.sequelize.query(

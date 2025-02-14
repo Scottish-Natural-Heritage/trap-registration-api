@@ -2,7 +2,7 @@
 
 const config = require('../../../src/config/database.js').ssDatabase;
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV !== 'all') {
   module.exports = {
     up: async (queryInterface, Sequelize) => {
       await queryInterface.sequelize.query('ALTER ROLE rotraps WITH PASSWORD :roTrapsPassword;', {

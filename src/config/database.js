@@ -1,6 +1,6 @@
 const config = require('./app.js');
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV !== 'all') {
   module.exports = {
     preMigrations: {
       username: 'licensing',
