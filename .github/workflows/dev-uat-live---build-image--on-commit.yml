@@ -107,7 +107,7 @@ jobs:
         id: redeploy-service
         env:
           CLUSTER_NAME: ${{env.PROJECT}}-${{env.ENVIRONMENT}}-cluster
-          SERVICE_NAME: ${{env.PROJECT}}-${{env.ENVIRONMENT}}-fit-and-competent
+          SERVICE_NAME: ${{env.PROJECT}}-${{env.ENVIRONMENT}}-trap-registration-api
         run: |
           echo Cluster: $CLUSTER_NAME
           echo Service: $SERVICE_NAME
