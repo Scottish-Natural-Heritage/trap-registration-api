@@ -34,7 +34,7 @@
     "winston": "^3.8.0"
   },
   "devDependencies": {
-    "newman": "^6.2.1",
+    "newman": "^6.2.0",
     "prettier": "^2.3.1",
     "sqlite3": "^5.0.2",
     "start-server-and-test": "^2.0.3",
