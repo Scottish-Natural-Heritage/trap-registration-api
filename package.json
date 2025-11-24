@@ -7,8 +7,8 @@
   "type": "module",
   "scripts": {
     "lint": "xo",
-    "premigrations": "npx sequelize-cli db:migrate --env preMigrations --migrations-path util/db/pre-migrations >/dev/null",
-    "migrations": "npx sequelize-cli db:migrate  --env database >/dev/null",
+    "premigrations": "npx sequelize-cli db:migrate --env preMigrations --migrations-path util/db/pre-migrations",
+    "migrations": "npx sequelize-cli db:migrate  --env database",
     "prestart": "npm run migrations",
     "start": "node --no-warnings src/server.js",
     "nm:run": "newman run tests/v1-trap-registration-api.postman_collection.json && newman run tests/v2-trap-registration-api.postman_collection.json",
@@ -21,7 +21,7 @@
   "dependencies": {
     "axios": "^1.10.0",
     "express": "^4.18.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.5",
     "naturescot-utils": "^1.2.0",
     "node-cron": "^3.0.2",
@@ -34,7 +34,7 @@
     "winston": "^3.8.0"
   },
   "devDependencies": {
-    "newman": "^6.2.1",
+    "newman": "^6.2.0",
     "prettier": "^2.3.1",
     "sqlite3": "^5.0.2",
     "start-server-and-test": "^2.0.3",
