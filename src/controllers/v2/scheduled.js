@@ -10,7 +10,8 @@ import {
   LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
 } from '../../notify-template-ids.js';
 
-const {Registration, Return} = database;
+const {Registration, Return, Revocation, Note} = database;
+const {Op} = database.Sequelize;
 
 const setReturnReminderEmailDetails = (registration) => ({
   id: registration.id,
@@ -138,6 +139,99 @@ const ScheduledController = {
     await Promise.all(promises);
 
     return sentCount;
+  },
+
+  /**
+   * soft-delete registrations that are older than 5 years.
+   *
+   * Non-revoked registrations whose expiryDate is more than 5 years ago.
+   * Revoked registrations whose Revocation.createdAt is more than 5 years ago (notes only).
+   *
+   * @returns {Object} Summary of what was deleted.
+   */
+  async softDeleteExpiredRegistrations() {
+    const fiveYearsAgo = new Date();
+    fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+
+    const summary = {
+      expiredRegistrationsDeleted: 0,
+      expiredNotesDeleted: 0,
+      revokedNotesDeleted: 0
+    };
+
+    const obfuscatedData = {
+      fullName: 'REDACTED',
+      emailAddress: 'redacted@redacted.redacted',
+      phoneNumber: 'REDACTED',
+      addressLine1: 'REDACTED',
+      addressLine2: null,
+      addressTown: 'REDACTED',
+      addressCounty: null
+    };
+
+    // registrations with expiryDate > 5 years ago.
+    const expiredRegistrations = await Registration.findAll({
+      where: {
+        expiryDate: {[Op.lt]: fiveYearsAgo}
+      },
+      include: [{model: Revocation, required: false}]
+    });
+
+    /* eslint-disable no-await-in-loop */
+    for (const registration of expiredRegistrations) {
+      if (registration.Revocation && registration.Revocation.isRevoked === true) {
+        continue;
+      }
+
+      try {
+        await database.sequelize.transaction(async (t) => {
+          await Registration.update(obfuscatedData, {where: {id: registration.id}, transaction: t});
+          const notesDeleted = await Note.destroy({where: {RegistrationId: registration.id}, transaction: t});
+          await Registration.destroy({where: {id: registration.id}, transaction: t});
+          summary.expiredNotesDeleted += notesDeleted;
+          summary.expiredRegistrationsDeleted++;
+        });
+      } catch (error) {
+        jsonConsoleLogger.error(unErrorJson(error));
+      }
+    }
+    /* eslint-enable no-await-in-loop */
+
+    // revoked registrations
+    const revokedRegistrations = await Registration.findAll({
+      paranoid: false,
+      include: [
+        {
+          model: Revocation,
+          required: true,
+          paranoid: false,
+          where: {
+            isRevoked: true,
+            createdAt: {[Op.lt]: fiveYearsAgo}
+          }
+        }
+      ]
+    });
+
+    /* eslint-disable no-await-in-loop */
+    for (const registration of revokedRegistrations) {
+      try {
+        await database.sequelize.transaction(async (t) => {
+          await Registration.update(obfuscatedData, {
+            where: {id: registration.id},
+            transaction: t,
+            paranoid: false
+          });
+          const notesDeleted = await Note.destroy({where: {RegistrationId: registration.id}, transaction: t});
+          summary.revokedNotesDeleted += notesDeleted;
+        });
+      } catch (error) {
+        jsonConsoleLogger.error(unErrorJson(error));
+      }
+    }
+    /* eslint-enable no-await-in-loop */
+
+    return summary;
   }
 };
 
