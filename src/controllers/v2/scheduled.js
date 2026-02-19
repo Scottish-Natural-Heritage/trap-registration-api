@@ -142,7 +142,7 @@ const ScheduledController = {
   },
 
   /**
-   * soft-delete registrations that are older than 5 years.
+   * Soft-delete registrations that are older than 5 years.
    *
    * Non-revoked registrations whose expiryDate is more than 5 years ago.
    * Revoked registrations whose Revocation.createdAt is more than 5 years ago (notes only).
@@ -169,7 +169,7 @@ const ScheduledController = {
       addressCounty: null
     };
 
-    // registrations with expiryDate > 5 years ago.
+    // Registrations with expiryDate > 5 years ago.
     const expiredRegistrations = await Registration.findAll({
       where: {
         expiryDate: {[Op.lt]: fiveYearsAgo}
