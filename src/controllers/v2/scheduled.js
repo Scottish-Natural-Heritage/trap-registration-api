@@ -2,7 +2,6 @@ import NotifyClient from 'notifications-node-client';
 import database from '../../models/index.js';
 import config from '../../config/app.js';
 import jsonConsoleLogger, {unErrorJson} from '../../json-console-logger.js';
-import softDeleteExpiredRegistrations from './retention.js';
 import {
   RETURN_REMINDER_NOTIFY_TEMPLATE_ID,
   PREVIOUS_YEAR_RETURN_NOTIFY_TEMPLATE_ID,
@@ -10,6 +9,7 @@ import {
   EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID,
   LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
 } from '../../notify-template-ids.js';
+import softDeleteExpiredRegistrations from './retention.js';
 
 const {Registration, Return} = database;
 

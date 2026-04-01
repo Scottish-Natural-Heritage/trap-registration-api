@@ -16,7 +16,6 @@ const obfuscatedData = {
   addressCounty: null
 };
 
-
 const findExpiredRegistrationIds = async (cutoffDate) => {
   const rows = await Registration.findAll({
     attributes: ['id'],
@@ -59,7 +58,6 @@ const findRevokedRegistrationIds = async (cutoffDate) => {
   return rows.map((r) => r.id);
 };
 
-
 const collectRegistrationIdsForCleanup = async (cutoffDate) => {
   const [expiredIds, revokedIds] = await Promise.all([
     findExpiredRegistrationIds(cutoffDate),
@@ -69,9 +67,8 @@ const collectRegistrationIdsForCleanup = async (cutoffDate) => {
   return new Set([...expiredIds, ...revokedIds]);
 };
 
-
-const cleanupRegistration = async (registrationId) => {
-  return database.sequelize.transaction(async (t) => {
+const cleanupRegistration = async (registrationId) =>
+  database.sequelize.transaction(async (t) => {
     // Use paranoid: false so the update applies to soft deleted rows
     await Registration.update(obfuscatedData, {
       where: {id: registrationId},
@@ -86,19 +83,18 @@ const cleanupRegistration = async (registrationId) => {
 
     return {notesDeleted, returnsDeleted};
   });
-};
 
 /**
- * 
+ *
  * Gets the ids for both revoked and expired registrations
  * Soft deletes them, their notes, and their returns
  * Updates any PII to dummy data
- * 
+ *
  * @returns {Object} Summary of what was processed
  */
 const softDeleteExpiredRegistrations = async () => {
   const cutoff = new Date();
-  cutoff.setFullYear(fiveYearsAgo.getFullYear() - retentionYears);
+  cutoff.setFullYear(cutoff.getFullYear() - retentionYears);
 
   const summary = {
     registrationsProcessed: 0,
