@@ -76,8 +76,8 @@ const cleanupRegistration = async (registrationId) =>
       paranoid: false
     });
 
-    const notesDeleted = await Note.destroy({where: {RegistrationId: registrationId}, transaction: t});
-    const returnsDeleted = await Return.destroy({where: {RegistrationId: registrationId}, transaction: t});
+    const notesDeleted = await Note.destroy({where: {RegistrationId: registrationId}, transaction: t, force: true});
+    const returnsDeleted = await Return.destroy({where: {RegistrationId: registrationId}, transaction: t, force: true});
 
     await Registration.destroy({where: {id: registrationId}, transaction: t});
 
