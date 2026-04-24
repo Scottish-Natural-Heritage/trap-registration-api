@@ -21,6 +21,13 @@ const initScheduledJobs = () => {
 
     // Tasks here.
 
+    // Daily: soft-delete registrations and notes older than 5 years.
+    try {
+      await axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/expired-registrations-cleanup`);
+    } catch (error) {
+      jsonConsoleLogger.error(unErrorJson(error));
+    }
+
     if (currentDate.getDate() === 1) {
       const promises = [];
 

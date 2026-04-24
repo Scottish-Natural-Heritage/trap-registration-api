@@ -9,6 +9,7 @@ import {
   EXPIRED_RECENTLY_NO_RETURN_NOTIFY_TEMPLATE_ID,
   LICENSING_REPLY_TO_NOTIFY_EMAIL_ID
 } from '../../notify-template-ids.js';
+import softDeleteExpiredRegistrations from './retention.js';
 
 const {Registration, Return} = database;
 
@@ -138,7 +139,9 @@ const ScheduledController = {
     await Promise.all(promises);
 
     return sentCount;
-  }
+  },
+
+  softDeleteExpiredRegistrations
 };
 
 export {ScheduledController as default};

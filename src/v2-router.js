@@ -751,6 +751,20 @@ v2Router.post('/expired-licence-no-returns-reminder', async (request, response) 
 });
 
 /**
+ * Soft-delete registrations and notes older than 5 years for data retention.
+ */
+v2Router.post('/expired-registrations-cleanup', async (request, response) => {
+  try {
+    const result = await ScheduledController.softDeleteExpiredRegistrations();
+    jsonConsoleLogger.info(result);
+    return response.status(200).send({message: 'Expired registrations cleanup completed.', result});
+  } catch (error) {
+    jsonConsoleLogger.error(unErrorJson(error));
+    return response.status(500).send({error});
+  }
+});
+
+/**
  * UPDATEs a single return in a single registration.
  */
 v2Router.put('/registrations/:id/returns/:returnId', async (request, response) =>
