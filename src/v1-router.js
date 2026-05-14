@@ -17,9 +17,6 @@ const {RequestUUID} = db;
 
 const v1router = express.Router();
 
-console.log(jwk.getPublicKey());
-console.log(jwk.getPrivateKey());
-
 // `/health` is a simple health-check end-point to test whether the service is up.
 v1router.get('/health', async (request, response) => {
   response.status(200).send({message: 'OK'});
