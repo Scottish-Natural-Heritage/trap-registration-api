@@ -59,10 +59,10 @@ const getPrivateKey = () => {
     const crypto = require('crypto');
     const privateKey = crypto.createPrivateKey({
       format: 'jwk',
-      key: testKeyPair,
+      key: testKeyPair
     });
 
-    return privateKey.export({ format: 'pem', type: 'pkcs8' }).toString();
+    return privateKey.export({format: 'pem', type: 'pkcs8'}).toString();
   }
 
   return fs.readFileSync('./.secrets/jwt-key');
