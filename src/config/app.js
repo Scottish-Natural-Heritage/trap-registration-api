@@ -1,3 +1,5 @@
+const process = require('node:process');
+
 // Grab our config from the env vars, or set some defaults if they're missing.
 module.exports = Object.freeze({
   port: '3001',

@@ -6,7 +6,10 @@ import config from './config/app.js';
 import jwk from './config/jwk.js';
 import Registration from './controllers/v1/registration.js';
 import Return from './controllers/v1/return.js';
+// eslint-disable-next-line import/order
 import db from './models/index.js';
+
+const process = require('node:process');
 
 const {RequestUUID} = db;
 
@@ -500,10 +503,14 @@ const cleanReturnInput = (id, body) => ({
   RegistrationId: id,
   createdByLicensingOfficer: body.createdByLicensingOfficer,
 
+  /* eslint-disable unicorn/prefer-logical-operator-over-ternary */
+
   // Copy across the year the return is for and the number of larsen mate / pod traps in which meat baits were used.
   year: body.year ? body.year : undefined,
   numberLarsenMate: body.numberLarsenMate ? body.numberLarsenMate : undefined,
   numberLarsenPod: body.numberLarsenPod ? body.numberLarsenPod : undefined,
+
+  /* eslint-enable unicorn/prefer-logical-operator-over-ternary */
 
   // We copy across the nonTargetSpeciesCaught, cleaning them as we go.
   nonTargetSpecies:

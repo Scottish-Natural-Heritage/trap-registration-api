@@ -1,5 +1,7 @@
 'use strict';
 
+const process = require('node:process');
+
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
     async up(queryInterface, Sequelize) {

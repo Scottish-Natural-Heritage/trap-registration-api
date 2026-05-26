@@ -98,6 +98,8 @@ const cleanNoteInput = (regId, body) => ({
 const cleanPatchInput = (body) => {
   const cleanedBody = {};
 
+  /* eslint-disable no-use-extend-native/no-use-extend-native */
+
   // Check for the existence of each field and if found clean it if required and add to the cleanedBody object.
   if (Object.hasOwn(body, 'convictions')) {
     cleanedBody.convictions = body.convictions;
@@ -150,6 +152,8 @@ const cleanPatchInput = (body) => {
     cleanedBody.emailAddress = utils.recipients.validateAndFormatEmailAddress(body.emailAddress);
   }
 
+  /* eslint-enable no-use-extend-native/no-use-extend-native */
+
   return cleanedBody;
 };
 
@@ -168,6 +172,8 @@ const cleanReturnInput = (id, body) => ({
   // The id passed in is set as the registration id.
   RegistrationId: id,
   createdByLicensingOfficer: body.createdByLicensingOfficer,
+
+  /* eslint-disable unicorn/prefer-logical-operator-over-ternary */
 
   // Copy across the year the return is for and the number of larsen mate / pod traps in which meat baits were used.
   year: body.year ? body.year : undefined,
@@ -213,6 +219,8 @@ const cleanPatchReturnInput = (id, body) => ({
   numberLarsenMate: Number.isNaN(body.numberLarsenMate) ? undefined : body.numberLarsenMate,
   numberLarsenPod: Number.isNaN(body.numberLarsenPod) ? undefined : body.numberLarsenPod
 });
+
+/* eslint-enable unicorn/prefer-logical-operator-over-ternary */
 
 /**
  * Clean the incoming request body to make it more compatible with the
