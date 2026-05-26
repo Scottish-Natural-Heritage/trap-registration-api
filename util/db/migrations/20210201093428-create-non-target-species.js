@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  async up(queryInterface, Sequelize) {
     // Create the NonTargetSpecies table
     await queryInterface.createTable('NonTargetSpecies', {
       id: {
@@ -50,7 +50,7 @@ module.exports = {
     });
   },
 
-  down: async (queryInterface) => {
+  async down(queryInterface) {
     await queryInterface.dropTable('NonTargetSpeciesCaught');
   }
 };

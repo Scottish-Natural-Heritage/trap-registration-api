@@ -3,7 +3,6 @@
 // eslint-disable-next-line no-unused-vars
 import express from 'express';
 import onFinished from 'on-finished';
-
 import jsonConsoleLogger from './json-console-logger.js';
 
 /**

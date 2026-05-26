@@ -13,7 +13,7 @@ const ReturnController = {
    *
    * @returns {Number} ID of the new Return
    */
-  create: async () => {
+  async create() {
     const newReturn = await Return.create();
     // If we run out of attempts let the calling code know by raising an error.
     if (newReturn === undefined) {
@@ -54,7 +54,7 @@ const ReturnController = {
    * @param {any} jsonReturn A JSON version of the model to replace the database's copy.
    * @returns {Sequelize.Model} The updated return.
    */
-  update: async (id, jsonReturn) => {
+  async update(id, jsonReturn) {
     // Grab the already existing object from the database.
     const existingReturn = await Return.findByPk(id);
 

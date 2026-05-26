@@ -108,7 +108,7 @@ const RegistrationController = {
       order: [['createdAt', 'DESC']]
     }),
 
-  create: async (reg) => {
+  async create(reg) {
     // Check this is the first time we've received this application.
     const isPreviousRequest = await RequestUUID.findOne({where: {uuid: reg.uuid}});
 
@@ -175,7 +175,7 @@ const RegistrationController = {
    * @param {any} reg a JSON version of the model containing only the fields to be updated
    * @returns {boolean} true if the record is updated, otherwise false
    */
-  update: async (id, reg) => {
+  async update(id, reg) {
     // Save the new values to the database.
     const result = await Registration.update(reg, {where: {id}});
 
@@ -197,7 +197,7 @@ const RegistrationController = {
    * @param {Object} cleanObject a new revocation object to be added to the database.
    * @returns {boolean} true if the record is deleted, otherwise false
    */
-  delete: async (id, cleanObject) => {
+  async delete(id, cleanObject) {
     try {
       // In order to delete a registration we need to also delete the return record associated with the registration
       // and the Non-Target Species records associated to the returns.

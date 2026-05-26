@@ -6,7 +6,6 @@ import jsonConsoleLogger from './json-console-logger.js';
 
 // Load the app.
 import app from './app.js';
-
 import initScheduledJobs from './scheduled-tasks.js';
 
 // Start up node-cron to handle any scheduled jobs.

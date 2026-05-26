@@ -1,6 +1,5 @@
 import Sequelize from 'sequelize';
 import NotifyClient from 'notifications-node-client';
-
 import db from '../../models/index.js';
 import config from '../../config/app.js';
 
@@ -103,7 +102,7 @@ const RegistrationController = {
    *
    * @returns {Number} ID of the new registration
    */
-  create: async () => {
+  async create() {
     let newReg;
     let remainingAttempts = 10;
     // Loop until we have a new empty registration or we run out of attempts,
@@ -144,7 +143,7 @@ const RegistrationController = {
    * @param {any} reg a JSON version of the model to replace the database's copy
    * @returns {boolean} true if the record is updated, otherwise false
    */
-  update: async (id, reg) => {
+  async update(id, reg) {
     // Save the new values to the database.
     const result = await Registration.update(reg, {where: {id}});
 
@@ -180,7 +179,7 @@ const RegistrationController = {
    * @param {Object} cleanObject an new revocation object to be added to the database.
    * @returns {boolean} true if the record is deleted, otherwise false
    */
-  delete: async (id, cleanObject) => {
+  async delete(id, cleanObject) {
     try {
       // In order to delete a registration we need to also delete the return record associated with the registration
       // and the Non-Target Species records associated to the returns.

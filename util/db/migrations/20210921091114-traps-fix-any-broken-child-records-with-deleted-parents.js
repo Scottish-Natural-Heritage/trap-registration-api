@@ -1,7 +1,7 @@
 'use strict';
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
-    up: async (queryInterface, Sequelize) => {
+    async up(queryInterface, Sequelize) {
       await queryInterface.sequelize.query(
         `
         UPDATE traps."Returns" SET "deletedAt" = CURRENT_TIMESTAMP WHERE "deletedAt" IS NULL AND "RegistrationId" IN (SELECT id FROM traps."Registrations" WHERE "deletedAt" IS NOT NULL)`,
@@ -19,11 +19,11 @@ if (process.env.NODE_ENV === 'production') {
       );
     },
 
-    down: async (_queryInterface, _Sequelize) => Promise.resolve()
+    async down(_queryInterface, _Sequelize) {}
   };
 } else {
   module.exports = {
-    up: async (queryInterface, Sequelize) => {
+    async up(queryInterface, Sequelize) {
       await queryInterface.sequelize.query(
         `
         UPDATE "Returns" SET "deletedAt" = CURRENT_TIMESTAMP WHERE "deletedAt" IS NULL AND "RegistrationId" IN (SELECT id FROM "Registrations" WHERE "deletedAt" IS NOT NULL)`,
@@ -41,6 +41,6 @@ if (process.env.NODE_ENV === 'production') {
       );
     },
 
-    down: async (_queryInterface, _Sequelize) => Promise.resolve()
+    async down(_queryInterface, _Sequelize) {}
   };
 }

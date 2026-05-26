@@ -1,16 +1,11 @@
 import express from 'express';
-
 import jwt from 'jsonwebtoken';
-
 import utils from 'naturescot-utils';
 import NotifyClient from 'notifications-node-client';
-
 import config from './config/app.js';
 import jwk from './config/jwk.js';
-
 import Registration from './controllers/v1/registration.js';
 import Return from './controllers/v1/return.js';
-
 import db from './models/index.js';
 
 const {RequestUUID} = db;
@@ -360,8 +355,8 @@ const postcodesMatch = (postcode1, postcode2) => {
   const notAlphaNumber = /[^a-z\d]/gi;
 
   // Clean our two strings to the 'same' representation.
-  const cleanPostcode1 = postcode1.replace(notAlphaNumber, '').toLocaleLowerCase();
-  const cleanPostcode2 = postcode2.replace(notAlphaNumber, '').toLocaleLowerCase();
+  const cleanPostcode1 = postcode1.replaceAll(notAlphaNumber, '').toLocaleLowerCase();
+  const cleanPostcode2 = postcode2.replaceAll(notAlphaNumber, '').toLocaleLowerCase();
 
   // Check if they match, now that they're clean.
   return cleanPostcode1 === cleanPostcode2;

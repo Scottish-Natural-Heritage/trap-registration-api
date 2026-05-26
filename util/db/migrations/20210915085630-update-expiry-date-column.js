@@ -2,7 +2,7 @@
 
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
-    up: async (queryInterface, Sequelize) => {
+    async up(queryInterface, Sequelize) {
       // Grab the registrations as an array of objects.
       const resultsArray = await queryInterface.sequelize.query('SELECT * FROM traps."Registrations";', {
         type: Sequelize.QueryTypes.SELECT
@@ -31,7 +31,7 @@ if (process.env.NODE_ENV === 'production') {
 
       await Promise.all(updateQueries);
     },
-    down: async (queryInterface, Sequelize) => {
+    async down(queryInterface, Sequelize) {
       // For the opposite set all expiry date values to null.
       await queryInterface.sequelize.query(`UPDATE traps."Registrations" SET "expiryDate" = null;`, {
         type: Sequelize.QueryTypes.UPDATE
@@ -40,7 +40,7 @@ if (process.env.NODE_ENV === 'production') {
   };
 } else {
   module.exports = {
-    up: async (queryInterface, Sequelize) => {
+    async up(queryInterface, Sequelize) {
       // Grab the registrations as an array of objects.
       const resultsArray = await queryInterface.sequelize.query('SELECT * FROM Registrations;', {
         type: Sequelize.QueryTypes.SELECT
@@ -69,7 +69,7 @@ if (process.env.NODE_ENV === 'production') {
 
       await Promise.all(updateQueries);
     },
-    down: async (queryInterface, Sequelize) => {
+    async down(queryInterface, Sequelize) {
       // For the opposite set all expiry date values to null.
       await queryInterface.sequelize.query(`UPDATE Registrations SET expiryDate = null;`, {
         type: Sequelize.QueryTypes.UPDATE

@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('node:fs');
 
 /**
  * An EC public+private keypair used to sign links during our automated

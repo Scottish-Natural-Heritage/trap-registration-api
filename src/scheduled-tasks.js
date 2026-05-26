@@ -3,7 +3,6 @@ import cron from 'node-cron';
 
 // Use to make HTTP calls.
 import axios from 'axios';
-
 import config from './config/app.js';
 
 // Let us log structured messages to the console.

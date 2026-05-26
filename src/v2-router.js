@@ -99,54 +99,54 @@ const cleanPatchInput = (body) => {
   const cleanedBody = {};
 
   // Check for the existence of each field and if found clean it if required and add to the cleanedBody object.
-  if (Object.prototype.hasOwnProperty.call(body, 'convictions')) {
+  if (Object.hasOwn(body, 'convictions')) {
     cleanedBody.convictions = body.convictions;
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'usingGL01')) {
+  if (Object.hasOwn(body, 'usingGL01')) {
     cleanedBody.usingGL01 = body.usingGL01;
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'usingGL02')) {
+  if (Object.hasOwn(body, 'usingGL02')) {
     cleanedBody.usingGL02 = body.usingGL02;
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'meatBaits')) {
+  if (Object.hasOwn(body, 'meatBaits')) {
     cleanedBody.meatBaits = body.meatBaits;
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'fullName')) {
+  if (Object.hasOwn(body, 'fullName')) {
     cleanedBody.fullName = body.fullName.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'addressLine1')) {
+  if (Object.hasOwn(body, 'addressLine1')) {
     cleanedBody.addressLine1 = body.addressLine1.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'addressLine2')) {
+  if (Object.hasOwn(body, 'addressLine2')) {
     cleanedBody.addressLine2 = body.addressLine2.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'addressTown')) {
+  if (Object.hasOwn(body, 'addressTown')) {
     cleanedBody.addressTown = body.addressTown.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'addressCounty')) {
+  if (Object.hasOwn(body, 'addressCounty')) {
     cleanedBody.addressCounty = body.addressCounty.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'addressPostcode')) {
+  if (Object.hasOwn(body, 'addressPostcode')) {
     cleanedBody.addressPostcode = utils.postalAddress.formatPostcodeForPrinting(body.addressPostcode);
     if (!utils.postalAddress.isaRealUkPostcode(cleanedBody.addressPostcode)) {
       throw new Error('Invalid postcode.');
     }
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'phoneNumber')) {
+  if (Object.hasOwn(body, 'phoneNumber')) {
     cleanedBody.phoneNumber = body.phoneNumber.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'emailAddress')) {
+  if (Object.hasOwn(body, 'emailAddress')) {
     cleanedBody.emailAddress = utils.recipients.validateAndFormatEmailAddress(body.emailAddress);
   }
 

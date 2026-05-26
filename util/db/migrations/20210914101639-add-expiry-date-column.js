@@ -2,7 +2,7 @@
 const databaseConfig = require('../../../src/config/database.js');
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  async up(queryInterface, Sequelize) {
     await queryInterface.addColumn(
       {
         schema: databaseConfig.database.schema,
@@ -12,7 +12,7 @@ module.exports = {
       Sequelize.DATE
     );
   },
-  down: async (queryInterface) => {
+  async down(queryInterface) {
     await queryInterface.removeColumn(
       {
         schema: databaseConfig.database.schema,
