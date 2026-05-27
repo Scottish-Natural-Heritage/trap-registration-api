@@ -1,3 +1,4 @@
+import * as process from 'node:process';
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import utils from 'naturescot-utils';
@@ -8,8 +9,6 @@ import Registration from './controllers/v1/registration.js';
 import Return from './controllers/v1/return.js';
 // eslint-disable-next-line import/order
 import db from './models/index.js';
-
-const process = require('node:process');
 
 const {RequestUUID} = db;
 
