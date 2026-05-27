@@ -7,7 +7,6 @@ import config from './config/app.js';
 import jwk from './config/jwk.js';
 import Registration from './controllers/v1/registration.js';
 import Return from './controllers/v1/return.js';
-// eslint-disable-next-line import/order
 import db from './models/index.js';
 
 const {RequestUUID} = db;

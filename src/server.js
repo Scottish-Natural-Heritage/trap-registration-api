@@ -5,7 +5,6 @@ import config from './config/app.js';
 import jsonConsoleLogger from './json-console-logger.js';
 // Load the app.
 import app from './app.js';
-// eslint-disable-next-line import/order
 import initScheduledJobs from './scheduled-tasks.js';
 
 // Start up node-cron to handle any scheduled jobs.
