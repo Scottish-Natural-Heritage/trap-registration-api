@@ -57,7 +57,7 @@ const getPublicKey = () => {
 
 const getPrivateKey = () => {
   if (process.env.NODE_ENV !== 'production') {
-    const crypto = require('crypto');
+    const crypto = require('node:crypto');
     const privateKey = crypto.createPrivateKey({
       format: 'jwk',
       key: testKeyPair
