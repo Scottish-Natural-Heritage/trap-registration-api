@@ -1,7 +1,10 @@
 'use strict';
+
+const process = require('node:process');
+
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
-    up: async (queryInterface, Sequelize) => {
+    async up(queryInterface, Sequelize) {
       await queryInterface.sequelize.query('DROP VIEW traps_Registrations;', {
         type: Sequelize.QueryTypes.RAW
       });
@@ -11,7 +14,7 @@ if (process.env.NODE_ENV === 'production') {
       });
     },
 
-    down: async (queryInterface, Sequelize) => {
+    async down(queryInterface, Sequelize) {
       await queryInterface.sequelize.query('DROP VIEW traps_Registrations;', {
         type: Sequelize.QueryTypes.RAW
       });

@@ -35,7 +35,7 @@ const NoteController = {
    *
    * @returns {Number} ID of the new Note
    */
-  create: async (incomingNote) => {
+  async create(incomingNote) {
     // Split the incoming json blob in to each object to be persisted.
     let newNote;
     // Start the database transaction.

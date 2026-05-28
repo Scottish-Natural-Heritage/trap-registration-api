@@ -1,8 +1,10 @@
 'use strict';
 
+const process = require('node:process');
+
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
-    up: async (queryInterface, Sequelize) => {
+    async up(queryInterface, Sequelize) {
       await queryInterface.sequelize.query(
         'CREATE VIEW traps_NonTargetSpecies AS SELECT * FROM traps."NonTargetSpecies";',
         {
@@ -22,7 +24,7 @@ if (process.env.NODE_ENV === 'production') {
         type: Sequelize.QueryTypes.RAW
       });
     },
-    down: async (queryInterface, Sequelize) => {
+    async down(queryInterface, Sequelize) {
       await queryInterface.sequelize.query('DROP VIEW traps_Revocations;', {
         type: Sequelize.QueryTypes.RAW
       });

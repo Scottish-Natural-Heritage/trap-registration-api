@@ -1,6 +1,5 @@
 import Sequelize from 'sequelize';
 import dbConfig from '../config/database.js';
-
 import Registration from './registration.js';
 import Return from './return.js';
 import NonTargetSpecies from './non-target-species.js';
@@ -10,23 +9,23 @@ import RequestUUID from './request-uuid.js';
 
 const sequelize = new Sequelize(dbConfig.database);
 
-const db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
-db.Registration = Registration(sequelize, Sequelize);
-db.Return = Return(sequelize, Sequelize);
-db.NonTargetSpecies = NonTargetSpecies(sequelize, Sequelize);
-db.Revocation = Revocation(sequelize, Sequelize);
-db.Note = Note(sequelize, Sequelize);
-db.RequestUUID = RequestUUID(sequelize, Sequelize);
+const database = {};
+database.Sequelize = Sequelize;
+database.sequelize = sequelize;
+database.Registration = Registration(sequelize, Sequelize);
+database.Return = Return(sequelize, Sequelize);
+database.NonTargetSpecies = NonTargetSpecies(sequelize, Sequelize);
+database.Revocation = Revocation(sequelize, Sequelize);
+database.Note = Note(sequelize, Sequelize);
+database.RequestUUID = RequestUUID(sequelize, Sequelize);
 
-db.Registration.hasMany(db.Return);
-db.Registration.hasOne(db.Revocation);
-db.Return.belongsTo(db.Registration);
-db.Return.hasMany(db.NonTargetSpecies);
-db.NonTargetSpecies.belongsTo(db.Return);
-db.Revocation.belongsTo(db.Registration);
-db.Registration.hasMany(db.Note);
-db.Note.belongsTo(db.Registration);
+database.Registration.hasMany(database.Return);
+database.Registration.hasOne(database.Revocation);
+database.Return.belongsTo(database.Registration);
+database.Return.hasMany(database.NonTargetSpecies);
+database.NonTargetSpecies.belongsTo(database.Return);
+database.Revocation.belongsTo(database.Registration);
+database.Registration.hasMany(database.Note);
+database.Note.belongsTo(database.Registration);
 
-export {db as default};
+export {database as default};

@@ -44,7 +44,7 @@ const ReturnController = {
    *
    * @returns {Number} ID of the new Return
    */
-  create: async (cleanedReturn) => {
+  async create(cleanedReturn) {
     // Split the incoming json blob in to each object to be persisted.
     const {nonTargetSpecies, ...returnObject} = cleanedReturn;
     let createdReturn;
@@ -92,7 +92,7 @@ const ReturnController = {
    * @param {any} jsonReturn a JSON version of the model containing only the fields to be updated
    * @returns {boolean} true if the record is updated, otherwise false
    */
-  update: async (id, jsonReturn) => {
+  async update(id, jsonReturn) {
     // Save the new values to the database.
     const result = await Return.update(jsonReturn, {where: {id}});
 

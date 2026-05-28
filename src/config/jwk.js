@@ -1,4 +1,5 @@
-const fs = require('fs');
+const fs = require('node:fs');
+const process = require('node:process');
 
 /**
  * An EC public+private keypair used to sign links during our automated
@@ -56,7 +57,7 @@ const getPublicKey = () => {
 
 const getPrivateKey = () => {
   if (process.env.NODE_ENV !== 'production') {
-    const crypto = require('crypto');
+    const crypto = require('node:crypto');
     const privateKey = crypto.createPrivateKey({
       format: 'jwk',
       key: testKeyPair
