@@ -8,7 +8,7 @@ const jsonConsoleLogger = winston.createLogger({
 });
 
 jsonConsoleLogger.stream = {
-  write: (message) => {
+  write(message) {
     jsonConsoleLogger.info(message);
   }
 };

@@ -1,8 +1,6 @@
 import express from 'express';
-
 import apiLogger from './api-logger.js';
 import config from './config/app.js';
-
 import v1Router from './v1-router.js';
 import v2Router from './v2-router.js';
 

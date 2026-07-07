@@ -1,3 +1,4 @@
+const process = require('node:process');
 const config = require('./app.js');
 
 if (process.env.NODE_ENV === 'production') {

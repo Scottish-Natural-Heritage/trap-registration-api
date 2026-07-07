@@ -1,7 +1,10 @@
 'use strict';
+
+const process = require('node:process');
+
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
-    up: async (queryInterface, Sequelize) => {
+    async up(queryInterface, Sequelize) {
       await queryInterface.sequelize.query(
         `UPDATE traps."SequelizeMeta" SET name = '20210830132333-traps-create-views.js' WHERE name = '20213008132333-traps-create-views.js';`,
         {
@@ -9,7 +12,7 @@ if (process.env.NODE_ENV === 'production') {
         }
       );
     },
-    down: async (queryInterface, Sequelize) => {
+    async down(queryInterface, Sequelize) {
       await queryInterface.sequelize.query(
         `UPDATE traps."SequelizeMeta" SET name = '20213008132333-traps-create-views.js' WHERE name = '20210830132333-traps-create-views.js';`,
         {
@@ -20,7 +23,7 @@ if (process.env.NODE_ENV === 'production') {
   };
 } else {
   module.exports = {
-    up: async (queryInterface, Sequelize) => {
+    async up(queryInterface, Sequelize) {
       await queryInterface.sequelize.query(
         `UPDATE SequelizeMeta SET name = '20210830132333-traps-create-views.js' WHERE name = '20213008132333-traps-create-views.js';`,
         {
@@ -28,7 +31,7 @@ if (process.env.NODE_ENV === 'production') {
         }
       );
     },
-    down: async (queryInterface, Sequelize) => {
+    async down(queryInterface, Sequelize) {
       await queryInterface.sequelize.query(
         `UPDATE SequelizeMeta SET name = '20213008132333-traps-create-views.js' WHERE name = '20210830132333-traps-create-views.js';`,
         {

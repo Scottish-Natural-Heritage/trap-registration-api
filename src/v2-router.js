@@ -98,57 +98,61 @@ const cleanNoteInput = (regId, body) => ({
 const cleanPatchInput = (body) => {
   const cleanedBody = {};
 
+  /* eslint-disable no-use-extend-native/no-use-extend-native */
+
   // Check for the existence of each field and if found clean it if required and add to the cleanedBody object.
-  if (Object.prototype.hasOwnProperty.call(body, 'convictions')) {
+  if (Object.hasOwn(body, 'convictions')) {
     cleanedBody.convictions = body.convictions;
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'usingGL01')) {
+  if (Object.hasOwn(body, 'usingGL01')) {
     cleanedBody.usingGL01 = body.usingGL01;
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'usingGL02')) {
+  if (Object.hasOwn(body, 'usingGL02')) {
     cleanedBody.usingGL02 = body.usingGL02;
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'meatBaits')) {
+  if (Object.hasOwn(body, 'meatBaits')) {
     cleanedBody.meatBaits = body.meatBaits;
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'fullName')) {
+  if (Object.hasOwn(body, 'fullName')) {
     cleanedBody.fullName = body.fullName.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'addressLine1')) {
+  if (Object.hasOwn(body, 'addressLine1')) {
     cleanedBody.addressLine1 = body.addressLine1.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'addressLine2')) {
+  if (Object.hasOwn(body, 'addressLine2')) {
     cleanedBody.addressLine2 = body.addressLine2.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'addressTown')) {
+  if (Object.hasOwn(body, 'addressTown')) {
     cleanedBody.addressTown = body.addressTown.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'addressCounty')) {
+  if (Object.hasOwn(body, 'addressCounty')) {
     cleanedBody.addressCounty = body.addressCounty.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'addressPostcode')) {
+  if (Object.hasOwn(body, 'addressPostcode')) {
     cleanedBody.addressPostcode = utils.postalAddress.formatPostcodeForPrinting(body.addressPostcode);
     if (!utils.postalAddress.isaRealUkPostcode(cleanedBody.addressPostcode)) {
       throw new Error('Invalid postcode.');
     }
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'phoneNumber')) {
+  if (Object.hasOwn(body, 'phoneNumber')) {
     cleanedBody.phoneNumber = body.phoneNumber.trim();
   }
 
-  if (Object.prototype.hasOwnProperty.call(body, 'emailAddress')) {
+  if (Object.hasOwn(body, 'emailAddress')) {
     cleanedBody.emailAddress = utils.recipients.validateAndFormatEmailAddress(body.emailAddress);
   }
+
+  /* eslint-enable no-use-extend-native/no-use-extend-native */
 
   return cleanedBody;
 };
@@ -168,6 +172,8 @@ const cleanReturnInput = (id, body) => ({
   // The id passed in is set as the registration id.
   RegistrationId: id,
   createdByLicensingOfficer: body.createdByLicensingOfficer,
+
+  /* eslint-disable unicorn/prefer-logical-operator-over-ternary */
 
   // Copy across the year the return is for and the number of larsen mate / pod traps in which meat baits were used.
   year: body.year ? body.year : undefined,
@@ -213,6 +219,8 @@ const cleanPatchReturnInput = (id, body) => ({
   numberLarsenMate: Number.isNaN(body.numberLarsenMate) ? undefined : body.numberLarsenMate,
   numberLarsenPod: Number.isNaN(body.numberLarsenPod) ? undefined : body.numberLarsenPod
 });
+
+/* eslint-enable unicorn/prefer-logical-operator-over-ternary */
 
 /**
  * Clean the incoming request body to make it more compatible with the
@@ -744,6 +752,20 @@ v2Router.post('/expired-licence-no-returns-reminder', async (request, response) 
     return response
       .status(200)
       .send({message: `Sent ${emailsSent} recently expired licence with meat baits but no returns reminder emails.`});
+  } catch (error) {
+    jsonConsoleLogger.error(unErrorJson(error));
+    return response.status(500).send({error});
+  }
+});
+
+/**
+ * Soft-delete registrations and notes older than 5 years for data retention.
+ */
+v2Router.post('/expired-registrations-cleanup', async (request, response) => {
+  try {
+    const result = await ScheduledController.softDeleteExpiredRegistrations();
+    jsonConsoleLogger.info(result);
+    return response.status(200).send({message: 'Expired registrations cleanup completed.', result});
   } catch (error) {
     jsonConsoleLogger.error(unErrorJson(error));
     return response.status(500).send({error});

@@ -1,16 +1,12 @@
+import * as process from 'node:process';
 import express from 'express';
-
 import jwt from 'jsonwebtoken';
-
 import utils from 'naturescot-utils';
 import NotifyClient from 'notifications-node-client';
-
 import config from './config/app.js';
 import jwk from './config/jwk.js';
-
 import Registration from './controllers/v1/registration.js';
 import Return from './controllers/v1/return.js';
-
 import db from './models/index.js';
 
 const {RequestUUID} = db;
@@ -360,8 +356,8 @@ const postcodesMatch = (postcode1, postcode2) => {
   const notAlphaNumber = /[^a-z\d]/gi;
 
   // Clean our two strings to the 'same' representation.
-  const cleanPostcode1 = postcode1.replace(notAlphaNumber, '').toLocaleLowerCase();
-  const cleanPostcode2 = postcode2.replace(notAlphaNumber, '').toLocaleLowerCase();
+  const cleanPostcode1 = postcode1.replaceAll(notAlphaNumber, '').toLocaleLowerCase();
+  const cleanPostcode2 = postcode2.replaceAll(notAlphaNumber, '').toLocaleLowerCase();
 
   // Check if they match, now that they're clean.
   return cleanPostcode1 === cleanPostcode2;
@@ -505,10 +501,14 @@ const cleanReturnInput = (id, body) => ({
   RegistrationId: id,
   createdByLicensingOfficer: body.createdByLicensingOfficer,
 
+  /* eslint-disable unicorn/prefer-logical-operator-over-ternary */
+
   // Copy across the year the return is for and the number of larsen mate / pod traps in which meat baits were used.
   year: body.year ? body.year : undefined,
   numberLarsenMate: body.numberLarsenMate ? body.numberLarsenMate : undefined,
   numberLarsenPod: body.numberLarsenPod ? body.numberLarsenPod : undefined,
+
+  /* eslint-enable unicorn/prefer-logical-operator-over-ternary */
 
   // We copy across the nonTargetSpeciesCaught, cleaning them as we go.
   nonTargetSpecies:

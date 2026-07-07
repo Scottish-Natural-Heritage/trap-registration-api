@@ -1,11 +1,8 @@
 // Use node-cron for scheduled tasks.
 import cron from 'node-cron';
-
 // Use to make HTTP calls.
 import axios from 'axios';
-
 import config from './config/app.js';
-
 // Let us log structured messages to the console.
 import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
 
@@ -14,12 +11,20 @@ import jsonConsoleLogger, {unErrorJson} from './json-console-logger.js';
  */
 const initScheduledJobs = () => {
   const scheduledJobFunction = cron.schedule('0 6 * * *', async () => {
+    // eslint-disable-next-line no-console
     console.log('Triggering cron job(s).');
 
     // Get the date.
     const currentDate = new Date();
 
     // Tasks here.
+
+    // Daily: soft-delete registrations and notes older than 5 years.
+    try {
+      await axios.post(`http://localhost:${config.port}${config.pathPrefix}/v2/expired-registrations-cleanup`);
+    } catch (error) {
+      jsonConsoleLogger.error(unErrorJson(error));
+    }
 
     if (currentDate.getDate() === 1) {
       const promises = [];
@@ -60,6 +65,7 @@ const initScheduledJobs = () => {
       }
     }
 
+    // eslint-disable-next-line no-console
     console.log('Ending cron job(s).');
   });
 

@@ -1,10 +1,11 @@
 'use strict';
 
+const process = require('node:process');
 const config = require('../../../src/config/database.js').ssDatabase;
 
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
-    up: async (queryInterface, Sequelize) => {
+    async up(queryInterface, Sequelize) {
       await queryInterface.sequelize.query('ALTER ROLE rotraps WITH PASSWORD :roTrapsPassword;', {
         type: Sequelize.QueryTypes.RAW,
         replacements: {
@@ -17,7 +18,7 @@ if (process.env.NODE_ENV === 'production') {
       });
     },
 
-    down: async (queryInterface, Sequelize) => {
+    async down(queryInterface, Sequelize) {
       await queryInterface.sequelize.query('grant traps to licensing;', {
         type: Sequelize.QueryTypes.RAW
       });
