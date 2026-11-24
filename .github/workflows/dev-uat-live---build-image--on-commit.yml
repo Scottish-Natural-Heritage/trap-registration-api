@@ -15,9 +15,6 @@ jobs:
   determine-environment:
     name: Determine Deployment Environment
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write   # required to request the OIDC JWT
-      contents: read    # required for actions/checkout
 
     steps:
       - name: Select environment
@@ -42,6 +39,9 @@ jobs:
     name: Build and Push the Image
     needs: determine-environment
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # required to request the OIDC JWT
+      contents: read    # required for actions/checkout
 
     env:
       ENVIRONMENT: ${{ needs.determine-environment.outputs.environment }}
